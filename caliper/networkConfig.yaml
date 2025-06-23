@@ -1,0 +1,486 @@
+---
+name: xAI-6G Fabric Network
+version: "1.0.0"
+client:
+  organization: Org1
+  credentialStore:
+    path: ./caliper-credentials
+    cryptoStore:
+      path: ./caliper-credentials
+channels:
+  generalchannelapp:
+    orderers:
+      - orderer1.example.com
+    peers:
+      peer0.org1.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org2.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org3.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org4.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org5.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org6.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org7.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org8.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org9.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org10.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+  iotchannelapp:
+    orderers:
+      - orderer1.example.com
+    peers:
+      peer0.org1.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org2.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org3.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org4.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org5.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org6.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org7.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org8.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org9.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org10.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+  securitychannelapp:
+    orderers:
+      - orderer1.example.com
+    peers:
+      peer0.org1.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org2.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org3.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org4.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org5.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org6.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org7.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org8.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org9.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org10.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+  monitoringchannelapp:
+    orderers:
+      - orderer1.example.com
+    peers:
+      peer0.org1.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org2.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org3.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org4.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org5.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org6.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org7.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org8.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org9.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org10.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+organizations:
+  Org1:
+    mspid: Org1MSP
+    peers:
+      - peer0.org1.example.com
+    certificateAuthorities:
+      - ca.org1.example.com
+    adminPrivateKey:
+      path: crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/priv_sk
+    signedCert:
+      path: crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem
+  Org2:
+    mspid: Org2MSP
+    peers:
+      - peer0.org2.example.com
+    certificateAuthorities:
+      - ca.org2.example.com
+    adminPrivateKey:
+      path: crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/keystore/priv_sk
+    signedCert:
+      path: crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/signcerts/Admin@org2.example.com-cert.pem
+  Org3:
+    mspid: Org3MSP
+    peers:
+      - peer0.org3.example.com
+    certificateAuthorities:
+      - ca.org3.example.com
+    adminPrivateKey:
+      path: crypto-config/peerOrganizations/org3.example.com/users/Admin@org3.example.com/msp/keystore/priv_sk
+    signedCert:
+      path: crypto-config/peerOrganizations/org3.example.com/users/Admin@org3.example.com/msp/signcerts/Admin@org3.example.com-cert.pem
+  Org4:
+    mspid: Org4MSP
+    peers:
+      - peer0.org4.example.com
+    certificateAuthorities:
+      - ca.org4.example.com
+    adminPrivateKey:
+      path: crypto-config/peerOrganizations/org4.example.com/users/Admin@org4.example.com/msp/keystore/priv_sk
+    signedCert:
+      path: crypto-config/peerOrganizations/org4.example.com/users/Admin@org4.example.com/msp/signcerts/Admin@org4.example.com-cert.pem
+  Org5:
+    mspid: Org5MSP
+    peers:
+      - peer0.org5.example.com
+    certificateAuthorities:
+      - ca.org5.example.com
+    adminPrivateKey:
+      path: crypto-config/peerOrganizations/org5.example.com/users/Admin@org5.example.com/msp/keystore/priv_sk
+    signedCert:
+      path: crypto-config/peerOrganizations/org5.example.com/users/Admin@org5.example.com/msp/signcerts/Admin@org5.example.com-cert.pem
+  Org6:
+    mspid: Org6MSP
+    peers:
+      - peer0.org6.example.com
+    certificateAuthorities:
+      - ca.org6.example.com
+    adminPrivateKey:
+      path: crypto-config/peerOrganizations/org6.example.com/users/Admin@org6.example.com/msp/keystore/priv_sk
+    signedCert:
+      path: crypto-config/peerOrganizations/org6.example.com/users/Admin@org6.example.com/msp/signcerts/Admin@org6.example.com-cert.pem
+  Org7:
+    mspid: Org7MSP
+    peers:
+      - peer0.org7.example.com
+    certificateAuthorities:
+      - ca.org7.example.com
+    adminPrivateKey:
+      path: crypto-config/peerOrganizations/org7.example.com/users/Admin@org7.example.com/msp/keystore/priv_sk
+    signedCert:
+      path: crypto-config/peerOrganizations/org7.example.com/users/Admin@org7.example.com/msp/signcerts/Admin@org7.example.com-cert.pem
+  Org8:
+    mspid: Org8MSP
+    peers:
+      - peer0.org8.example.com
+    certificateAuthorities:
+      - ca.org8.example.com
+    adminPrivateKey:
+      path: crypto-config/peerOrganizations/org8.example.com/users/Admin@org8.example.com/msp/keystore/priv_sk
+    signedCert:
+      path: crypto-config/peerOrganizations/org8.example.com/users/Admin@org8.example.com/msp/signcerts/Admin@org8.example.com-cert.pem
+  Org9:
+    mspid: Org9MSP
+    peers:
+      - peer0.org9.example.com
+    certificateAuthorities:
+      - ca.org9.example.com
+    adminPrivateKey:
+      path: crypto-config/peerOrganizations/org9.example.com/users/Admin@org9.example.com/msp/keystore/priv_sk
+    signedCert:
+      path: crypto-config/peerOrganizations/org9.example.com/users/Admin@org9.example.com/msp/signcerts/Admin@org9.example.com-cert.pem
+  Org10:
+    mspid: Org10MSP
+    peers:
+      - peer0.org10.example.com
+    certificateAuthorities:
+      - ca.org10.example.com
+    adminPrivateKey:
+      path: crypto-config/peerOrganizations/org10.example.com/users/Admin@org10.example.com/msp/keystore/priv_sk
+    signedCert:
+      path: crypto-config/peerOrganizations/org10.example.com/users/Admin@org10.example.com/msp/signcerts/Admin@org10.example.com-cert.pem
+orderers:
+  orderer1.example.com:
+    url: grpc://localhost:7050
+    grpcOptions:
+      ssl-target-name-override: orderer1.example.com
+    tlsCACerts:
+      path: crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/ca.crt
+peers:
+  peer0.org1.example.com:
+    url: grpc://localhost:7051
+    grpcOptions:
+      ssl-target-name-override: peer0.org1.example.com
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+  peer0.org2.example.com:
+    url: grpc://localhost:8051
+    grpcOptions:
+      ssl-target-name-override: peer0.org2.example.com
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+  peer0.org3.example.com:
+    url: grpc://localhost:9051
+    grpcOptions:
+      ssl-target-name-override: peer0.org3.example.com
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt
+  peer0.org4.example.com:
+    url: grpc://localhost:10051
+    grpcOptions:
+      ssl-target-name-override: peer0.org4.example.com
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt
+  peer0.org5.example.com:
+    url: grpc://localhost:11051
+    grpcOptions:
+      ssl-target-name-override: peer0.org5.example.com
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt
+  peer0.org6.example.com:
+    url: grpc://localhost:12051
+    grpcOptions:
+      ssl-target-name-override: peer0.org6.example.com
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt
+  peer0.org7.example.com:
+    url: grpc://localhost:13051
+    grpcOptions:
+      ssl-target-name-override: peer0.org7.example.com
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org7.example.com/peers/peer0.org7.example.com/tls/ca.crt
+  peer0.org8.example.com:
+    url: grpc://localhost:14051
+    grpcOptions:
+      ssl-target-name-override: peer0.org8.example.com
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org8.example.com/peers/peer0.org8.example.com/tls/ca.crt
+  peer0.org9.example.com:
+    url: grpc://localhost:15051
+    grpcOptions:
+      ssl-target-name-override: peer0.org9.example.com
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org9.example.com/peers/peer0.org9.example.com/tls/ca.crt
+  peer0.org10.example.com:
+    url: grpc://localhost:16051
+    grpcOptions:
+      ssl-target-name-override: peer0.org10.example.com
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org10.example.com/peers/peer0.org10.example.com/tls/ca.crt
+certificateAuthorities:
+  ca.org1.example.com:
+    url: http://localhost:7054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+  ca.org2.example.com:
+    url: http://localhost:8054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org2.example.com/ca/ca.org2.example.com-cert.pem
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+  ca.org3.example.com:
+    url: http://localhost:9054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org3.example.com/ca/ca.org3.example.com-cert.pem
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+  ca.org4.example.com:
+    url: http://localhost:10054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org4.example.com/ca/ca.org4.example.com-cert.pem
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+  ca.org5.example.com:
+    url: http://localhost:11054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org5.example.com/ca/ca.org5.example.com-cert.pem
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+  ca.org6.example.com:
+    url: http://localhost:12054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org6.example.com/ca/ca.org6.example.com-cert.pem
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+  ca.org7.example.com:
+    url: http://localhost:13054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org7.example.com/ca/ca.org7.example.com-cert.pem
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+  ca.org8.example.com:
+    url: http://localhost:14054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org8.example.com/ca/ca.org8.example.com-cert.pem
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+  ca.org9.example.com:
+    url: http://localhost:15054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org9.example.com/ca/ca.org9.example.com-cert.pem
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+  ca.org10.example.com:
+    url: http://localhost:16054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: crypto-config/peerOrganizations/org10.example.com/ca/ca.org10.example.com-cert.pem
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
