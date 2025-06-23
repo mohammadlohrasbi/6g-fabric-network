@@ -12,7 +12,7 @@ check_error() {
 command -v configtxgen >/dev/null 2>&1 || { echo "خطا: configtxgen نصب نشده است"; exit 1; }
 command -v cryptogen >/dev/null 2>&1 || { echo "خطا: cryptogen نصب نشده است"; exit 1; }
 command -v docker >/dev/null 2>&1 || { echo "خطا: docker نصب نشده است"; exit 1; }
-command -v docker-compose >/dev/null 2>&1 || { echo "خطا: docker-compose نصب نشده است"; exit 1; }
+#command -v docker-compose >/dev/null 2>&1 || { echo "خطا: docker-compose نصب نشده است"; exit 1; }
 
 echo "شروع راه‌اندازی شبکه 6G Fabric..."
 
