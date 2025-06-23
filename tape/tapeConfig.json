@@ -1,0 +1,114 @@
+---
+network:
+  orderer:
+    url: grpc://localhost:7050
+    tlsCACerts: ./crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/ca.crt
+    grpcOptions:
+      - name: ssl-target-name-override
+        value: orderer1.example.com
+  peers:
+    - name: peer0.org1.example.com
+      url: grpc://localhost:7051
+      tlsCACerts: ./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+      grpcOptions:
+        - name: ssl-target-name-override
+          value: peer0.org1.example.com
+    - name: peer0.org2.example.com
+      url: grpc://localhost:8051
+      tlsCACerts: ./crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+      grpcOptions:
+        - name: ssl-target-name-override
+          value: peer0.org2.example.com
+    - name: peer0.org3.example.com
+      url: grpc://localhost:9051
+      tlsCACerts: ./crypto-config/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt
+      grpcOptions:
+        - name: ssl-target-name-override
+          value: peer0.org3.example.com
+    - name: peer0.org4.example.com
+      url: grpc://localhost:10051
+      tlsCACerts: ./crypto-config/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt
+      grpcOptions:
+        - name: ssl-target-name-override
+          value: peer0.org4.example.com
+    - name: peer0.org5.example.com
+      url: grpc://localhost:11051
+      tlsCACerts: ./crypto-config/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls/ca.crt
+      grpcOptions:
+        - name: ssl-target-name-override
+          value: peer0.org5.example.com
+    - name: peer0.org6.example.com
+      url: grpc://localhost:12051
+      tlsCACerts: ./crypto-config/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls/ca.crt
+      grpcOptions:
+        - name: ssl-target-name-override
+          value: peer0.org6.example.com
+    - name: peer0.org7.example.com
+      url: grpc://localhost:13051
+      tlsCACerts: ./crypto-config/peerOrganizations/org7.example.com/peers/peer0.org7.example.com/tls/ca.crt
+      grpcOptions:
+        - name: ssl-target-name-override
+          value: peer0.org7.example.com
+    - name: peer0.org8.example.com
+      url: grpc://localhost:14051
+      tlsCACerts: ./crypto-config/peerOrganizations/org8.example.com/peers/peer0.org8.example.com/tls/ca.crt
+      grpcOptions:
+        - name: ssl-target-name-override
+          value: peer0.org8.example.com
+    - name: peer0.org9.example.com
+      url: grpc://localhost:15051
+      tlsCACerts: ./crypto-config/peerOrganizations/org9.example.com/peers/peer0.org9.example.com/tls/ca.crt
+      grpcOptions:
+        - name: ssl-target-name-override
+          value: peer0.org9.example.com
+    - name: peer0.org10.example.com
+      url: grpc://localhost:16051
+      tlsCACerts: ./crypto-config/peerOrganizations/org10.example.com/peers/peer0.org10.example.com/tls/ca.crt
+      grpcOptions:
+        - name: ssl-target-name-override
+          value: peer0.org10.example.com
+  channels:
+    - name: generalchannelapp
+      chaincodes:
+        - id: GeoAssign
+          version: v1
+          language: golang
+          path: chaincode/GeoAssign
+    - name: iotchannelapp
+      chaincodes:
+        - id: AuthIoT
+          version: v1
+          language: golang
+          path: chaincode/AuthIoT
+    - name: securitychannelapp
+      chaincodes:
+        - id: IntrusionDetect
+          version: v1
+          language: golang
+          path: chaincode/IntrusionDetect
+    - name: monitoringchannelapp
+      chaincodes:
+        - id: RealTimeMonitor
+          version: v1
+          language: golang
+          path: chaincode/RealTimeMonitor
+  mspid: Org1MSP
+  ca:
+    url: http://localhost:7054
+    name: ca-org1
+    tlsCACerts: ./crypto-config/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem
+chaincode:
+  id: GeoAssign
+  version: v1
+  language: golang
+  path: chaincode/GeoAssign
+tx:
+  function: AssignEntity
+  args:
+    - entity1
+    - ${Math.random() * 500}
+    - ${Math.random() * 500}
+rate: 100
+duration: 60
+clients: 2
+entityCount: ${process.env.ENTITY_COUNT || 1000}
