@@ -1,0 +1,499 @@
+---
+Organizations:
+  - &OrdererOrg
+    Name: OrdererOrg
+    ID: OrdererMSP
+    MSPDir: crypto-config/ordererOrganizations/example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.admin')"
+  - &Org1
+    Name: Org1MSP
+    ID: Org1MSP
+    MSPDir: crypto-config/peerOrganizations/org1.example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('Org1MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org1MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org1MSP.admin')"
+    AnchorPeers:
+      - Host: peer0.org1.example.com
+        Port: 7051
+  - &Org2
+    Name: Org2MSP
+    ID: Org2MSP
+    MSPDir: crypto-config/peerOrganizations/org2.example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('Org2MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org2MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org2MSP.admin')"
+    AnchorPeers:
+      - Host: peer0.org2.example.com
+        Port: 8051
+  - &Org3
+    Name: Org3MSP
+    ID: Org3MSP
+    MSPDir: crypto-config/peerOrganizations/org3.example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('Org3MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org3MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org3MSP.admin')"
+    AnchorPeers:
+      - Host: peer0.org3.example.com
+        Port: 9051
+  - &Org4
+    Name: Org4MSP
+    ID: Org4MSP
+    MSPDir: crypto-config/peerOrganizations/org4.example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('Org4MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org4MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org4MSP.admin')"
+    AnchorPeers:
+      - Host: peer0.org4.example.com
+        Port: 10051
+  - &Org5
+    Name: Org5MSP
+    ID: Org5MSP
+    MSPDir: crypto-config/peerOrganizations/org5.example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('Org5MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org5MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org5MSP.admin')"
+    AnchorPeers:
+      - Host: peer0.org5.example.com
+        Port: 11051
+  - &Org6
+    Name: Org6MSP
+    ID: Org6MSP
+    MSPDir: crypto-config/peerOrganizations/org6.example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('Org6MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org6MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org6MSP.admin')"
+    AnchorPeers:
+      - Host: peer0.org6.example.com
+        Port: 12051
+  - &Org7
+    Name: Org7MSP
+    ID: Org7MSP
+    MSPDir: crypto-config/peerOrganizations/org7.example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('Org7MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org7MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org7MSP.admin')"
+    AnchorPeers:
+      - Host: peer0.org7.example.com
+        Port: 13051
+  - &Org8
+    Name: Org8MSP
+    ID: Org8MSP
+    MSPDir: crypto-config/peerOrganizations/org8.example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('Org8MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org8MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org8MSP.admin')"
+    AnchorPeers:
+      - Host: peer0.org8.example.com
+        Port: 14051
+  - &Org9
+    Name: Org9MSP
+    ID: Org9MSP
+    MSPDir: crypto-config/peerOrganizations/org9.example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('Org9MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org9MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org9MSP.admin')"
+    AnchorPeers:
+      - Host: peer0.org9.example.com
+        Port: 15051
+  - &Org10
+    Name: Org10MSP
+    ID: Org10MSP
+    MSPDir: crypto-config/peerOrganizations/org10.example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('Org10MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org10MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org10MSP.admin')"
+    AnchorPeers:
+      - Host: peer0.org10.example.com
+        Port: 16051
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Application: &ApplicationCapabilities
+    V2_0: true
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+
+Orderer: &OrdererDefaults
+  OrdererType: etcdraft
+  Addresses:
+    - orderer1.example.com:7050
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: Signature
+      Rule: "OR('OrdererMSP.member', 'Org1MSP.member', 'Org2MSP.member', 'Org3MSP.member', 'Org4MSP.member', 'Org5MSP.member', 'Org6MSP.member', 'Org7MSP.member', 'Org8MSP.member', 'Org9MSP.member', 'Org10MSP.member')"
+    Writers:
+      Type: Signature
+      Rule: "OR('OrdererMSP.member', 'Org1MSP.member', 'Org2MSP.member', 'Org3MSP.member', 'Org4MSP.member', 'Org5MSP.member', 'Org6MSP.member', 'Org7MSP.member', 'Org8MSP.member', 'Org9MSP.member', 'Org10MSP.member')"
+    Admins:
+      Type: Signature
+      Rule: "OR('OrdererMSP.admin', 'Org1MSP.admin', 'Org2MSP.admin', 'Org3MSP.admin', 'Org4MSP.admin', 'Org5MSP.admin', 'Org6MSP.admin', 'Org7MSP.admin', 'Org8MSP.admin', 'Org9MSP.admin', 'Org10MSP.admin')"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+Profiles:
+  GeneralChannel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org1
+        - *Org2
+        - *Org3
+        - *Org4
+        - *Org5
+        - *Org6
+        - *Org7
+        - *Org8
+        - *Org9
+        - *Org10
+      Capabilities:
+        <<: *ApplicationCapabilities
+  IoTChannel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org1
+        - *Org2
+        - *Org3
+        - *Org4
+        - *Org5
+        - *Org6
+        - *Org7
+        - *Org8
+        - *Org9
+        - *Org10
+      Capabilities:
+        <<: *ApplicationCapabilities
+  SecurityChannel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org1
+        - *Org2
+        - *Org3
+        - *Org4
+        - *Org5
+        - *Org6
+        - *Org7
+        - *Org8
+        - *Org9
+        - *Org10
+      Capabilities:
+        <<: *ApplicationCapabilities
+  MonitoringChannel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org1
+        - *Org2
+        - *Org3
+        - *Org4
+        - *Org5
+        - *Org6
+        - *Org7
+        - *Org8
+        - *Org9
+        - *Org10
+      Capabilities:
+        <<: *ApplicationCapabilities
+  Org1Channel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org1
+      Capabilities:
+        <<: *ApplicationCapabilities
+  Org2Channel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org2
+      Capabilities:
+        <<: *ApplicationCapabilities
+  Org3Channel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org3
+      Capabilities:
+        <<: *ApplicationCapabilities
+  Org4Channel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org4
+      Capabilities:
+        <<: *ApplicationCapabilities
+  Org5Channel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org5
+      Capabilities:
+        <<: *ApplicationCapabilities
+  Org6Channel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org6
+      Capabilities:
+        <<: *ApplicationCapabilities
+  Org7Channel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org7
+      Capabilities:
+        <<: *ApplicationCapabilities
+  Org8Channel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org8
+      Capabilities:
+        <<: *ApplicationCapabilities
+  Org9Channel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org9
+      Capabilities:
+        <<: *ApplicationCapabilities
+  Org10Channel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Org10
+      Capabilities:
+        <<: *ApplicationCapabilities
