@@ -26,6 +26,11 @@ echo "تولید گواهی‌ها..."
 cryptogen generate --config=./crypto-config.yaml
 check_error "تولید گواهی‌ها"
 
+# تولید فایل‌های core.yaml
+echo "تولید فایل‌های core.yaml..."
+./generateCoreYamls.sh
+check_error "تولید فایل‌های core.yaml"
+
 # تولید پروفایل‌های اتصال
 echo "تولید پروفایل‌های اتصال..."
 ./generateConnectionProfiles.sh
@@ -40,6 +45,11 @@ check_error "تولید قراردادها"
 echo "تولید فایل‌های workload..."
 ./generateWorkloadFiles.sh
 check_error "تولید فایل‌های workload"
+
+# تولید فایل‌های tapeConfig.yaml
+echo "تولید فایل‌های tapeConfig.yaml..."
+./generateTapeConfigs.sh
+check_error "تولید فایل‌های tapeConfig.yaml"
 
 # تنظیم مسیر Fabric
 export FABRIC_CFG_PATH=$PWD
