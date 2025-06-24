@@ -1,358 +1,783 @@
-پروژه شبکه 6G Fabric با Hyperledger Fabric
-این پروژه یک شبکه بلاک‌چین مبتنی بر Hyperledger Fabric نسخه 2.5 را پیاده‌سازی می‌کند که برای شبیه‌سازی یک شبکه 6G طراحی شده است. سازمان‌ها به عنوان آنتن‌های اصلی (Org1 تا Org10)، دستگاه‌های IoT به عنوان آنتن‌های پشتیبانی، و کاربران به عنوان اعضای سازمان‌ها تعریف شده‌اند. تخصیص کاربران و دستگاه‌های IoT به نزدیک‌ترین آنتن بر اساس فاصله اقلیدسی انجام می‌شود. پروژه شامل ۷۰ قرارداد هوشمند، چندین کانال برای جداسازی تراکنش‌ها، و ابزارهای تست عملکرد (Caliper و Tape) با پشتیبانی از موقعیت‌های تصادفی است.
-ویژگی‌های کلیدی
+برای ارائه فایل `README.md` به‌صورت جداگانه جهت دانلود، محتوای آن را در قالب یک فایل متنی ارائه می‌دهم که می‌توانید آن را مستقیماً ذخیره کنید. این فایل همان نسخه جامع و به‌روزرسانی‌شده‌ای است که در پاسخ قبلی ارائه شد و شامل توضیحات دقیق درباره قراردادهای هوشمند، کانال‌ها، و دستورالعمل‌های اجرای پروژه 6G Fabric است. برای دانلود، می‌توانید محتوای زیر را در یک فایل متنی ذخیره کرده و یا از دستورات ارائه‌شده برای ذخیره مستقیم استفاده کنید.
 
-سازمان‌ها (آنتن‌ها): ۱۰ سازمان (Org1 تا Org10)، هر کدام با یک همتا (peer) و یک CA.
-کاربران و IoT‌ها: تخصیص به نزدیک‌ترین آنتن بر اساس مختصات جغرافیایی (x, y) با استفاده از فاصله اقلیدسی.
-کانال‌ها:
-GeneralChannel: برای همکاری بین تمام ۱۰ آنتن.
-IoTChannel: برای مدیریت تراکنش‌های دستگاه‌های IoT.
-SecurityChannel: برای تراکنش‌های امنیتی مانند تشخیص نفوذ و رمزنگاری کوانتومی.
-MonitoringChannel: برای نظارت بلادرنگ و گزارش‌گیری شبکه.
-Org1Channel تا Org10Channel: کانال‌های اختصاصی برای هر آنتن.
+---
+
+### ذخیره فایل `README.md`
+محتوای زیر را کپی کرده و در فایلی به نام `README.md` ذخیره کنید:
 
 
-قراردادهای هوشمند: ۷۰ قرارداد هوشمند برای مدیریت تخصیص، احراز هویت، نظارت، بهینه‌سازی، و امنیت شبکه.
-تست عملکرد:
-Caliper: تست بار با موقعیت‌های تصادفی و سناریوهای مختلف.
-Tape: تست تراکنش‌ها با پیکربندی‌های انعطاف‌پذیر.
+# پروژه 6G Fabric
 
+این پروژه یک شبکه بلاکچین مبتنی بر **Hyperledger Fabric 2.5** را پیاده‌سازی می‌کند که برای شبیه‌سازی تخصیص کاربران و دستگاه‌های IoT به آنتن‌ها در یک شبکه 6G طراحی شده است. این شبکه شامل **۱۰ سازمان**، **۱ ترتیب‌دهنده**، **۱۴ کانال**، و **۷۰ قرارداد هوشمند** است که عملیات مختلفی مانند تخصیص جغرافیایی، احراز هویت، مدیریت پهنای باند، و نظارت بر عملکرد را انجام می‌دهند. قراردادهای هوشمند از منطق تخصیص مبتنی بر **فاصله اقلیدسی** برای اتصال کاربران یا دستگاه‌های IoT به نزدیک‌ترین آنتن استفاده می‌کنند.
 
-موقعیت‌های تصادفی: مختصات تصادفی در محدوده 0 تا 500 برای کاربران و IoT‌ها.
+## نمای کلی پروژه
+شبکه 6G Fabric برای شبیه‌سازی یک محیط 6G طراحی شده است که در آن کاربران و دستگاه‌های IoT به آنتن‌های متعلق به سازمان‌های مختلف (مانند اپراتورهای مخابراتی) متصل می‌شوند. هر سازمان یک همتا (peer) و یک کانتینر CLI دارد. قراردادهای هوشمند عملیات مختلفی از جمله تخصیص منابع، احراز هویت، و نظارت بر شبکه را مدیریت می‌کنند. شبکه از ۱۴ کانال برای جداسازی عملیات استفاده می‌کند: ۴ کانال مشترک (برای برنامه‌های عمومی، IoT، امنیت، و نظارت) و ۱۰ کانال سازمانی (یکی برای هر سازمان).
 
-ساختار پروژه
+### مختصات آنتن‌ها
+هر سازمان یک آنتن با مختصات ثابت دارد که برای محاسبه فاصله اقلیدسی در قراردادهای هوشمند (مانند `GeoAssign`) استفاده می‌شود:
+- **Org1**: (100, 100)
+- **Org2**: (200, 100)
+- **Org3**: (300, 100)
+- **Org4**: (100, 200)
+- **Org5**: (200, 200)
+- **Org6**: (300, 200)
+- **Org7**: (100, 300)
+- **Org8**: (200, 300)
+- **Org9**: (300, 300)
+- **Org10**: (400, 300)
 
-channel-artifacts/: شامل آرتیفکت‌های کانال‌ها (مانند genesis.block و فایل‌های tx).
-crypto-config/: گواهی‌ها و کلیدهای رمزنگاری برای سازمان‌ها.
-chaincode/: کد منبع ۷۰ قرارداد هوشمند (به زبان Go).
-workload/: فایل‌های workload برای Caliper (به زبان JavaScript).
-caliper/: پیکربندی‌های Caliper (networkConfig.yaml و benchmarkConfig.yaml).
-tape/: پیکربندی Tape (tapeConfig.yaml).
-اسکریپت‌ها:
-setup_network.sh: تولید آرتیفاکت‌ها و راه‌اندازی اولیه.
-generateConnectionProfiles.sh: تولید پروفایل‌های اتصال.
-generateChaincodes.sh: تولید قراردادها.
-generateWorkloadFiles.sh: تولید فایل‌های workload برای.
-create_zip.sh: ایجاد فایل ZIP از پروژه.
+این مختصات برای تخصیص کاربران/IoT‌ها به نزدیک‌ترین آنتن استفاده می‌شوند. مختصات کاربران/IoT‌ها به‌صورت تصادفی در محدوده (0 تا 500) تولید می‌شوند.
 
+## ساختار پروژه
+پروژه شامل فایل‌ها و دایرکتوری‌های زیر است:
+- **`crypto-config.yaml`**: تعریف سازمان‌ها، همتاها، و گواهی‌ها با استفاده از ابزار `cryptogen`.
+- **`configtx.yaml`**: پیکربندی کانال‌ها، پروفایل‌ها، و ترتیب‌دهنده برای تولید آرتیفکت‌های کانال و بلاک جنسیس.
+- **`docker-compose.yaml`**: تعریف سرویس‌های شبکه شامل ۱ ترتیب‌دهنده، ۱۰ همتا، و ۱۰ کانتینر CLI (یکی برای هر سازمان).
+- **`core-org1.yaml` تا `core-org10.yaml`**: فایل‌های پیکربندی برای CLI هر سازمان.
+- **`setup_network.sh`**: اسکریپت راه‌اندازی شبکه و تولید آرتیفکت‌ها.
+- **`generateCoreYamls.sh`**: تولید فایل‌های `core.yaml` برای هر سازمان.
+- **`generateConnectionProfiles.sh`**: تولید پروفایل‌های اتصال JSON برای Caliper و Tape.
+- **`generateChaincodes.sh`**: تولید ۷۰ قرارداد هوشمند Go.
+- **`generateWorkloadFiles.sh`**: تولید فایل‌های workload برای تست‌های Caliper.
+- **`generateTapeConfigs.sh`**: تولید فایل‌های پیکربندی Tape برای تست قراردادها.
+- **`caliper/`**: شامل `benchmarkConfig.yaml` و `networkConfig.yaml` برای تست عملکرد با Caliper.
+- **`tape/`**: شامل فایل‌های `tape-*.yaml` برای تست قراردادها با Tape.
+- **`create_zip.sh`**: اسکریپت برای فشرده‌سازی پروژه.
+- **`chaincode/`**: دایرکتوری قراردادهای هوشمند (مانند `GeoAssign`, `GeoUpdate`, و غیره).
+- **`channel-artifacts/`**: آرتیفکت‌های کانال (مانند `genesis.block`, `generalchannel.tx`).
+- **`crypto-config/`**: گواهی‌ها و کلیدهای تولیدشده توسط `cryptogen`.
 
-فایل‌های پیکربندی:
-crypto-config.yaml: تعریف سازمان‌ها و CAها.
-configtx.yaml: تعریف کانال‌ها و سیاست‌ها.
-docker-compose.yaml: راه‌اندازی سرویس‌های شبکه.
+## کانال‌ها
+شبکه شامل **۱۴ کانال** است که به شرح زیر سازمان‌دهی شده‌اند:
+1. **کانال‌های مشترک**:
+   - **`generalchannelapp`**: برای عملیات عمومی مانند تخصیص جغرافیایی، احراز هویت کاربران، و مدیریت پهنای باند (شامل قراردادهایی مانند `GeoAssign`, `GeoUpdate`, `AuthUser`).
+   - **`iotchannelapp`**: برای عملیات مربوط به دستگاه‌های IoT (مانند `AuthIoT`, `ConnectIoT`, `IoTBandwidth`).
+   - **`securitychannelapp`**: برای عملیات امنیتی (مانند `IntrusionDetect`, `KeyManage`, `QuantumEncrypt`).
+   - **`monitoringchannelapp`**: برای نظارت بر عملکرد شبکه (مانند `TrafficMonitor`, `NetworkPerf`, `RealTimeMonitor`).
+2. **کانال‌های سازمانی**:
+   - **`org1channelapp` تا `org10channelapp`**: هر سازمان یک کانال اختصاصی برای عملیات داخلی خود دارد (مانند مدیریت کاربران و دستگاه‌های خاص سازمان).
 
+هر کانال از زیرمجموعه‌ای از ۷۰ قرارداد هوشمند پشتیبانی می‌کند که در فایل `generateTapeConfigs.sh` مشخص شده‌اند.
 
+## قراردادهای هوشمند
+پروژه شامل **۷۰ قرارداد هوشمند** است که در دایرکتوری `chaincode/` ذخیره شده‌اند. هر قرارداد شامل دو تابع اصلی است:
+- **`AssignEntity`**: تخصیص یک کاربر یا دستگاه IoT به نزدیک‌ترین آنتن بر اساس فاصله اقلیدسی.
+- **`QueryAssignment`**: بازیابی اطلاعات تخصیص برای یک موجودیت خاص.
 
-مختصات آنتن‌ها
-آنتن‌ها (سازمان‌ها) دارای مختصات ثابت زیر هستند:
+لیست قراردادها به شرح زیر است (دسته‌بندی‌شده بر اساس نوع عملیات):
+1. **تخصیص جغرافیایی**:
+   - `GeoAssign`: تخصیص اولیه کاربران/IoT‌ها به آنتن‌ها.
+   - `GeoUpdate`: به‌روزرسانی مختصات موجودیت‌ها.
+   - `GeoHandover`: انتقال کاربران/IoT‌ها بین آنتن‌ها.
+2. **احراز هویت و ثبت‌نام**:
+   - `AuthUser`, `AuthIoT`, `AuthAntenna`: احراز هویت کاربران، دستگاه‌های IoT، و آنتن‌ها.
+   - `RegisterUser`, `RegisterIoT`: ثبت‌نام کاربران و دستگاه‌های IoT.
+   - `RevokeUser`, `RevokeIoT`: ابطال دسترسی کاربران و دستگاه‌های IoT.
+3. **مدیریت منابع و پهنای باند**:
+   - `BandwidthAlloc`, `IoTBandwidth`, `SpectrumShare`: تخصیص و اشتراک پهنای باند.
+   - `ResourceRequest`, `ResourceAudit`: درخواست و ممیزی منابع.
+4. **نظارت و تحلیل**:
+   - `NetworkPerf`, `TrafficMonitor`, `LatencyTrack`, `EnergyMonitor`, `RealTimeMonitor`: نظارت بر عملکرد شبکه.
+   - `IoTAnalytics`, `UserAnalytics`, `DataAnalytics`: تحلیل داده‌های کاربران و IoT.
+5. **امنیت و حریم خصوصی**:
+   - `DataEncrypt`, `IoTEncrypt`, `QuantumEncrypt`: رمزنگاری داده‌ها.
+   - `IntrusionDetect`, `KeyManage`, `PrivacyPolicy`, `SecureChannel`: مدیریت امنیت و حریم خصوصی.
+6. **مدیریت شبکه و بهینه‌سازی**:
+   - `LoadBalance`, `DynamicAlloc`, `DynamicRouting`, `BandwidthShare`, `LatencyOptimize`: بهینه‌سازی منابع و مسیریابی.
+   - `EnergyOptimize`, `NetworkOptimize`: بهینه‌سازی مصرف انرژی و عملکرد شبکه.
+7. **تشخیص و مدیریت خطا**:
+   - `FaultDetect`, `IoTFault`, `FaultPredict`: تشخیص و پیش‌بینی خطاها.
+   - `NetworkHealth`, `IoTHealth`: نظارت بر سلامت شبکه و دستگاه‌ها.
+8. **پیکربندی و ممیزی**:
+   - `IoTConfig`, `UserConfig`, `AntennaConfig`: پیکربندی دستگاه‌ها و آنتن‌ها.
+   - `PerformanceAudit`, `SecurityAudit`, `ConnectionAudit`: ممیزی عملکرد و امنیت.
+9. **سایر عملیات**:
+   - `Roaming`, `SessionTrack`, `IoTSession`, `Disconnect`: مدیریت جابجایی و جلسات.
+   - `Billing`, `TransactionLog`, `AccessLog`: صورت‌حساب و ثبت تراکنش‌ها.
 
-Org1: (100, 100)
-Org2: (200, 100)
-Org3: (300, 100)
-Org4: (100, 200)
-Org5: (200, 200)
-Org6: (300, 200)
-Org7: (100, 300)
-Org8: (200, 300)
-Org9: (300, 300)
-Org10: (400, 300)
+هر قرارداد در یکی از کانال‌های مشترک یا سازمانی مستقر می‌شود. برای جزئیات، به فایل‌های `caliper/benchmarkConfig.yaml` و `tape/tape-*.yaml` مراجعه کنید.
 
-قراردادهای هوشمند
-هر قرارداد شامل دو تابع اصلی است:
+## پیش‌نیازها
+برای اجرای پروژه، ابزارهای زیر مورد نیاز است:
+- **Docker و Docker Compose** (نسخه 1.29 یا بالاتر)
+- **Hyperledger Fabric 2.5** (شامل ابزارهای `cryptogen` و `configtxgen`)
+- **Node.js و npm** (برای Caliper و Tape)
+- **Go** (برای قراردادهای هوشمند)
+- **Bash** (برای اجرای اسکریپت‌ها)
 
-AssignEntity(entityID, x, y): تخصیص کاربر یا دستگاه IoT به نزدیک‌ترین آنتن بر اساس مختصات.
-QueryAssignment(entityID): بازیابی اطلاعات تخصیص.
+## نصب پیش‌نیازها
+1. نصب Docker و Docker Compose:
+   ```bash
+   sudo apt-get update
+   sudo apt-get install -y docker.io docker-compose
+   sudo systemctl start docker
+   sudo systemctl enable docker
+   ```
 
-لیست قراردادها
+2. نصب ابزارهای Hyperledger Fabric:
+   ```bash
+   curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.5.0 1.5.2
+   export PATH=$HOME/fabric-samples/bin:$PATH
+   ```
 
-GeoAssign: تخصیص کاربر/IoT به نزدیک‌ترین آنتن.
-GeoUpdate: به‌روزرسانی مختصات کاربر/IoT.
-GeoHandover: انتقال کاربر/IoT بین آنتن‌ها.
-AuthUser: احراز هویت کاربران.
-AuthIoT: احراز هویت دستگاه‌های IoT.
-ConnectUser: اتصال کاربران به آنتن.
-ConnectIoT: اتصال IoT‌ها به آنتن.
-BandwidthAlloc: تخصیص پهنای باند.
-AuthAntenna: احراز هویت آنتن‌ها.
-RegisterUser: ثبت‌نام کاربران.
-RegisterIoT: ثبت‌نام IoT‌ها.
-RevokeUser: لغو دسترسی کاربران.
-RevokeIoT: لغو دسترسی IoT‌ها.
-RoleAssign: تخصیص نقش‌ها.
-AccessControl: کنترل دسترسی.
-AuditIdentity: حسابرسی هویت‌ها.
-IoTBandwidth: مدیریت پهنای باند IoT.
-AntennaLoad: نظارت بر بار آنتن‌ها.
-ResourceRequest: درخواست منابع.
-QoSManage: مدیریت کیفیت خدمات.
-SpectrumShare: اشتراک‌گذاری طیف.
-PriorityAssign: تخصیص اولویت.
-ResourceAudit: حسابرسی منابع.
-LoadBalance: تعادل بار.
-DynamicAlloc: تخصیص پویا.
-AntennaStatus: نظارت بر وضعیت آنتن‌ها.
-IoTStatus: نظارت بر وضعیت IoT‌ها.
-NetworkPerf: نظارت بر عملکرد شبکه.
-UserActivity: نظارت بر فعالیت کاربران.
-FaultDetect: تشخیص خطا در سیستم.
-IoTFault: تشخیص خطای IoT.
-TrafficMonitor: نظارت بر ترافیک شبکه.
-ReportGenerate: تولید گزارش‌های تحلیلی.
-LatencyTrack: ردیابی تأخیر شبکه.
-EnergyMonitor: نظارت بر مصرف انرژی.
-Roaming: مدیریت رومینگ کاربران/IoT.
-SessionTrack: ردیابی جلسات کاربران.
-IoTSession: ردیابی جلسات IoT.
-Disconnect: قطع اتصال کاربران/IoT.
-Billing: مدیریت صورت‌حساب.
-TransactionLog: ثبت لاگ تراکنش‌ها.
-ConnectionAudit: حسابرسی اتصالات.
-DataEncrypt: رمزنگاری داده‌ها.
-IoTEncrypt: رمزنگاری داده‌های IoT.
-AccessLog: ثبت لاگ دسترسی.
-IntrusionDetect: تشخیص نفوذ.
-KeyManage: مدیریت کلیدهای رمزنگاری.
-PrivacyPolicy: اجرای سیاست‌های حریم خصوصی.
-SecureChannel: ایجاد کانال امن.
-AuditSecurity: حسابرسی امنیتی.
-EnergyOptimize: بهینه‌سازی مصرف انرژی.
-NetworkOptimize: بهینه‌سازی عملکرد شبکه.
-IoTAnalytics: تحلیل داده‌های IoT.
-UserAnalytics: تحلیل داده‌های کاربران.
-SecurityMonitor: نظارت امنیتی بلادرنگ.
-QuantumEncrypt: رمزنگاری کوانتومی.
-MultiAntenna: مدیریت چندین آنتن.
-EdgeCompute: محاسبات لبه.
-IoTHealth: نظارت بر سلامت IoT.
-NetworkHealth: نظارت بر سلامت شبکه.
-DataIntegrity: تضمین یکپارچگی داده‌ها.
-PolicyEnforce: اجرای سیاست‌های شبکه.
-DynamicRouting: مسیریابی پویا.
-BandwidthShare: اشتراک‌گذاری پهنای باند.
-LatencyOptimize: بهینه‌سازی تأخیر.
-FaultPredict: پیش‌بینی خطا.
-IoTConfig: پیکربندی دستگاه‌های IoT.
-UserConfig: پیکربندی کاربران.
-AntennaConfig: پیکربندی آنتن‌ها.
-PerformanceAudit: حسابرسی عملکرد شبکه.
-SecurityAudit: حسابرسی امنیتی پیشرفته.
-DataAnalytics: تحلیل داده‌های کلان.
-RealTimeMonitor: نظارت بلادرنگ شبکه.
+3. نصب Node.js و npm:
+   ```bash
+   sudo apt-get install -y nodejs npm
+   ```
 
-پیش‌نیازها
+4. نصب Caliper و Tape:
+   ```bash
+   npm install -g @hyperledger/caliper-cli
+   npm install -g tape
+   ```
 
-Docker و Docker Compose (آخرین نسخه پایدار)
-Hyperledger Fabric 2.5 (شامل ابزارهای cryptogen، configtxgen، و CLI)
-Node.js (نسخه 14 یا بالاتر برای Caliper و Tape)
-Go (نسخه 1.17 یا بالاتر برای chaincodeها)
-Python (برای اسکریپت‌های کمکی، اختیاری)
-Git (برای کلون کردن پروژه)
+5. نصب Go:
+   ```bash
+   sudo apt-get install -y golang-go
+   export PATH=$PATH:/usr/lib/go/bin
+   ```
 
-نصب پیش‌نیازها
-
-نصب Docker و Docker Compose:sudo apt update
-sudo apt install docker.io docker-compose
-sudo systemctl start docker
-sudo systemctl enable docker
-
-
-نصب Hyperledger Fabric:curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.5.0 1.5.0
-export PATH=$PATH:$PWD/bin
-
-
-نصب Node.js:curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-sudo apt install -y nodejs
-
-
-نصب Go:wget https://golang.org/dl/go1.17.6.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.17.6.linux-amd64.tar.gz
-export PATH=$PATH:/usr/local/go/bin
-
-
-
-راه‌اندازی شبکه
-
-کلون کردن پروژه:git clone <repository-url>
+## راه‌اندازی پروژه
+### ۱. ایجاد ساختار دایرکتوری
+```bash
+mkdir -p 6g-fabric-project/{channel-artifacts,crypto-config,chaincode,workload,caliper,tape}
 cd 6g-fabric-project
+```
 
+### ۲. ذخیره فایل‌های پروژه
+فایل‌های زیر را در دایرکتوری پروژه ذخیره کنید:
+- `crypto-config.yaml`
+- `configtx.yaml`
+- `docker-compose.yaml`
+- `core-org1.yaml` تا `core-org10.yaml`
+- `setup_network.sh`
+- `generateCoreYamls.sh`
+- `generateConnectionProfiles.sh`
+- `generateChaincodes.sh`
+- `generateWorkloadFiles.sh`
+- `generateTapeConfigs.sh`
+- `caliper/benchmarkConfig.yaml`
+- `caliper/networkConfig.yaml`
+- `tape/tape-*.yaml`
+- `create_zip.sh`
+- `README.md`
 
-تولید آرتیفکت‌ها:chmod +x *.sh
+### ۳. تنظیم مجوزهای اسکریپت‌ها
+```bash
+chmod +x setup_network.sh generateCoreYamls.sh generateConnectionProfiles.sh generateChaincodes.sh generateWorkloadFiles.sh generateTapeConfigs.sh create_zip.sh
+```
+
+### ۴. اجرای اسکریپت راه‌اندازی
+```bash
 ./setup_network.sh
-
+```
 این اسکریپت:
-گواهی‌ها را با cryptogen تولید می‌کند.
-پروفایل‌های اتصال را با generateConnectionProfiles.sh ایجاد می‌کند.
-قراردادهای هوشمند را با generateChaincodes.sh تولید می‌کند.
-فایل‌های workload را با generateWorkloadFiles.sh ایجاد می‌کند.
-بلاک جنسیس و آرتیفکت‌های کانال‌ها را با configtxgen تولید می‌کند.
+- دایرکتوری‌های مورد نیاز را ایجاد می‌کند.
+- گواهی‌ها را با `cryptogen` تولید می‌کند.
+- فایل‌های `core.yaml` را برای هر سازمان تولید می‌کند.
+- پروفایل‌های اتصال، قراردادهای هوشمند، و فایل‌های workload و Tape را تولید می‌کند.
+- بلاک جنسیس و آرتیفکت‌های کانال را با `configtxgen` تولید می‌کند.
 
+### ۵. راه‌اندازی شبکه
+```bash
+docker-compose -f docker-compose.yaml up -d
+```
+این دستور ۲۱ کانتینر را راه‌اندازی می‌کند:
+- ۱ ترتیب‌دهنده: `orderer1.example.com`
+- ۱۰ همتا: `peer0.org1.example.com` تا `peer0.org10.example.com`
+- ۱۰ CLI: `cli-org1` تا `cli-org10`
 
-راه‌اندازی شبکه با Docker:docker-compose -f docker-compose.yaml up -d
+بررسی کنید که تمام کانتینرها فعال هستند:
+```bash
+docker ps -a
+```
 
-این دستور سرویس‌های زیر را راه‌اندازی می‌کند:
-۱ ترتیب‌دهنده (orderer1.example.com)
-۱۰ همتا (peer0.org1.example.com تا peer0.org10.example.com)
-۱۰ CA (ca.org1.example.com تا ca.org10.example.com)
-
-
-ایجاد کانال‌ها:از CLI Fabric برای ایجاد کانال‌ها استفاده کنید:docker exec -it cli bash
+### ۶. ایجاد کانال‌ها
+برای هر سازمان، به کانتینر CLI مربوطه وارد شوید و کانال‌ها را ایجاد کنید. به‌عنوان مثال، برای `Org1`:
+```bash
+docker exec -it cli-org1 bash
+```
+سپس کانال‌های مشترک را ایجاد کنید:
+```bash
 export CHANNEL_NAME=generalchannelapp
 peer channel create -o orderer1.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/generalchannel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+peer channel join -b ./channel-artifacts/generalchannel.block
+```
+این کار را برای `iotchannelapp`, `securitychannelapp`, و `monitoringchannelapp` تکرار کنید:
+```bash
+export CHANNEL_NAME=iotchannelapp
+peer channel create -o orderer1.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/iotchannel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+peer channel join -b ./channel-artifacts/iotchannel.block
 
-این کار را برای سایر کانال‌ها (iotchannelapp, securitychannelapp, monitoringchannelapp, و org1channelapp تا org10channelapp) تکرار کنید.
-نصب و تأیید قراردادهای هوشمند:برای نصب قرارداد مثلاً GeoAssign در GeneralChannel:peer lifecycle chaincode package geoassign.tar.gz --path /opt/gopath/src/github.com/chaincode/GeoAssign --lang golang --label geoassign_1
+export CHANNEL_NAME=securitychannelapp
+peer channel create -o orderer1.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/securitychannel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+peer channel join -b ./channel-artifacts/securitychannel.block
+
+export CHANNEL_NAME=monitoringchannelapp
+peer channel create -o orderer1.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/monitoringchannel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+peer channel join -b ./channel-artifacts/monitoringchannel.block
+```
+برای کانال سازمانی `org1channelapp`:
+```bash
+export CHANNEL_NAME=org1channelapp
+peer channel create -o orderer1.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/org1channel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+peer channel join -b ./channel-artifacts/org1channel.block
+```
+برای سازمان‌های دیگر (`Org2` تا `Org10`)، به کانتینرهای `cli-org2` تا `cli-org10` وارد شوید و دستورات بالا را با نام کانال مربوطه (`org2channelapp` تا `org10channelapp`) تکرار کنید.
+
+### ۷. نصب و فعال‌سازی قراردادهای هوشمند
+برای هر قرارداد و کانال، قرارداد را نصب و فعال کنید. به‌عنوان مثال، برای `GeoAssign` در `generalchannelapp`:
+```bash
+peer lifecycle chaincode package geoassign.tar.gz --path /opt/gopath/src/github.com/chaincode/GeoAssign --lang golang --label geoassign_1
 peer lifecycle chaincode install geoassign.tar.gz
 peer lifecycle chaincode approveformyorg -o orderer1.example.com:7050 --channelID generalchannelapp --name GeoAssign --version 1.0 --package-id geoassign_1 --sequence 1 --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 peer lifecycle chaincode commit -o orderer1.example.com:7050 --channelID generalchannelapp --name GeoAssign --version 1.0 --sequence 1 --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+```
+این مراحل را برای سایر قراردادها و کانال‌ها تکرار کنید. برای کانال‌های سازمانی، فقط سازمان مربوطه قرارداد را نصب و تأیید می‌کند.
 
-این مراحل را برای سایر قراردادها و کانال‌ها تکرار کنید.
+### ۸. تست عملکرد
+پروژه از دو ابزار برای تست عملکرد استفاده می‌کند: **Caliper** و **Tape**.
 
-تست با Caliper
-Caliper برای تست عملکرد شبکه با سناریوهای مختلف استفاده می‌شود. فایل caliper/benchmarkConfig.yaml شامل ۷۰ دور تست (یکی برای هر قرارداد) با ۱۰۰۰ تراکنش و نرخ ۱۰۰ تراکنش در ثانیه (tps) است.
-پیش‌نیازهای Caliper
+#### تست با Caliper
+Caliper برای تست تمام ۷۰ قرارداد در کانال‌های مربوطه استفاده می‌شود. فایل `caliper/benchmarkConfig.yaml` شامل تنظیمات برای هر قرارداد است.
+```bash
+ENTITY_COUNT=1000 npx caliper launch manager --caliper-benchconfig caliper/benchmarkConfig.yaml --caliper-networkconfig caliper/networkConfig.yaml
+```
+- `ENTITY_COUNT=1000`: تعداد موجودیت‌ها (کاربران/IoT) برای تست.
+- هر قرارداد ۱۰۰۰ تراکنش با نرخ ۱۰۰ TPS اجرا می‌کند.
+- نتایج در دایرکتوری `caliper/` ذخیره می‌شوند.
 
-نصب Caliper:npm install -g @hyperledger/caliper-cli@0.4.2
-npm install --save @hyperledger/fabric-sdk-node@2.2.0
+#### تست با Tape
+Tape برای تست فردی قراردادها در کانال‌های خاص استفاده می‌شود. فایل‌های `tape/tape-*.yaml` برای هر قرارداد و کانال تولید شده‌اند.
+به‌عنوان مثال، برای تست `GeoAssign` در `generalchannelapp`:
+```bash
+ENTITY_COUNT=1000 tape --config tape/tape-geoassign-generalchannelapp.yaml
+```
+برای تست سایر قراردادها، فایل `tapeConfig.yaml` مربوطه را مشخص کنید (مانند `tape/tape-authiot-iotchannelapp.yaml`).
 
+#### سناریوهای تست
+1. **تست کامل شبکه**:
+   - تمام قراردادها را در تمام کانال‌ها با Caliper تست کنید.
+   - از `benchmarkConfig.yaml` استفاده کنید که شامل تمام ۷۰ قرارداد است.
+2. **تست قراردادهای خاص**:
+   - برای تست یک قرارداد خاص (مانند `GeoAssign`)، فایل `tape/tape-geoassign-generalchannelapp.yaml` را با Tape اجرا کنید.
+3. **تست کانال‌های سازمانی**:
+   - برای تست قراردادها در کانال‌های سازمانی (مانند `org1channelapp`)، از `cli-org1` و فایل `tape/tape-geoassign-org1channelapp.yaml` استفاده کنید.
+4. **تست مقیاس‌پذیری**:
+   - تعداد موجودیت‌ها (`ENTITY_COUNT`) را به ۵۰۰۰ یا ۱۰۰۰۰ افزایش دهید و عملکرد را با Caliper بررسی کنید:
+     ```bash
+     ENTITY_COUNT=5000 npx caliper launch manager --caliper-benchconfig caliper/benchmarkConfig.yaml --caliper-networkconfig caliper/networkConfig.yaml
+     ```
 
-تنظیم متغیرهای محیطی:export FABRIC_SDK_LOGLEVEL=info
-
-
-
-حالت‌های تست Caliper
-
-تست پیش‌فرض (تمام قراردادها):ENTITY_COUNT=1000 npx caliper launch manager --caliper-benchconfig caliper/benchmarkConfig.yaml --caliper-networkconfig caliper/networkConfig.yaml
-
-
-توضیح: تست تمام ۷۰ قرارداد با ۱۰۰۰ موجودیت (کاربر/IoT) و مختصات تصادفی (0 تا 500).
-خروجی: گزارش HTML در دایرکتوری report با معیارهای تأخیر، توان عملیاتی، و مصرف منابع.
-
-
-تست با تعداد موجودیت‌های بیشتر:برای تست با ۱۰۰۰۰ موجودیت:ENTITY_COUNT=10000 npx caliper launch manager --caliper-benchconfig caliper/benchmarkConfig.yaml --caliper-networkconfig caliper/networkConfig.yaml
-
-
-توضیح: افزایش تعداد موجودیت‌ها برای شبیه‌سازی بار سنگین‌تر.
-
-
-تست با نرخ تراکنش بالاتر:فایل caliper/benchmarkConfig.yaml را ویرایش کنید و tps را به ۵۰۰ تغییر دهید:rateControl:
-  type: fixed-rate
-  opts:
-    tps: 500
-
-سپس تست را اجرا کنید:ENTITY_COUNT=1000 npx caliper launch manager --caliper-benchconfig caliper/benchmarkConfig.yaml --caliper-networkconfig caliper/networkConfig.yaml
-
-
-توضیح: تست عملکرد شبکه تحت بار تراکنشی بالا.
-
-
-تست یک قرارداد خاص:برای تست فقط قرارداد GeoAssign، بخش‌های دیگر را از benchmarkConfig.yaml حذف کنید و فقط دور زیر را نگه دارید:rounds:
-  - label: GeoAssign
-    txNumber: 1000
-    rateControl:
-      type: fixed-rate
-      opts:
-        tps: 100
-    workload:
-      module: workload/geoassign.js
-
-سپس تست را اجرا کنید:npx caliper launch manager --caliper-benchconfig caliper/benchmarkConfig.yaml --caliper-networkconfig caliper/networkConfig.yaml
-
-
-توضیح: مناسب برای دیباگ یا تحلیل یک قرارداد خاص.
-
-
-
-نکات Caliper
-
-ENTITY_COUNT: تعداد موجودیت‌ها (پیش‌فرض: ۱۰۰۰). برای تست‌های سنگین‌تر، آن را افزایش دهید.
-موقعیت‌های تصادفی: مختصات x و y بین 0 تا 500 تولید می‌شوند.
-گزارش‌ها: گزارش‌های HTML در دایرکتوری report ذخیره می‌شوند.
-تنظیمات پیشرفته: برای تغییر تعداد کلاینت‌ها، number را در clients در benchmarkConfig.yaml ویرایش کنید.
-
-تست با Tape
-Tape برای تست تراکنش‌ها با پیکربندی‌های انعطاف‌پذیر استفاده می‌شود. فایل tape/tapeConfig.yaml برای تست قرارداد GeoAssign در GeneralChannel با ۱۰۰۰ موجودیت پیکربندی شده است.
-پیش‌نیازهای Tape
-
-نصب Tape:npm install -g tape
-
-
-کپی فایل‌های گواهی به دایرکتوری Tape:mkdir -p tape/crypto
-cp -r crypto-config/* tape/crypto/
-
-
-
-حالت‌های تست Tape
-
-تست پیش‌فرض:ENTITY_COUNT=1000 tape --config tape/tapeConfig.yaml
-
-
-توضیح: تست قرارداد GeoAssign با ۱۰۰۰ موجودیت و مختصات تصادفی (0 تا 500).
-خروجی: گزارش متنی با معیارهای توان عملیاتی و تأخیر.
-
-
-تست با تعداد موجودیت‌های بیشتر:ENTITY_COUNT=10000 tape --config tape/tapeConfig.yaml
-
-
-توضیح: شبیه‌سازی بار سنگین‌تر با ۱۰۰۰۰ موجودیت.
-
-
-تست قرارداد دیگر:برای تست قرارداد IntrusionDetect در SecurityChannel، فایل tapeConfig.yaml را ویرایش کنید:chaincode:
-  id: IntrusionDetect
-  version: v1
-  language: golang
-  path: chaincode/IntrusionDetect
-channels:
-  - name: securitychannelapp
-    chaincodes:
-      - id: IntrusionDetect
-        version: v1
-        language: golang
-        path: chaincode/IntrusionDetect
-
-سپس تست را اجرا کنید:ENTITY_COUNT=1000 tape --config tape/tapeConfig.yaml
-
-
-توضیح: تست قرارداد امنیتی در کانال مربوطه.
-
-
-تست با نرخ تراکنش بالاتر:در tapeConfig.yaml، مقدار rate را به ۵۰۰ تغییر دهید:rate: 500
-
-سپس تست را اجرا کنید:ENTITY_COUNT=1000 tape --config tape/tapeConfig.yaml
-
-
-توضیح: تست عملکرد تحت بار تراکنشی بالا.
-
-
-
-نکات Tape
-
-ENTITY_COUNT: تعداد موجودیت‌ها (پیش‌فرض: ۱۰۰۰). برای تست‌های سنگین‌تر، آن را افزایش دهید.
-موقعیت‌های تصادفی: مختصات در فایل tapeConfig.yaml به‌صورت تصادفی تولید می‌شوند.
-خروجی: گزارش‌های متنی در کنسول نمایش داده می‌شوند.
-تنظیمات پیشرفته: برای تغییر تعداد کلاینت‌ها، clients را در tapeConfig.yaml ویرایش کنید.
-
-ایجاد فایل ZIP
-برای بسته‌بندی پروژه:
+### ۹. فشرده‌سازی پروژه
+برای ایجاد فایل زیپ پروژه:
+```bash
 ./create_zip.sh
+```
+این اسکریپت فایل‌های غیرضروری (مانند `.git`, `node_modules`, `channel-artifacts`, `crypto-config`) را حذف کرده و فایل `6g-fabric-project.zip` را تولید می‌کند.
 
-این اسکریپت تمام فایل‌ها را در 6g_fabric_project.zip بسته‌بندی می‌کند.
-نکات و توصیه‌ها
+## رفع اشکال
+### خطای `No such container: cli`
+- **علت**: کانتینرهای CLI در `docker-compose.yaml` تعریف نشده‌اند یا اجرا نشده‌اند.
+- **راه‌حل**:
+  - اطمینان حاصل کنید که `docker-compose.yaml` شامل سرویس‌های `cli-org1` تا `cli-org10` است.
+  - بررسی کنید که دستور `docker-compose -f docker-compose.yaml up -d` اجرا شده است.
+  - خروجی `docker ps -a` را بررسی کنید تا مطمئن شوید تمام کانتینرها فعال هستند.
 
-مقیاس‌پذیری: برای تست‌های مقیاس بزرگ، تعداد همتاها یا ترتیب‌دهنده‌ها را در docker-compose.yaml افزایش دهید.
-دیباگ: لاگ‌های Docker را با docker logs <container-name> بررسی کنید.
-بهینه‌سازی: برای بهبود عملکرد، سیاست‌های تأیید (endorsement policies) را در configtx.yaml تنظیم کنید.
-امنیت: گواهی‌ها و کلیدها را در محیط عملیاتی با احتیاط مدیریت کنید.
-سناریوهای پیشرفته:
-برای شبیه‌سازی شبکه‌های پیچیده‌تر، تعداد آنتن‌ها را در crypto-config.yaml افزایش دهید.
-قراردادهای جدید (مانند QuantumEncrypt) برای سناریوهای آینده‌نگرانه 6G طراحی شده‌اند.
+### خطای `Config File "core" Not Found`
+- **علت**: فایل‌های `core-org1.yaml` تا `core-org10.yaml` در دایرکتوری پروژه وجود ندارند یا به درستی مپ نشده‌اند.
+- **راه‌حل**:
+  - اسکریپت `generateCoreYamls.sh` را اجرا کنید:
+    ```bash
+    ./generateCoreYamls.sh
+    ```
+  - اطمینان حاصل کنید که فایل‌های `core-orgX.yaml` به مسیر `/opt/gopath/src/github.com/hyperledger/fabric/peer/config/core.yaml` در کانتینرهای CLI مپ شده‌اند.
+
+### خطای `etcdraft configuration missing`
+- **علت**: بخش `EtcdRaft` در `configtx.yaml` ناقص است.
+- **راه‌حل**:
+  - بررسی کنید که بخش `EtcdRaft` در `configtx.yaml` شامل تعریف `Consenters` و مسیرهای TLS باشد:
+    ```yaml
+    EtcdRaft:
+      Consenters:
+        - Host: orderer1.example.com
+          Port: 7050
+          ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
+          ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
+    ```
+
+### خطاهای عمومی
+- **کانتینرها اجرا نمی‌شوند**:
+  - لاگ‌ها را بررسی کنید:
+    ```bash
+    docker logs cli-org1
+    docker logs orderer1.example.com
+    docker logs peer0.org1.example.com
+    ```
+  - اطمینان حاصل کنید که پورت‌ها (7050, 7051, 8051, ..., 16051) آزاد هستند:
+    ```bash
+    netstat -tuln | grep 7050
+    ```
+- **خطای نصب قرارداد**:
+  - بررسی کنید که دایرکتوری `chaincode/` شامل فایل‌های Go قراردادها باشد.
+  - اسکریپت `generateChaincodes.sh` را دوباره اجرا کنید:
+    ```bash
+    ./generateChaincodes.sh
+    ```
+
+## پاکسازی محیط
+برای توقف و حذف شبکه:
+```bash
+docker-compose -f docker-compose.yaml down
+docker volume prune -f
+rm -rf channel-artifacts crypto-config
+```
+
+## بررسی نسخه‌ها
+اطمینان حاصل کنید که نسخه‌های درست نصب شده‌اند:
+```bash
+peer version
+configtxgen --version
+docker --version
+docker-compose --version
+node --version
+npm --version
+go version
+```
+
+## پشتیبانی
+برای مشکلات، اطلاعات زیر را بررسی یا ارائه دهید:
+1. خروجی `docker ps -a`.
+2. لاگ‌های کانتینرها (`docker logs cli-org1`, `docker logs orderer1.example.com`).
+3. خروجی دستورات `peer version` و `configtxgen --version`.
+4. هرگونه تغییر دستی در فایل‌ها یا اسکریپت‌ها.
+
+## نکات اضافی
+- **مقیاس‌پذیری**: برای تست مقیاس‌پذیری، تعداد همتاها یا سازمان‌ها را می‌توانید با ویرایش `crypto-config.yaml` و `docker-compose.yaml` افزایش دهید.
+- **شبیه‌سازی مختصات**: برای شبیه‌سازی واقعی‌تر، می‌توانید مختصات آنتن‌ها را در قراردادهای هوشمند تغییر دهید.
+- **اتوماسیون**: برای خودکارسازی نصب قراردادها در تمام سازمان‌ها و کانال‌ها، می‌توانید اسکریپت‌های اضافی بنویسید. در صورت نیاز، درخواست کنید.
+
+این پروژه یک زیرساخت قوی برای شبیه‌سازی شبکه 6G با استفاده از Hyperledger Fabric فراهم می‌کند و برای تست‌های عملکرد و توسعه بیشتر مناسب است.
 
 
+---
 
-محدودیت‌ها
+### نحوه ذخیره و دانلود فایل `README.md`
+برای ذخیره فایل به‌صورت جداگانه، یکی از روش‌های زیر را دنبال کنید:
 
-قراردادها در حال حاضر فقط تخصیص مبتنی بر فاصله و پرس‌وجو را پیاده‌سازی کرده‌اند. برای منطق پیچیده‌تر، کد chaincode را گسترش دهید.
-تست‌های Caliper و Tape برای محیط محلی بهینه شده‌اند. برای محیط‌های توزیع‌شده، پیکربندی شبکه را اصلاح کنید.
-مصرف منابع (CPU و RAM) در تست‌های سنگین ممکن است بالا باشد.
+1. **ذخیره دستی**:
+   - محتوای بالا را کپی کنید.
+   - در سیستم خود یک فایل جدید ایجاد کنید:
+     ```bash
+     nano README.md
+     ```
+   - محتوای کپی‌شده را جای‌گذاری کنید، سپس ذخیره کنید (Ctrl+O، Enter، Ctrl+X).
+   - فایل `README.md` را می‌توانید به سیستم دیگر منتقل کنید (مثلاً با `scp`):
+     ```bash
+     scp README.md user@your-local-machine:/path/to/destination
+     ```
 
-پشتیبانی
-برای سؤالات یا مشکلات، با تیم توسعه تماس بگیرید یا یک issue در مخزن پروژه باز کنید.
+2. **ذخیره با استفاده از دستورات لینوکس**:
+   اگر در محیط لینوکس یا مک هستید، می‌توانید محتوای فایل را مستقیماً ذخیره کنید:
+   ```bash
+   cat << 'EOF' > README.md
+   # پروژه 6G Fabric
+   این پروژه یک شبکه بلاکچین مبتنی بر **Hyperledger Fabric 2.5** را پیاده‌سازی می‌کند که برای شبیه‌سازی تخصیص کاربران و دستگاه‌های IoT به آنتن‌ها در یک شبکه 6G طراحی شده است. این شبکه شامل **۱۰ سازمان**، **۱ ترتیب‌دهنده**، **۱۴ کانال**، و **۷۰ قرارداد هوشمند** است که عملیات مختلفی مانند تخصیص جغرافیایی، احراز هویت، مدیریت پهنای باند، و نظارت بر عملکرد را انجام می‌دهند. قراردادهای هوشمند از منطق تخصیص مبتنی بر **فاصله اقلیدسی** برای اتصال کاربران یا دستگاه‌های IoT به نزدیک‌ترین آنتن استفاده می‌کنند.
+
+   ## نمای کلی پروژه
+   شبکه 6G Fabric برای شبیه‌سازی یک محیط 6G طراحی شده است که در آن کاربران و دستگاه‌های IoT به آنتن‌های متعلق به سازمان‌های مختلف (مانند اپراتورهای مخابراتی) متصل می‌شوند. هر سازمان یک همتا (peer) و یک کانتینر CLI دارد. قراردادهای هوشمند عملیات مختلفی از جمله تخصیص منابع، احراز هویت، و نظارت بر شبکه را مدیریت می‌کنند. شبکه از ۱۴ کانال برای جداسازی عملیات استفاده می‌کند: ۴ کانال مشترک (برای برنامه‌های عمومی، IoT، امنیت، و نظارت) و ۱۰ کانال سازمانی (یکی برای هر سازمان).
+
+   ### مختصات آنتن‌ها
+   هر سازمان یک آنتن با مختصات ثابت دارد که برای محاسبه فاصله اقلیدسی در قراردادهای هوشمند (مانند `GeoAssign`) استفاده می‌شود:
+   - **Org1**: (100, 100)
+   - **Org2**: (200, 100)
+   - **Org3**: (300, 100)
+   - **Org4**: (100, 200)
+   - **Org5**: (200, 200)
+   - **Org6**: (300, 200)
+   - **Org7**: (100, 300)
+   - **Org8**: (200, 300)
+   - **Org9**: (300, 300)
+   - **Org10**: (400, 300)
+
+   این مختصات برای تخصیص کاربران/IoT‌ها به نزدیک‌ترین آنتن استفاده می‌شوند. مختصات کاربران/IoT‌ها به‌صورت تصادفی در محدوده (0 تا 500) تولید می‌شوند.
+
+   ## ساختار پروژه
+   پروژه شامل فایل‌ها و دایرکتوری‌های زیر است:
+   - **`crypto-config.yaml`**: تعریف سازمان‌ها، همتاها، و گواهی‌ها با استفاده از ابزار `cryptogen`.
+   - **`configtx.yaml`**: پیکربندی کانال‌ها، پروفایل‌ها، و ترتیب‌دهنده برای تولید آرتیفکت‌های کانال و بلاک جنسیس.
+   - **`docker-compose.yaml`**: تعریف سرویس‌های شبکه شامل ۱ ترتیب‌دهنده، ۱۰ همتا، و ۱۰ کانتینر CLI (یکی برای هر سازمان).
+   - **`core-org1.yaml` تا `core-org10.yaml`**: فایل‌های پیکربندی برای CLI هر سازمان.
+   - **`setup_network.sh`**: اسکریپت راه‌اندازی شبکه و تولید آرتیفکت‌ها.
+   - **`generateCoreYamls.sh`**: تولید فایل‌های `core.yaml` برای هر سازمان.
+   - **`generateConnectionProfiles.sh`**: تولید پروفایل‌های اتصال JSON برای Caliper و Tape.
+   - **`generateChaincodes.sh`**: تولید ۷۰ قرارداد هوشمند Go.
+   - **`generateWorkloadFiles.sh`**: تولید فایل‌های workload برای تست‌های Caliper.
+   - **`generateTapeConfigs.sh`**: تولید فایل‌های پیکربندی Tape برای تست قراردادها.
+   - **`caliper/`**: شامل `benchmarkConfig.yaml` و `networkConfig.yaml` برای تست عملکرد با Caliper.
+   - **`tape/`**: شامل فایل‌های `tape-*.yaml` برای تست قراردادها با Tape.
+   - **`create_zip.sh`**: اسکریپت برای فشرده‌سازی پروژه.
+   - **`chaincode/`**: دایرکتوری قراردادهای هوشمند (مانند `GeoAssign`, `GeoUpdate`, و غیره).
+   - **`channel-artifacts/`**: آرتیفکت‌های کانال (مانند `genesis.block`, `generalchannel.tx`).
+   - **`crypto-config/`**: گواهی‌ها و کلیدهای تولیدشده توسط `cryptogen`.
+
+   ## کانال‌ها
+   شبکه شامل **۱۴ کانال** است که به شرح زیر سازمان‌دهی شده‌اند:
+   1. **کانال‌های مشترک**:
+      - **`generalchannelapp`**: برای عملیات عمومی مانند تخصیص جغرافیایی، احراز هویت کاربران، و مدیریت پهنای باند (شامل قراردادهایی مانند `GeoAssign`, `GeoUpdate`, `AuthUser`).
+      - **`iotchannelapp`**: برای عملیات مربوط به دستگاه‌های IoT (مانند `AuthIoT`, `ConnectIoT`, `IoTBandwidth`).
+      - **`securitychannelapp`**: برای عملیات امنیتی (مانند `IntrusionDetect`, `KeyManage`, `QuantumEncrypt`).
+      - **`monitoringchannelapp`**: برای نظارت بر عملکرد شبکه (مانند `TrafficMonitor`, `NetworkPerf`, `RealTimeMonitor`).
+   2. **کانال‌های سازمانی**:
+      - **`org1channelapp` تا `org10channelapp`**: هر سازمان یک کانال اختصاصی برای عملیات داخلی خود دارد (مانند مدیریت کاربران و دستگاه‌های خاص سازمان).
+
+   هر کانال از زیرمجموعه‌ای از ۷۰ قرارداد هوشمند پشتیبانی می‌کند که در فایل `generateTapeConfigs.sh` مشخص شده‌اند.
+
+   ## قراردادهای هوشمند
+   پروژه شامل **۷۰ قرارداد هوشمند** است که در دایرکتوری `chaincode/` ذخیره شده‌اند. هر قرارداد شامل دو تابع اصلی است:
+   - **`AssignEntity`**: تخصیص یک کاربر یا دستگاه IoT به نزدیک‌ترین آنتن بر اساس فاصله اقلیدسی.
+   - **`QueryAssignment`**: بازیابی اطلاعات تخصیص برای یک موجودیت خاص.
+
+   لیست قراردادها به شرح زیر است (دسته‌بندی‌شده بر اساس نوع عملیات):
+   1. **تخصیص جغرافیایی**:
+      - `GeoAssign`: تخصیص اولیه کاربران/IoT‌ها به آنتن‌ها.
+      - `GeoUpdate`: به‌روزرسانی مختصات موجودیت‌ها.
+      - `GeoHandover`: انتقال کاربران/IoT‌ها بین آنتن‌ها.
+   2. **احراز هویت و ثبت‌نام**:
+      - `AuthUser`, `AuthIoT`, `AuthAntenna`: احراز هویت کاربران، دستگاه‌های IoT، و آنتن‌ها.
+      - `RegisterUser`, `RegisterIoT`: ثبت‌نام کاربران و دستگاه‌های IoT.
+      - `RevokeUser`, `RevokeIoT`: ابطال دسترسی کاربران و دستگاه‌های IoT.
+   3. **مدیریت منابع و پهنای باند**:
+      - `BandwidthAlloc`, `IoTBandwidth`, `SpectrumShare`: تخصیص و اشتراک پهنای باند.
+      - `ResourceRequest`, `ResourceAudit`: درخواست و ممیزی منابع.
+   4. **نظارت و تحلیل**:
+      - `NetworkPerf`, `TrafficMonitor`, `LatencyTrack`, `EnergyMonitor`, `RealTimeMonitor`: نظارت بر عملکرد شبکه.
+      - `IoTAnalytics`, `UserAnalytics`, `DataAnalytics`: تحلیل داده‌های کاربران و IoT.
+   5. **امنیت و حریم خصوصی**:
+      - `DataEncrypt`, `IoTEncrypt`, `QuantumEncrypt`: رمزنگاری داده‌ها.
+      - `IntrusionDetect`, `KeyManage`, `PrivacyPolicy`, `SecureChannel`: مدیریت امنیت و حریم خصوصی.
+   6. **مدیریت شبکه و بهینه‌سازی**:
+      - `LoadBalance`, `DynamicAlloc`, `DynamicRouting`, `BandwidthShare`, `LatencyOptimize`: بهینه‌سازی منابع و مسیریابی.
+      - `EnergyOptimize`, `NetworkOptimize`: بهینه‌سازی مصرف انرژی و عملکرد شبکه.
+   7. **تشخیص و مدیریت خطا**:
+      - `FaultDetect`, `IoTFault`, `FaultPredict`: تشخیص و پیش‌بینی خطاها.
+      - `NetworkHealth`, `IoTHealth`: نظارت بر سلامت شبکه و دستگاه‌ها.
+   8. **پیکربندی و ممیزی**:
+      - `IoTConfig`, `UserConfig`, `AntennaConfig`: پیکربندی دستگاه‌ها و آنتن‌ها.
+      - `PerformanceAudit`, `SecurityAudit`, `ConnectionAudit`: ممیزی عملکرد و امنیت.
+   9. **سایر عملیات**:
+      - `Roaming`, `SessionTrack`, `IoTSession`, `Disconnect`: مدیریت جابجایی و جلسات.
+      - `Billing`, `TransactionLog`, `AccessLog`: صورت‌حساب و ثبت تراکنش‌ها.
+
+   هر قرارداد در یکی از کانال‌های مشترک یا سازمانی مستقر می‌شود. برای جزئیات، به فایل‌های `caliper/benchmarkConfig.yaml` و `tape/tape-*.yaml` مراجعه کنید.
+
+   ## پیش‌نیازها
+   برای اجرای پروژه، ابزارهای زیر مورد نیاز است:
+   - **Docker و Docker Compose** (نسخه 1.29 یا بالاتر)
+   - **Hyperledger Fabric 2.5** (شامل ابزارهای `cryptogen` و `configtxgen`)
+   - **Node.js و npm** (برای Caliper و Tape)
+   - **Go** (برای قراردادهای هوشمند)
+   - **Bash** (برای اجرای اسکریپت‌ها)
+
+   ## نصب پیش‌نیازها
+   1. نصب Docker و Docker Compose:
+      ```bash
+      sudo apt-get update
+      sudo apt-get install -y docker.io docker-compose
+      sudo systemctl start docker
+      sudo systemctl enable docker
+      ```
+
+   2. نصب ابزارهای Hyperledger Fabric:
+      ```bash
+      curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.5.0 1.5.2
+      export PATH=$HOME/fabric-samples/bin:$PATH
+      ```
+
+   3. نصب Node.js و npm:
+      ```bash
+      sudo apt-get install -y nodejs npm
+      ```
+
+   4. نصب Caliper و Tape:
+      ```bash
+      npm install -g @hyperledger/caliper-cli
+      npm install -g tape
+      ```
+
+   5. نصب Go:
+      ```bash
+      sudo apt-get install -y golang-go
+      export PATH=$PATH:/usr/lib/go/bin
+      ```
+
+   ## راه‌اندازی پروژه
+   ### ۱. ایجاد ساختار دایرکتوری
+   ```bash
+   mkdir -p 6g-fabric-project/{channel-artifacts,crypto-config,chaincode,workload,caliper,tape}
+   cd 6g-fabric-project
+   ```
+
+   ### ۲. ذخیره فایل‌های پروژه
+   فایل‌های زیر را در دایرکتوری پروژه ذخیره کنید:
+   - `crypto-config.yaml`
+   - `configtx.yaml`
+   - `docker-compose.yaml`
+   - `core-org1.yaml` تا `core-org10.yaml`
+   - `setup_network.sh`
+   - `generateCoreYamls.sh`
+   - `generateConnectionProfiles.sh`
+   - `generateChaincodes.sh`
+   - `generateWorkloadFiles.sh`
+   - `generateTapeConfigs.sh`
+   - `caliper/benchmarkConfig.yaml`
+   - `caliper/networkConfig.yaml`
+   - `tape/tape-*.yaml`
+   - `create_zip.sh`
+   - `README.md`
+
+   ### ۳. تنظیم مجوزهای اسکریپت‌ها
+   ```bash
+   chmod +x setup_network.sh generateCoreYamls.sh generateConnectionProfiles.sh generateChaincodes.sh generateWorkloadFiles.sh generateTapeConfigs.sh create_zip.sh
+   ```
+
+   ### ۴. اجرای اسکریپت راه‌اندازی
+   ```bash
+   ./setup_network.sh
+   ```
+   این اسکریپت:
+   - دایرکتوری‌های مورد نیاز را ایجاد می‌کند.
+   - گواهی‌ها را با `cryptogen` تولید می‌کند.
+   - فایل‌های `core.yaml` را برای هر سازمان تولید می‌کند.
+   - پروفایل‌های اتصال، قراردادهای هوشمند، و فایل‌های workload و Tape را تولید می‌کند.
+   - بلاک جنسیس و آرتیفکت‌های کانال را با `configtxgen` تولید می‌کند.
+
+   ### ۵. راه‌اندازی شبکه
+   ```bash
+   docker-compose -f docker-compose.yaml up -d
+   ```
+   این دستور ۲۱ کانتینر را راه‌اندازی می‌کند:
+   - ۱ ترتیب‌دهنده: `orderer1.example.com`
+   - ۱۰ همتا: `peer0.org1.example.com` تا `peer0.org10.example.com`
+   - ۱۰ CLI: `cli-org1` تا `cli-org10`
+
+   بررسی کنید که تمام کانتینرها فعال هستند:
+   ```bash
+   docker ps -a
+   ```
+
+   ### ۶. ایجاد کانال‌ها
+   برای هر سازمان، به کانتینر CLI مربوطه وارد شوید و کانال‌ها را ایجاد کنید. به‌عنوان مثال، برای `Org1`:
+   ```bash
+   docker exec -it cli-org1 bash
+   ```
+   سپس کانال‌های مشترک را ایجاد کنید:
+   ```bash
+   export CHANNEL_NAME=generalchannelapp
+   peer channel create -o orderer1.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/generalchannel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+   peer channel join -b ./channel-artifacts/generalchannel.block
+   ```
+   این کار را برای `iotchannelapp`, `securitychannelapp`, و `monitoringchannelapp` تکرار کنید:
+   ```bash
+   export CHANNEL_NAME=iotchannelapp
+   peer channel create -o orderer1.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/iotchannel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+   peer channel join -b ./channel-artifacts/iotchannel.block
+
+   export CHANNEL_NAME=securitychannelapp
+   peer channel create -o orderer1.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/securitychannel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+   peer channel join -b ./channel-artifacts/securitychannel.block
+
+   export CHANNEL_NAME=monitoringchannelapp
+   peer channel create -o orderer1.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/monitoringchannel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+   peer channel join -b ./channel-artifacts/monitoringchannel.block
+   ```
+   برای کانال سازمانی `org1channelapp`:
+   ```bash
+   export CHANNEL_NAME=org1channelapp
+   peer channel create -o orderer1.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/org1channel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+   peer channel join -b ./channel-artifacts/org1channel.block
+   ```
+   برای سازمان‌های دیگر (`Org2` تا `Org10`)، به کانتینرهای `cli-org2` تا `cli-org10` وارد شوید و دستورات بالا را با نام کانال مربوطه (`org2channelapp` تا `org10channelapp`) تکرار کنید.
+
+   ### ۷. نصب و فعال‌سازی قراردادهای هوشمند
+   برای هر قرارداد و کانال، قرارداد را نصب و فعال کنید. به‌عنوان مثال، برای `GeoAssign` در `generalchannelapp`:
+   ```bash
+   peer lifecycle chaincode package geoassign.tar.gz --path /opt/gopath/src/github.com/chaincode/GeoAssign --lang golang --label geoassign_1
+   peer lifecycle chaincode install geoassign.tar.gz
+   peer lifecycle chaincode approveformyorg -o orderer1.example.com:7050 --channelID generalchannelapp --name GeoAssign --version 1.0 --package-id geoassign_1 --sequence 1 --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+   peer lifecycle chaincode commit -o orderer1.example.com:7050 --channelID generalchannelapp --name GeoAssign --version 1.0 --sequence 1 --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer1.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+   ```
+   این مراحل را برای سایر قراردادها و کانال‌ها تکرار کنید. برای کانال‌های سازمانی، فقط سازمان مربوطه قرارداد را نصب و تأیید می‌کند.
+
+   ### ۸. تست عملکرد
+   پروژه از دو ابزار برای تست عملکرد استفاده می‌کند: **Caliper** و **Tape**.
+
+   #### تست با Caliper
+   Caliper برای تست تمام ۷۰ قرارداد در کانال‌های مربوطه استفاده می‌شود. فایل `caliper/benchmarkConfig.yaml` شامل تنظیمات برای هر قرارداد است.
+   ```bash
+   ENTITY_COUNT=1000 npx caliper launch manager --caliper-benchconfig caliper/benchmarkConfig.yaml --caliper-networkconfig caliper/networkConfig.yaml
+   ```
+   - `ENTITY_COUNT=1000`: تعداد موجودیت‌ها (کاربران/IoT) برای تست.
+   - هر قرارداد ۱۰۰۰ تراکنش با نرخ ۱۰۰ TPS اجرا می‌کند.
+   - نتایج در دایرکتوری `caliper/` ذخیره می‌شوند.
+
+   #### تست با Tape
+   Tape برای تست فردی قراردادها در کانال‌های خاص استفاده می‌شود. فایل‌های `tape/tape-*.yaml` برای هر قرارداد و کانال تولید شده‌اند.
+   به‌عنوان مثال، برای تست `GeoAssign` در `generalchannelapp`:
+   ```bash
+   ENTITY_COUNT=1000 tape --config tape/tape-geoassign-generalchannelapp.yaml
+   ```
+   برای تست سایر قراردادها، فایل `tapeConfig.yaml` مربوطه را مشخص کنید (مانند `tape/tape-authiot-iotchannelapp.yaml`).
+
+   #### سناریوهای تست
+   1. **تست کامل شبکه**:
+      - تمام قراردادها را در تمام کانال‌ها با Caliper تست کنید.
+      - از `benchmarkConfig.yaml` استفاده کنید که شامل تمام ۷۰ قرارداد است.
+   2. **تست قراردادهای خاص**:
+      - برای تست یک قرارداد خاص (مانند `GeoAssign`)، فایل `tape/tape-geoassign-generalchannelapp.yaml` را با Tape اجرا کنید.
+   3. **تست کانال‌های سازمانی**:
+      - برای تست قراردادها در کانال‌های سازمانی (مانند `org1channelapp`)، از `cli-org1` و فایل `tape/tape-geoassign-org1channelapp.yaml` استفاده کنید.
+   4. **تست مقیاس‌پذیری**:
+      - تعداد موجودیت‌ها (`ENTITY_COUNT`) را به ۵۰۰۰ یا ۱۰۰۰۰ افزایش دهید و عملکرد را با Caliper بررسی کنید:
+        ```bash
+        ENTITY_COUNT=5000 npx caliper launch manager --caliper-benchconfig caliper/benchmarkConfig.yaml --caliper-networkconfig caliper/networkConfig.yaml
+        ```
+
+   ### ۹. فشرده‌سازی پروژه
+   برای ایجاد فایل زیپ پروژه:
+   ```bash
+   ./create_zip.sh
+   ```
+   این اسکریپت فایل‌های غیرضروری (مانند `.git`, `node_modules`, `channel-artifacts`, `crypto-config`) را حذف کرده و فایل `6g-fabric-project.zip` را تولید می‌کند.
+
+   ## رفع اشکال
+   ### خطای `No such container: cli`
+   - **علت**: کانتینرهای CLI در `docker-compose.yaml` تعریف نشده‌اند یا اجرا نشده‌اند.
+   - **راه‌حل**:
+     - اطمینان حاصل کنید که `docker-compose.yaml` شامل سرویس‌های `cli-org1` تا `cli-org10` است.
+     - بررسی کنید که دستور `docker-compose -f docker-compose.yaml up -d` اجرا شده است.
+     - خروجی `docker ps -a` را بررسی کنید تا مطمئن شوید تمام کانتینرها فعال هستند.
+
+   ### خطای `Config File "core" Not Found`
+   - **علت**: فایل‌های `core-org1.yaml` تا `core-org10.yaml` در دایرکتوری پروژه وجود ندارند یا به درستی مپ نشده‌اند.
+   - **راه‌حل**:
+     - اسکریپت `generateCoreYamls.sh` را اجرا کنید:
+       ```bash
+       ./generateCoreYamls.sh
+       ```
+     - اطمینان حاصل کنید که فایل‌های `core-orgX.yaml` به مسیر `/opt/gopath/src/github.com/hyperledger/fabric/peer/config/core.yaml` در کانتینرهای CLI مپ شده‌اند.
+
+   ### خطای `etcdraft configuration missing`
+   - **علت**: بخش `EtcdRaft` در `configtx.yaml` ناقص است.
+   - **راه‌حل**:
+     - بررسی کنید که بخش `EtcdRaft` در `configtx.yaml` شامل تعریف `Consenters` و مسیرهای TLS باشد:
+       ```yaml
+       EtcdRaft:
+         Consenters:
+           - Host: orderer1.example.com
+             Port: 7050
+             ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
+             ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
+       ```
+
+   ### خطاهای عمومی
+   - **کانتینرها اجرا نمی‌شوند**:
+     - لاگ‌ها را بررسی کنید:
+       ```bash
+       docker logs cli-org1
+       docker logs orderer1.example.com
+       docker logs peer0.org1.example.com
+       ```
+     - اطمینان حاصل کنید که پورت‌ها (7050, 7051, 8051, ..., 16051) آزاد هستند:
+       ```bash
+       netstat -tuln | grep 7050
+       ```
+   - **خطای نصب قرارداد**:
+     - بررسی کنید که دایرکتوری `chaincode/` شامل فایل‌های Go قراردادها باشد.
+     - اسکریپت `generateChaincodes.sh` را دوباره اجرا کنید:
+       ```bash
+       ./generateChaincodes.sh
+       ```
+
+   ## پاکسازی محیط
+   برای توقف و حذف شبکه:
+   ```bash
+   docker-compose -f docker-compose.yaml down
+   docker volume prune -f
+   rm -rf channel-artifacts crypto-config
+   ```
+
+   ## بررسی نسخه‌ها
+   اطمینان حاصل کنید که نسخه‌های درست نصب شده‌اند:
+   ```bash
+   peer version
+   configtxgen --version
+   docker --version
+   docker-compose --version
+   node --version
+   npm --version
+   go version
+   ```
+
+   ## پشتیبانی
+   برای مشکلات، اطلاعات زیر را بررسی یا ارائه دهید:
+   1. خروجی `docker ps -a`.
+   2. لاگ‌های کانتینرها (`docker logs cli-org1`, `docker logs orderer1.example.com`).
+   3. خروجی دستورات `peer version` و `configtxgen --version`.
+   4. هرگونه تغییر دستی در فایل‌ها یا اسکریپت‌ها.
+
+   ## نکات اضافی
+   - **مقیاس‌پذیری**: برای تست مقیاس‌پذیری، تعداد همتاها یا سازمان‌ها را می‌توانید با ویرایش `crypto-config.yaml` و `docker-compose.yaml` افزایش دهید.
+   - **شبیه‌سازی مختصات**: برای شبیه‌سازی واقعی‌تر، می‌توانید مختصات آنتن‌ها را در قراردادهای هوشمند تغییر دهید.
+   - **اتوماسیون**: برای خودکارسازی نصب قراردادها در تمام سازمان‌ها و کانال‌ها، می‌توانید اسکریپت‌های اضافی بنویسید. در صورت نیاز، درخواست کنید.
+
+   این پروژه یک زیرساخت قوی برای شبیه‌سازی شبکه 6G با استفاده از Hyperledger Fabric فراهم می‌کند و برای تست‌های عملکرد و توسعه بیشتر مناسب است.
+   EOF
+   ```
+
+3. **دانلود فایل در محیط‌های مختلف**:
+   - **لینوکس/مک**:
+     پس از ذخیره فایل، می‌توانید آن را به سیستم محلی خود منتقل کنید:
+     ```bash
+     scp README.md user@your-local-machine:/path/to/destination
+     ```
+   - **ویندوز (با WSL یا Git Bash)**:
+     فایل را ذخیره کرده و از ابزارهایی مانند WinSCP برای انتقال استفاده کنید.
+   - **محیط‌های وب (مانند Jupyter Notebook)**:
+     اگر در محیط وب هستید، فایل `README.md` را ذخیره کرده و از رابط کاربری برای دانلود استفاده کنید (مثلاً گزینه "Download" در Jupyter).
+   - **سرور ابری**:
+     اگر روی سرور ابری کار می‌کنید، فایل را به یک مکان قابل دسترسی (مانند Google Drive یا سرور FTP) آپلود کنید:
+     ```bash
+     curl -T README.md ftp://your-ftp-server.com/path/to/destination --user username:password
+     ```
+
+---
+
+### نکات اضافی
+- **تأیید فایل**: پس از ذخیره، محتوای فایل را بررسی کنید:
+  ```bash
+  cat README.md
+  ```
+  اطمینان حاصل کنید که ساختار و محتوا درست است.
+
+- **رفع اشکال**: اگر در ذخیره یا انتقال فایل مشکلی داشتید، موارد زیر را بررسی کنید:
+  - خروجی `ls -l` برای تأیید وجود فایل `README.md`.
+  - مجوزهای فایل:
+    ```bash
+    ls -l README.md
+    chmod 644 README.md
+    ```
+  - اگر فایل به درستی ذخیره نشده، محتوای بالا را دوباره کپی کنید.
+
+- **درخواست فایل‌های دیگر**: اگر نیاز به فایل‌های دیگر پروژه (مانند `docker-compose.yaml`, `crypto-config.yaml`, یا اسکریپت‌ها) به‌صورت جداگانه دارید، لطفاً مشخص کنید تا محتوای آن‌ها را ارائه کنم.
+
+---
+
+### اگر مشکل ادامه داشت
+لطفاً اطلاعات زیر را ارائه دهید:
+1. محیطی که در آن کار می‌کنید (لینوکس، مک، ویندوز، سرور ابری، یا رابط وب).
+2. روش دانلود مورد نظر (مثلاً مستقیم، FTP، یا لینک اشتراک).
+3. هرگونه خطا در ذخیره یا انتقال فایل.
+4. خروجی دستور `ls -l` در دایرکتوری پروژه.
+
+این فایل `README.md` به‌صورت جداگانه ارائه شده و آماده ذخیره و دانلود است. اگر نیاز به روش خاصی برای دانلود یا افزودن به پروژه دارید، لطفاً جزئیات بیشتری ارائه دهید.
