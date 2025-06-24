@@ -205,7 +205,7 @@ test:
         opts:
           tps: 100
       workload:
-        module: workload/dynamicaloc.js
+        module: workload/dynamicalloc.js
     - label: AntennaStatus
       txNumber: 1000
       rateControl:
@@ -590,8 +590,3 @@ test:
           tps: 100
       workload:
         module: workload/realtimemonitor.js
-monitor:
-  type: docker
-  docker:
-    name: []
-  interval: 2
