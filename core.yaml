@@ -1,0 +1,21 @@
+---
+peer:
+  id: cli
+  networkId: 6gfabric
+  address: peer0.org1.example.com:7051
+  localMspId: Org1MSP
+  mspConfigPath: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+  tls:
+    enabled: true
+    clientCert: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/tls/client.crt
+    clientKey: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/tls/client.key
+    rootcert: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+  gossip:
+    useLeaderElection: true
+    orgLeader: false
+    externalEndpoint: peer0.org1.example.com:7051
+  chaincodeListenAddress: 0.0.0.0:7052
+  chaincodeAddress: peer0.org1.example.com:7052
+logging:
+  level: info
+fileSystemPath: /var/hyperledger/production
