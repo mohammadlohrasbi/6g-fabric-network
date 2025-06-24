@@ -1,6 +1,6 @@
 ---
 peer:
-  id: cli
+  id: cli-org1
   networkId: 6gfabric
   address: peer0.org1.example.com:7051
   localMspId: Org1MSP
