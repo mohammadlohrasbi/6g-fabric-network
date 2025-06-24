@@ -184,7 +184,6 @@ Organizations:
     AnchorPeers:
       - Host: peer0.org10.example.com
         Port: 16051
-
 Capabilities:
   Channel: &ChannelCapabilities
     V2_0: true
@@ -192,7 +191,6 @@ Capabilities:
     V2_0: true
   Application: &ApplicationCapabilities
     V2_0: true
-
 Application: &ApplicationDefaults
   Organizations:
   Policies:
@@ -211,7 +209,6 @@ Application: &ApplicationDefaults
     Endorsement:
       Type: ImplicitMeta
       Rule: "MAJORITY Endorsement"
-
 Orderer: &OrdererDefaults
   OrdererType: etcdraft
   EtcdRaft:
@@ -241,7 +238,6 @@ Orderer: &OrdererDefaults
     BlockValidation:
       Type: ImplicitMeta
       Rule: "ANY Writers"
-
 Channel: &ChannelDefaults
   Policies:
     Readers:
@@ -255,7 +251,6 @@ Channel: &ChannelDefaults
       Rule: "OR('OrdererMSP.admin', 'Org1MSP.admin', 'Org2MSP.admin', 'Org3MSP.admin', 'Org4MSP.admin', 'Org5MSP.admin', 'Org6MSP.admin', 'Org7MSP.admin', 'Org8MSP.admin', 'Org9MSP.admin', 'Org10MSP.admin')"
   Capabilities:
     <<: *ChannelCapabilities
-
 Profiles:
   GeneralChannel:
     Consortium: SampleConsortium
