@@ -8,154 +8,107 @@ check_error() {
     fi
 }
 
-# مسیر ذخیره chaincode
-contract_dir="chaincode"
-mkdir -p "$contract_dir"
+echo "تولید قراردادهای هوشمند..."
 
 # لیست قراردادها
-contracts=(
-    "GeoAssign" "GeoUpdate" "GeoHandover" "AuthUser" "AuthIoT" "ConnectUser" "ConnectIoT"
-    "BandwidthAlloc" "AuthAntenna" "RegisterUser" "RegisterIoT" "RevokeUser" "RevokeIoT"
-    "RoleAssign" "AccessControl" "AuditIdentity" "IoTBandwidth" "AntennaLoad" "ResourceRequest"
-    "QoSManage" "SpectrumShare" "PriorityAssign" "ResourceAudit" "LoadBalance" "DynamicAlloc"
-    "AntennaStatus" "IoTStatus" "NetworkPerf" "UserActivity" "FaultDetect" "IoTFault"
-    "TrafficMonitor" "ReportGenerate" "LatencyTrack" "EnergyMonitor" "Roaming" "SessionTrack"
-    "IoTSession" "Disconnect" "Billing" "TransactionLog" "ConnectionAudit" "DataEncrypt"
-    "IoTEncrypt" "AccessLog" "IntrusionDetect" "KeyManage" "PrivacyPolicy" "SecureChannel"
-    "AuditSecurity" "EnergyOptimize" "NetworkOptimize" "IoTAnalytics" "UserAnalytics"
-    "SecurityMonitor" "QuantumEncrypt" "MultiAntenna" "EdgeCompute" "IoTHealth" "NetworkHealth"
-    "DataIntegrity" "PolicyEnforce" "DynamicRouting" "BandwidthShare" "LatencyOptimize"
-    "FaultPredict" "IoTConfig" "UserConfig" "AntennaConfig" "PerformanceAudit" "SecurityAudit"
-    "DataAnalytics" "RealTimeMonitor"
+chaincodes=(
+  "GeoAssign" "GeoUpdate" "GeoHandover" "AuthUser" "AuthIoT" "ConnectUser" "ConnectIoT"
+  "BandwidthAlloc" "AuthAntenna" "RegisterUser" "RegisterIoT" "RevokeUser" "RevokeIoT"
+  "RoleAssign" "AccessControl" "AuditIdentity" "IoTBandwidth" "AntennaLoad" "ResourceRequest"
+  "QoSManage" "SpectrumShare" "PriorityAssign" "ResourceAudit" "LoadBalance" "DynamicAlloc"
+  "AntennaStatus" "IoTStatus" "NetworkPerf" "UserActivity" "FaultDetect" "IoTFault"
+  "TrafficMonitor" "ReportGenerate" "LatencyTrack" "EnergyMonitor" "Roaming" "SessionTrack"
+  "IoTSession" "Disconnect" "Billing" "TransactionLog" "ConnectionAudit" "DataEncrypt"
+  "IoTEncrypt" "AccessLog" "IntrusionDetect" "KeyManage" "PrivacyPolicy" "SecureChannel"
+  "AuditSecurity" "EnergyOptimize" "NetworkOptimize" "IoTAnalytics" "UserAnalytics"
+  "SecurityMonitor" "QuantumEncrypt" "MultiAntenna" "EdgeCompute" "IoTHealth" "NetworkHealth"
+  "DataIntegrity" "PolicyEnforce" "DynamicRouting" "BandwidthShare" "LatencyOptimize"
+  "FaultPredict" "IoTConfig" "UserConfig" "AntennaConfig" "PerformanceAudit" "SecurityAudit"
+  "DataAnalytics" "RealTimeMonitor"
 )
 
-# قالب chaincode
-template=$(cat << 'EOF'
+# ایجاد دایرکتوری و فایل برای هر قرارداد
+for cc in "${chaincodes[@]}"; do
+  mkdir -p chaincode/$cc
+  cat > chaincode/$cc/$cc.go << EOL
 package main
 
 import (
     "encoding/json"
     "fmt"
     "math"
-    "strconv"
     "github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
-type {{contractName}}Contract struct {
+type SmartContract struct {
     contractapi.Contract
 }
 
-// تعریف ساختار تخصیص
 type Assignment struct {
-    EntityID  string `json:"entityid"`
-    AntennaID string `json:"antennaid"`
-    X         float64 `json:"x"`
-    Y         float64 `json:"y"`
-    Timestamp string `json:"timestamp"`
+    EntityID string  \`json:"entityID"\`
+    Antenna  string  \`json:"antenna"\`
+    X        float64 \`json:"x"\`
+    Y        float64 \`json:"y"\`
 }
 
-// مختصات ثابت آنتن‌ها (Org1 تا Org10)
-var antennas = map[string][2]float64{
-    "Org1":  {100.0, 100.0},
-    "Org2":  {200.0, 100.0},
-    "Org3":  {300.0, 100.0},
-    "Org4":  {100.0, 200.0},
-    "Org5":  {200.0, 200.0},
-    "Org6":  {300.0, 200.0},
-    "Org7":  {100.0, 300.0},
-    "Org8":  {200.0, 300.0},
-    "Org9":  {300.0, 300.0},
-    "Org10": {400.0, 300.0},
+var antennaLocations = map[string][2]float64{
+    "Org1":  {100, 100},
+    "Org2":  {200, 100},
+    "Org3":  {300, 100},
+    "Org4":  {100, 200},
+    "Org5":  {200, 200},
+    "Org6":  {300, 200},
+    "Org7":  {100, 300},
+    "Org8":  {200, 300},
+    "Org9":  {300, 300},
+    "Org10": {400, 300},
 }
 
-// محاسبه فاصله اقلیدسی
-func calculateDistance(x1, y1, x2, y2 float64) float64 {
-    return math.Sqrt(math.Pow(x2-x1, 2) + math.Pow(y2-y1, 2))
-}
-
-// پیدا کردن نزدیک‌ترین آنتن
-func findNearestAntenna(x, y float64) string {
+func (s *SmartContract) AssignEntity(ctx contractapi.TransactionContextInterface, entityID string, x, y float64) error {
+    var closestAntenna string
     minDistance := math.MaxFloat64
-    nearestAntenna := ""
-    for org, coords := range antennas {
-        distance := calculateDistance(x, y, coords[0], coords[1])
+
+    for org, loc := range antennaLocations {
+        distance := math.Sqrt(math.Pow(loc[0]-x, 2) + math.Pow(loc[1]-y, 2))
         if distance < minDistance {
             minDistance = distance
-            nearestAntenna = org
+            closestAntenna = org
         }
     }
-    return nearestAntenna
+
+    assignment := Assignment{
+        EntityID: entityID,
+        Antenna:  closestAntenna,
+        X:        x,
+        Y:        y,
+    }
+
+    assignmentBytes, _ := json.Marshal(assignment)
+    return ctx.GetStub().PutState(entityID, assignmentBytes)
 }
 
-func (s *{{contractName}}Contract) AssignEntity(ctx contractapi.TransactionContextInterface, entityID, xStr, yStr string) error {
-    if entityID == "" || xStr == "" || yStr == "" {
-        return fmt.Errorf("ورودی‌ها نمی‌توانند خالی باشند")
-    }
-
-    x, err := strconv.ParseFloat(xStr, 64)
+func (s *SmartContract) QueryAssignment(ctx contractapi.TransactionContextInterface, entityID string) (string, error) {
+    assignmentBytes, err := ctx.GetStub().GetState(entityID)
     if err != nil {
-        return fmt.Errorf("خطا در تبدیل x: %v", err)
+        return "", fmt.Errorf("خطا در خواندن از ledger: %v", err)
     }
-    y, err := strconv.ParseFloat(yStr, 64)
-    if err != nil {
-        return fmt.Errorf("خطا در تبدیل y: %v", err)
+    if assignmentBytes == nil {
+        return "", fmt.Errorf("موجودیت %s یافت نشد", entityID)
     }
-
-    antennaID := findNearestAntenna(x, y)
-    if antennaID == "" {
-        return fmt.Errorf("هیچ آنتن‌ها یافت نشد")
-    }
-
-    data := Assignment{
-        EntityID:  entityID,
-        AntennaID: antennaID,
-        X:         x,
-        Y:         y,
-        Timestamp: ctx.GetStub().GetTxTimestamp().String(),
-    }
-
-    dataJSON, err := json.Marshal(data)
-    if err != nil {
-        return fmt.Errorf("خطا در سریال‌سازی: %v", err)
-    }
-
-    err = ctx.GetStub().PutState(entityID, dataJSON)
-    if err != nil {
-        return fmt.Errorf("خطا در ثبت داده: %v", err)
-    }
-
-    return nil
-}
-
-func (s *{{contractName}}Contract) QueryAssignment(ctx contractapi.TransactionContextInterface, entityID string) (*Assignment, error) {
-    dataJSON, err := ctx.GetStub().GetState(entityID)
-    if err != nil {
-        return nil, fmt.Errorf("خطا در خواندن داده‌ها: %v", err)
-    }
-    if dataJSON == nil {
-        return nil, fmt.Errorf("داده برای %s یافت نشد", entityID)
-    }
-
-    var data Assignment
-    err = json.Unmarshal(dataJSON, &data)
-    if err != nil {
-        return nil, fmt.Errorf("خطا در دی‌سریال‌سازی: %v", err)
-    }
-    return &data, nil
+    return string(assignmentBytes), nil
 }
 
 func main() {
-    contract := new({{contractName}}Contract)
-    contract.Name = "{{contractName}}"
-    contractapi.Start(contract)
+    chaincode, err := contractapi.NewChaincode(&SmartContract{})
+    if err != nil {
+        fmt.Printf("خطا در ایجاد chaincode: %v", err)
+    }
+    if err := chaincode.Start(); err != nil {
+        fmt.Printf("خطا در شروع chaincode: %v", err)
+    }
 }
-EOF
-)
-
-# تولید chaincode برای هر قرارداد
-for contract in "${contracts[@]}"; do
-    echo "Processing contract: $contract"
-    echo "$template" | sed "s#{{contractName}}#$contract#g" > "$contract_dir/$contract.go"
-    check_error "تولید chaincode $contract.go"
-    echo "Generated chaincode: $contract.go"
+EOL
+  check_error "تولید chaincode $cc"
 done
+
+echo "قراردادهای هوشمند با موفقیت تولید شدند!"
