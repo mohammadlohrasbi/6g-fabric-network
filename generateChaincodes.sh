@@ -1,114 +1,65 @@
 #!/bin/bash
 
-# تابع بررسی خطا
-check_error() {
-    if [ $? -ne 0 ]; then
-        echo "خطا: $1"
-        exit 1
-    fi
-}
-
-echo "تولید قراردادهای هوشمند..."
-
-# لیست قراردادها
-chaincodes=(
-  "GeoAssign" "GeoUpdate" "GeoHandover" "AuthUser" "AuthIoT" "ConnectUser" "ConnectIoT"
-  "BandwidthAlloc" "AuthAntenna" "RegisterUser" "RegisterIoT" "RevokeUser" "RevokeIoT"
-  "RoleAssign" "AccessControl" "AuditIdentity" "IoTBandwidth" "AntennaLoad" "ResourceRequest"
-  "QoSManage" "SpectrumShare" "PriorityAssign" "ResourceAudit" "LoadBalance" "DynamicAlloc"
-  "AntennaStatus" "IoTStatus" "NetworkPerf" "UserActivity" "FaultDetect" "IoTFault"
-  "TrafficMonitor" "ReportGenerate" "LatencyTrack" "EnergyMonitor" "Roaming" "SessionTrack"
-  "IoTSession" "Disconnect" "Billing" "TransactionLog" "ConnectionAudit" "DataEncrypt"
-  "IoTEncrypt" "AccessLog" "IntrusionDetect" "KeyManage" "PrivacyPolicy" "SecureChannel"
-  "AuditSecurity" "EnergyOptimize" "NetworkOptimize" "IoTAnalytics" "UserAnalytics"
-  "SecurityMonitor" "QuantumEncrypt" "MultiAntenna" "EdgeCompute" "IoTHealth" "NetworkHealth"
-  "DataIntegrity" "PolicyEnforce" "DynamicRouting" "BandwidthShare" "LatencyOptimize"
-  "FaultPredict" "IoTConfig" "UserConfig" "AntennaConfig" "PerformanceAudit" "SecurityAudit"
-  "DataAnalytics" "RealTimeMonitor"
+CHAINCODES=(
+  "ResourceAllocate" "BandwidthShare" "DynamicRouting" "LoadBalance" "LatencyOptimize"
+  "EnergyOptimize" "NetworkOptimize" "SpectrumManage" "ResourceScale" "ResourcePrioritize"
+  "UserAuth" "DeviceAuth" "AccessControl" "TokenAuth" "RoleBasedAuth"
+  "IdentityVerify" "SessionAuth" "MultiFactorAuth" "AuthPolicy" "AuthAudit"
+  "NetworkMonitor" "PerformanceMonitor" "TrafficMonitor" "ResourceMonitor" "HealthMonitor"
+  "AlertMonitor" "LogMonitor" "EventMonitor" "MetricsCollector" "StatusMonitor"
+  "Encryption" "IntrusionDetect" "FirewallRules" "SecureChannel" "ThreatMonitor"
+  "AccessLog" "SecurityPolicy" "VulnerabilityScan" "DataIntegrity" "SecureBackup"
+  "TransactionAudit" "ComplianceAudit" "AccessAudit" "EventAudit" "PolicyAudit"
+  "DataAudit" "UserAudit" "SystemAudit" "PerformanceAudit" "SecurityAudit"
+  "ConfigManage" "PolicyManage" "ResourceManage" "NetworkManage" "DeviceManage"
+  "UserManage" "ServiceManage" "EventManage" "AlertManage" "LogManage"
+  "DataAnalytics" "FaultDetect" "AnomalyDetect" "PredictiveMaintenance" "PerformanceAnalytics"
+  "TrafficAnalytics" "SecurityAnalytics" "ResourceAnalytics" "EventAnalytics" "LogAnalytics"
 )
 
-# ایجاد دایرکتوری و فایل برای هر قرارداد
-for cc in "${chaincodes[@]}"; do
-  mkdir -p chaincode/$cc
-  cat > chaincode/$cc/$cc.go << EOL
+for chaincode in "${CHAINCODES[@]}"; do
+  mkdir -p chaincode/$chaincode
+  cat << EOF > chaincode/$chaincode/$chaincode.go
 package main
 
 import (
-    "encoding/json"
-    "fmt"
-    "math"
-    "github.com/hyperledger/fabric-contract-api-go/contractapi"
+	"fmt"
+	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
-type SmartContract struct {
-    contractapi.Contract
+type ${chaincode} struct {
+	contractapi.Contract
 }
 
-type Assignment struct {
-    EntityID string  \`json:"entityID"\`
-    Antenna  string  \`json:"antenna"\`
-    X        float64 \`json:"x"\`
-    Y        float64 \`json:"y"\`
+func (s *${chaincode}) InitLedger(ctx contractapi.TransactionContextInterface) error {
+	return nil
 }
 
-var antennaLocations = map[string][2]float64{
-    "Org1":  {100, 100},
-    "Org2":  {200, 100},
-    "Org3":  {300, 100},
-    "Org4":  {100, 200},
-    "Org5":  {200, 200},
-    "Org6":  {300, 200},
-    "Org7":  {100, 300},
-    "Org8":  {200, 300},
-    "Org9":  {300, 300},
-    "Org10": {400, 300},
+func (s *${chaincode}) Register(ctx contractapi.TransactionContextInterface, id, value string) error {
+	return ctx.GetStub().PutState(id, []byte(value))
 }
 
-func (s *SmartContract) AssignEntity(ctx contractapi.TransactionContextInterface, entityID string, x, y float64) error {
-    var closestAntenna string
-    minDistance := math.MaxFloat64
-
-    for org, loc := range antennaLocations {
-        distance := math.Sqrt(math.Pow(loc[0]-x, 2) + math.Pow(loc[1]-y, 2))
-        if distance < minDistance {
-            minDistance = distance
-            closestAntenna = org
-        }
-    }
-
-    assignment := Assignment{
-        EntityID: entityID,
-        Antenna:  closestAntenna,
-        X:        x,
-        Y:        y,
-    }
-
-    assignmentBytes, _ := json.Marshal(assignment)
-    return ctx.GetStub().PutState(entityID, assignmentBytes)
-}
-
-func (s *SmartContract) QueryAssignment(ctx contractapi.TransactionContextInterface, entityID string) (string, error) {
-    assignmentBytes, err := ctx.GetStub().GetState(entityID)
-    if err != nil {
-        return "", fmt.Errorf("خطا در خواندن از ledger: %v", err)
-    }
-    if assignmentBytes == nil {
-        return "", fmt.Errorf("موجودیت %s یافت نشد", entityID)
-    }
-    return string(assignmentBytes), nil
+func (s *${chaincode}) Query(ctx contractapi.TransactionContextInterface, id string) (string, error) {
+	value, err := ctx.GetStub().GetState(id)
+	if err != nil {
+		return "", fmt.Errorf("failed to read from world state: %v", err)
+	}
+	if value == nil {
+		return "", fmt.Errorf("asset %s does not exist", id)
+	}
+	return string(value), nil
 }
 
 func main() {
-    chaincode, err := contractapi.NewChaincode(&SmartContract{})
-    if err != nil {
-        fmt.Printf("خطا در ایجاد chaincode: %v", err)
-    }
-    if err := chaincode.Start(); err != nil {
-        fmt.Printf("خطا در شروع chaincode: %v", err)
-    }
+	chaincode, err := contractapi.NewChaincode(&${chaincode}{})
+	if err != nil {
+		fmt.Printf("Error creating ${chaincode} chaincode: %v", err)
+	}
+	if err := chaincode.Start(); err != nil {
+		fmt.Printf("Error starting ${chaincode} chaincode: %v", err)
+	}
 }
-EOL
-  check_error "تولید chaincode $cc"
+EOF
 done
 
-echo "قراردادهای هوشمند با موفقیت تولید شدند!"
+echo "Generated chaincode for ${#CHAINCODES[@]} chaincodes"
