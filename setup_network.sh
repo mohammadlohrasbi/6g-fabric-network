@@ -18,7 +18,7 @@ done
 configtxgen -profile GeneralChannelApp -outputBlock ./channel-artifacts/genesis.block
 
 # Start network
-docker-compose -f docker-compose.yaml up -d
+docker compose up -d
 
 # Wait for network to stabilize
 sleep 10
