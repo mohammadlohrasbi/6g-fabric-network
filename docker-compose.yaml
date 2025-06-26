@@ -16,6 +16,10 @@ services:
       - ORDERER_GENERAL_LISTENPORT=7050
       - ORDERER_GENERAL_BOOTSTRAPMETHOD=file
       - ORDERER_GENERAL_BOOTSTRAPFILE=/var/hyperledger/orderer/genesis.block
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
     volumes:
       - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/genesis.block
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/msp:/var/hyperledger/orderer/msp
@@ -23,7 +27,9 @@ services:
     ports:
       - 7050:7050
     networks:
-      - fabric
+      fabric:
+        aliases:
+          - orderer.example.com
   ca.org1.example.com:
     container_name: ca.org1.example.com
     image: hyperledger/fabric-ca:1.5
@@ -52,6 +58,10 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=host
       - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/peer/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/peer/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/peer/tls/ca.crt
     volumes:
       - ./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp:/var/hyperledger/peer/msp
       - ./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls:/var/hyperledger/peer/tls
@@ -59,7 +69,9 @@ services:
     ports:
       - 7051:7051
     networks:
-      - fabric
+      fabric:
+        aliases:
+          - peer0.org1.example.com
   ca.org2.example.com:
     container_name: ca.org2.example.com
     image: hyperledger/fabric-ca:1.5
@@ -88,6 +100,10 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=host
       - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/peer/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/peer/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/peer/tls/ca.crt
     volumes:
       - ./crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/msp:/var/hyperledger/peer/msp
       - ./crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls:/var/hyperledger/peer/tls
@@ -95,7 +111,9 @@ services:
     ports:
       - 8051:8051
     networks:
-      - fabric
+      fabric:
+        aliases:
+          - peer0.org2.example.com
   ca.org3.example.com:
     container_name: ca.org3.example.com
     image: hyperledger/fabric-ca:1.5
@@ -124,6 +142,10 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=host
       - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/peer/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/peer/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/peer/tls/ca.crt
     volumes:
       - ./crypto-config/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/msp:/var/hyperledger/peer/msp
       - ./crypto-config/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls:/var/hyperledger/peer/tls
@@ -131,7 +153,9 @@ services:
     ports:
       - 9051:9051
     networks:
-      - fabric
+      fabric:
+        aliases:
+          - peer0.org3.example.com
   ca.org4.example.com:
     container_name: ca.org4.example.com
     image: hyperledger/fabric-ca:1.5
@@ -157,9 +181,13 @@ services:
       - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/peer/msp
       - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org4.example.com:10051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org4.example.com:10051
-      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_ENDPOINT=unix:///host餐/run/docker.sock
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=host
       - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/peer/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/peer/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/peer/tls/ca.crt
     volumes:
       - ./crypto-config/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/msp:/var/hyperledger/peer/msp
       - ./crypto-config/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls:/var/hyperledger/peer/tls
@@ -167,7 +195,9 @@ services:
     ports:
       - 10051:10051
     networks:
-      - fabric
+      fabric:
+        aliases:
+          - peer0.org4.example.com
   ca.org5.example.com:
     container_name: ca.org5.example.com
     image: hyperledger/fabric-ca:1.5
@@ -196,6 +226,10 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=host
       - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/peer/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/peer/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/peer/tls/ca.crt
     volumes:
       - ./crypto-config/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/msp:/var/hyperledger/peer/msp
       - ./crypto-config/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls:/var/hyperledger/peer/tls
@@ -203,7 +237,9 @@ services:
     ports:
       - 11051:11051
     networks:
-      - fabric
+      fabric:
+        aliases:
+          - peer0.org5.example.com
   ca.org6.example.com:
     container_name: ca.org6.example.com
     image: hyperledger/fabric-ca:1.5
@@ -232,6 +268,10 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=host
       - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/peer/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/peer/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/peer/tls/ca.crt
     volumes:
       - ./crypto-config/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/msp:/var/hyperledger/peer/msp
       - ./crypto-config/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls:/var/hyperledger/peer/tls
@@ -239,7 +279,9 @@ services:
     ports:
       - 12051:12051
     networks:
-      - fabric
+      fabric:
+        aliases:
+          - peer0.org6.example.com
   ca.org7.example.com:
     container_name: ca.org7.example.com
     image: hyperledger/fabric-ca:1.5
@@ -268,6 +310,10 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=host
       - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/peer/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/peer/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/peer/tls/ca.crt
     volumes:
       - ./crypto-config/peerOrganizations/org7.example.com/peers/peer0.org7.example.com/msp:/var/hyperledger/peer/msp
       - ./crypto-config/peerOrganizations/org7.example.com/peers/peer0.org7.example.com/tls:/var/hyperledger/peer/tls
@@ -275,7 +321,9 @@ services:
     ports:
       - 13051:13051
     networks:
-      - fabric
+      fabric:
+        aliases:
+          - peer0.org7.example.com
   ca.org8.example.com:
     container_name: ca.org8.example.com
     image: hyperledger/fabric-ca:1.5
@@ -304,6 +352,10 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=host
       - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/peer/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/peer/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/peer/tls/ca.crt
     volumes:
       - ./crypto-config/peerOrganizations/org8.example.com/peers/peer0.org8.example.com/msp:/var/hyperledger/peer/msp
       - ./crypto-config/peerOrganizations/org8.example.com/peers/peer0.org8.example.com/tls:/var/hyperledger/peer/tls
@@ -311,7 +363,9 @@ services:
     ports:
       - 14051:14051
     networks:
-      - fabric
+      fabric:
+        aliases:
+          - peer0.org8.example.com
   ca.org9.example.com:
     container_name: ca.org9.example.com
     image: hyperledger/fabric-ca:1.5
@@ -340,6 +394,10 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=host
       - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/peer/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/peer/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/peer/tls/ca.crt
     volumes:
       - ./crypto-config/peerOrganizations/org9.example.com/peers/peer0.org9.example.com/msp:/var/hyperledger/peer/msp
       - ./crypto-config/peerOrganizations/org9.example.com/peers/peer0.org9.example.com/tls:/var/hyperledger/peer/tls
@@ -347,7 +405,9 @@ services:
     ports:
       - 15051:15051
     networks:
-      - fabric
+      fabric:
+        aliases:
+          - peer0.org9.example.com
   ca.org10.example.com:
     container_name: ca.org10.example.com
     image: hyperledger/fabric-ca:1.5
@@ -376,6 +436,10 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=host
       - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/peer/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/peer/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/peer/tls/ca.crt
     volumes:
       - ./crypto-config/peerOrganizations/org10.example.com/peers/peer0.org10.example.com/msp:/var/hyperledger/peer/msp
       - ./crypto-config/peerOrganizations/org10.example.com/peers/peer0.org10.example.com/tls:/var/hyperledger/peer/tls
@@ -383,4 +447,6 @@ services:
     ports:
       - 16051:16051
     networks:
-      - fabric
+      fabric:
+        aliases:
+          - peer0.org10.example.com
