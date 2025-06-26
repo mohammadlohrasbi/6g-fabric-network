@@ -1,78 +1,51 @@
 #!/bin/bash
 
-# تابع بررسی خطا
-check_error() {
-    if [ $? -ne 0 ]; then
-        echo "خطا: $1"
-        exit 1
-    fi
-}
-
-echo "تولید فایل‌های workload..."
-
-# لیست قراردادها
-chaincodes=(
-  "GeoAssign" "GeoUpdate" "GeoHandover" "AuthUser" "AuthIoT" "ConnectUser" "ConnectIoT"
-  "BandwidthAlloc" "AuthAntenna" "RegisterUser" "RegisterIoT" "RevokeUser" "RevokeIoT"
-  "RoleAssign" "AccessControl" "AuditIdentity" "IoTBandwidth" "AntennaLoad" "ResourceRequest"
-  "QoSManage" "SpectrumShare" "PriorityAssign" "ResourceAudit" "LoadBalance" "DynamicAlloc"
-  "AntennaStatus" "IoTStatus" "NetworkPerf" "UserActivity" "FaultDetect" "IoTFault"
-  "TrafficMonitor" "ReportGenerate" "LatencyTrack" "EnergyMonitor" "Roaming" "SessionTrack"
-  "IoTSession" "Disconnect" "Billing" "TransactionLog" "ConnectionAudit" "DataEncrypt"
-  "IoTEncrypt" "AccessLog" "IntrusionDetect" "KeyManage" "PrivacyPolicy" "SecureChannel"
-  "AuditSecurity" "EnergyOptimize" "NetworkOptimize" "IoTAnalytics" "UserAnalytics"
-  "SecurityMonitor" "QuantumEncrypt" "MultiAntenna" "EdgeCompute" "IoTHealth" "NetworkHealth"
-  "DataIntegrity" "PolicyEnforce" "DynamicRouting" "BandwidthShare" "LatencyOptimize"
-  "FaultPredict" "IoTConfig" "UserConfig" "AntennaConfig" "PerformanceAudit" "SecurityAudit"
-  "DataAnalytics" "RealTimeMonitor"
-)
-
-# ایجاد فایل workload برای هر قرارداد
-for cc in "${chaincodes[@]}"; do
-  cat > workload/${cc,,}.js << EOL
+mkdir -p workload
+cat << EOF > workload/callback.js
 const { WorkloadModuleBase } = require('@hyperledger/caliper-core');
 
-class ${cc}Workload extends WorkloadModuleBase {
+class MyWorkload extends WorkloadModuleBase {
     constructor() {
         super();
-        this.entityCount = parseInt(process.env.ENTITY_COUNT) || 1000;
+        this.chaincodeID = '';
+        this.channel = '';
+        this.txIndex = 0;
     }
 
     async initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext) {
         await super.initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext);
-        this.entities = [];
-        for (let i = 0; i < this.entityCount; i++) {
-            this.entities.push(\`entity\${workerIndex}_\${i}\`);
-        }
+        this.chaincodeID = roundArguments.chaincodeID;
+        this.channel = roundArguments.channel;
+        this.txNumber = roundArguments.txNumber;
+        this.args = roundArguments.args;
     }
 
     async submitTransaction() {
-        const entityID = this.entities[Math.floor(Math.random() * this.entities.length)];
-        const x = Math.random() * 500;
-        const y = Math.random() * 500;
-
+        const func = this.args[this.txIndex % 2].function;
+        const args = this.args[this.txIndex % 2].args;
         const request = {
-            contractId: '${cc}',
-            contractFunction: 'AssignEntity',
-            contractArguments: [entityID, x.toString(), y.toString()],
-            readOnly: false
+            contractId: this.chaincodeID,
+            channel: this.channel,
+            contractVersion: 'v1',
+            contractFunction: func,
+            contractArguments: args,
+            timeout: 30
         };
 
         await this.sutAdapter.sendRequests(request);
+        this.txIndex++;
     }
 
     async cleanupWorkloadModule() {
-        // تمیزکاری
+        // No cleanup needed
+    }
+
+    static createWorkloadModule() {
+        return new MyWorkload();
     }
 }
 
-function createWorkloadModule() {
-    return new ${cc}Workload();
-}
+module.exports.createWorkloadModule = MyWorkload.createWorkloadModule;
+EOF
 
-module.exports.createWorkloadModule = createWorkloadModule;
-EOL
-  check_error "تولید workload $cc"
-done
-
-echo "فایل‌های workload با موفقیت تولید شدند!"
+echo "Generated workload/callback.js"
