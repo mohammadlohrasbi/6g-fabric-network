@@ -1,0 +1,13 @@
+peer:
+  id: peer0.org2.example.com
+  networkId: fabric
+  listenAddress: 0.0.0.0:8051
+  chaincodeListenAddress: 0.0.0.0:8052
+  address: peer0.org2.example.com:8051
+  localMspId: Org2MSP
+  mspConfigPath: /var/hyperledger/peer/msp
+  gossip:
+    bootstrap: peer0.org2.example.com:8051
+    externalEndpoint: peer0.org2.example.com:8051
+  logging:
+    level: info
