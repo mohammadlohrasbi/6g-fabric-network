@@ -1,0 +1,14 @@
+target: grpc://localhost:7051
+channel: iotchannelapp
+chaincode: BandwidthShare
+ccType: golang
+nProc: 10
+testRound: 1
+txNumber: [1000]
+rate: [100]
+arguments:
+  - ["AssignEntity", ["entity1", "100", "200", "1000"]]
+  - ["QueryAssignment", ["entity1"]]
+contractConfig:
+  endorsement:
+    orgs: ["Org1MSP", "Org2MSP", "Org3MSP", "Org4MSP", "Org5MSP", "Org6MSP", "Org7MSP", "Org8MSP", "Org9MSP", "Org10MSP"]
