@@ -1,33 +1,46 @@
 #!/bin/bash
 
-# Generate crypto material
-cryptogen generate --config=./crypto-config.yaml
+# Check prerequisites
+command -v cryptogen >/dev/null 2>&1 || { echo "cryptogen is required but not installed. Aborting."; exit 1; }
+command -v configtxgen >/dev/null 2>&1 || { echo "configtxgen is required but not installed. Aborting."; exit 1; }
+command -v docker >/dev/null 2>&1 || { echo "docker is required but not installed. Aborting."; exit 1; }
+command -v docker-compose >/dev/null 2>&1 || { echo "docker-compose is required but not installed. Aborting."; exit 1; }
 
-# Create channel artifacts directory
+# Clean up previous artifacts
+rm -rf channel-artifacts crypto-config
 mkdir -p channel-artifacts
+
+# Generate crypto material
+echo "Generating crypto material..."
+cryptogen generate --config=./crypto-config.yaml || { echo "Failed to generate crypto material"; exit 1; }
 
 # Generate genesis block and channel artifacts
 export FABRIC_CFG_PATH=$PWD
-configtxgen -profile GeneralChannelApp -outputCreateChannelTx ./channel-artifacts/generalchannelapp.tx -channelID generalchannelapp
-configtxgen -profile IoTChannelApp -outputCreateChannelTx ./channel-artifacts/iotchannelapp.tx -channelID iotchannelapp
-configtxgen -profile SecurityChannelApp -outputCreateChannelTx ./channel-artifacts/securitychannelapp.tx -channelID securitychannelapp
-configtxgen -profile MonitoringChannelApp -outputCreateChannelTx ./channel-artifacts/monitoringchannelapp.tx -channelID monitoringchannelapp
+echo "Generating genesis block and channel artifacts..."
+configtxgen -profile GeneralChannelApp -outputCreateChannelTx ./channel-artifacts/generalchannelapp.tx -channelID generalchannelapp || { echo "Failed to generate generalchannelapp.tx"; exit 1; }
+configtxgen -profile IoTChannelApp -outputCreateChannelTx ./channel-artifacts/iotchannelapp.tx -channelID iotchannelapp || { echo "Failed to generate iotchannelapp.tx"; exit 1; }
+configtxgen -profile SecurityChannelApp -outputCreateChannelTx ./channel-artifacts/securitychannelapp.tx -channelID securitychannelapp || { echo "Failed to generate securitychannelapp.tx"; exit 1; }
+configtxgen -profile MonitoringChannelApp -outputCreateChannelTx ./channel-artifacts/monitoringchannelapp.tx -channelID monitoringchannelapp || { echo "Failed to generate monitoringchannelapp.tx"; exit 1; }
 for i in {1..10}; do
-  configtxgen -profile Org${i}ChannelApp -outputCreateChannelTx ./channel-artifacts/org${i}channelapp.tx -channelID org${i}channelapp
+  configtxgen -profile Org${i}ChannelApp -outputCreateChannelTx ./channel-artifacts/org${i}channelapp.tx -channelID org${i}channelapp || { echo "Failed to generate org${i}channelapp.tx"; exit 1; }
 done
-configtxgen -profile GeneralChannelApp -outputBlock ./channel-artifacts/genesis.block
+configtxgen -profile GeneralChannelApp -outputBlock ./channel-artifacts/genesis.block || { echo "Failed to generate genesis.block"; exit 1; }
 
 # Start network
-docker compose up -d
+echo "Starting Docker network..."
+docker compose up -d || { echo "Failed to start Docker network"; exit 1; }
 
 # Wait for network to stabilize
+echo "Waiting for network to stabilize..."
 sleep 10
 
 # Create and join channels
 for channel in generalchannelapp iotchannelapp securitychannelapp monitoringchannelapp org{1..10}channelapp; do
-  docker exec peer0.org1.example.com peer channel create -o orderer.example.com:7050 -c $channel -f ./channel-artifacts/${channel}.tx --outputBlock ./channel-artifacts/${channel}.block --tls --cafile /var/hyperledger/peer/tls/ca.crt
+  echo "Creating channel $channel..."
+  docker exec peer0.org1.example.com peer channel create -o localhost:7050 -c $channel -f ./channel-artifacts/${channel}.tx --outputBlock ./channel-artifacts/${channel}.block --tls --cafile /var/hyperledger/peer/tls/ca.crt || { echo "Failed to create channel $channel"; exit 1; }
   for i in {1..10}; do
-    docker exec peer0.org${i}.example.com peer channel join -b ./channel-artifacts/${channel}.block
+    echo "Joining peer0.org${i}.example.com to $channel..."
+    docker exec peer0.org${i}.example.com peer channel join -b ./channel-artifacts/${channel}.block || { echo "Failed to join peer0.org${i}.example.com to $channel"; exit 1; }
   done
 done
 
@@ -51,10 +64,13 @@ CHAINCODES=(
 
 for chaincode in "${CHAINCODES[@]}"; do
   for i in {1..10}; do
-    docker exec peer0.org${i}.example.com peer chaincode install -n $chaincode -v 1.0 -p /opt/gopath/src/github.com/chaincode/$chaincode
+    echo "Installing chaincode $chaincode on peer0.org${i}.example.com..."
+    docker exec peer0.org${i}.example.com peer chaincode install -n $chaincode -v 1.0 -p /opt/gopath/src/github.com/chaincode/$chaincode || { echo "Failed to install chaincode $chaincode on peer0.org${i}.example.com"; exit 1; }
   done
   for channel in generalchannelapp iotchannelapp securitychannelapp monitoringchannelapp org{1..10}channelapp; do
-    docker exec peer0.org1.example.com peer chaincode instantiate -o orderer.example.com:7050 -C $channel -n $chaincode -v 1.0 -c '{"Args":["init"]}' -P "OR('Org1MSP.member','Org2MSP.member','Org3MSP.member','Org4MSP.member','Org5MSP.member','Org6MSP.member','Org7MSP.member','Org8MSP.member','Org9MSP.member','Org10MSP.member')" --tls --cafile /var/hyperledger/peer/tls/ca.crt
+    echo "Instantiating chaincode $chaincode on $channel..."
+    docker exec peer0.org1.example.com peer chaincode instantiate -o localhost:7050 -C $channel -n $chaincode -v 1.0 -c '{"Args":["init"]}' -P "OR('Org1MSP.member','Org2MSP.member','Org3MSP.member','Org4MSP.member','Org5MSP.member','Org6MSP.member','Org7MSP.member','Org8MSP.member','Org9MSP.member','Org10MSP.member')" --tls --cafile /var/hyperledger/peer/tls/ca.crt || { echo "Failed to instantiate chaincode $chaincode on $channel"; exit 1; }
+    sleep 5 # Wait for instantiation to complete
   done
 done
 
