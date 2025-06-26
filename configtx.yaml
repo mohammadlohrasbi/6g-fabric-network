@@ -1,4 +1,3 @@
-```yaml
 Organizations:
   - &OrdererOrg
     Name: OrdererOrg
@@ -114,7 +113,6 @@ Organizations:
     AnchorPeers:
       - Host: peer0.org10.example.com
         Port: 16051
-
 Capabilities:
   Channel: &ChannelCapabilities
     V2_0: true
@@ -122,197 +120,88 @@ Capabilities:
     V2_0: true
   Application: &ApplicationCapabilities
     V2_0: true
-
 Application:
-  Organizations:
-  Policies:
-    Readers: { Type: ImplicitMeta, Rule: "ANY Readers" }
-    Writers: { Type: ImplicitMeta, Rule: "ANY Writers" }
-    Admins: { Type: ImplicitMeta, Rule: "MAJORITY Admins" }
-    LifecycleEndorsement: { Type: ImplicitMeta, Rule: "MAJORITY Endorsement" }
-    Endorsement: { Type: ImplicitMeta, Rule: "MAJORITY Endorsement" }
-
+  Organizations: [Org1, Org2, Org3, Org4, Org5, Org6, Org7, Org8, Org9, Org10]
 Orderer:
   OrdererType: etcdraft
-  EtcdRaft:
-    Consenters:
-      - Host: orderer1.example.com
-        Port: 7050
-        ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
-        ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
-  Addresses:
-    - orderer1.example.com:7050
+  Addresses: [orderer.example.com:7050]
   BatchTimeout: 2s
   BatchSize:
     MaxMessageCount: 10
     AbsoluteMaxBytes: 99 MB
     PreferredMaxBytes: 512 KB
-  Organizations:
-  Policies:
-    Readers: { Type: ImplicitMeta, Rule: "ANY Readers" }
-    Writers: { Type: ImplicitMeta, Rule: "ANY Writers" }
-    Admins: { Type: ImplicitMeta, Rule: "MAJORITY Admins" }
-    BlockValidation: { Type: ImplicitMeta, Rule: "ANY Writers" }
-
+  Organizations: [OrdererOrg]
+  Capabilities: *OrdererCapabilities
 Channel:
-  Policies:
-    Readers: { Type: ImplicitMeta, Rule: "ANY Readers" }
-    Writers: { Type: ImplicitMeta, Rule: "ANY Writers" }
-    Admins: { Type: ImplicitMeta, Rule: "MAJORITY Admins" }
-
+  Capabilities: *ChannelCapabilities
 Profiles:
-  OrdererGenesis:
-    Capabilities: *ChannelCapabilities
-    Orderer:
-      <<: *Orderer
-      Organizations:
-        - *OrdererOrg
-      Capabilities: *OrdererCapabilities
-    Consortiums:
-      SampleConsortium:
-        Organizations:
-          - *Org1
-          - *Org2
-          - *Org3
-          - *Org4
-          - *Org5
-          - *Org6
-          - *Org7
-          - *Org8
-          - *Org9
-          - *Org10
-  GeneralChannel:
+  GeneralChannelApp:
     Consortium: SampleConsortium
     Application:
-      <<: *Application
-      Organizations:
-        - *Org1
-        - *Org2
-        - *Org3
-        - *Org4
-        - *Org5
-        - *Org6
-        - *Org7
-        - *Org8
-        - *Org9
-        - *Org10
+      Organizations: [Org1, Org2, Org3, Org4, Org5, Org6, Org7, Org8, Org9, Org10]
       Capabilities: *ApplicationCapabilities
-  IoTChannel:
+  IoTChannelApp:
     Consortium: SampleConsortium
     Application:
-      <<: *Application
-      Organizations:
-        - *Org1
-        - *Org2
-        - *Org3
-        - *Org4
-        - *Org5
-        - *Org6
-        - *Org7
-        - *Org8
-        - *Org9
-        - *Org10
+      Organizations: [Org1, Org2, Org3, Org4, Org5, Org6, Org7, Org8, Org9, Org10]
       Capabilities: *ApplicationCapabilities
-  SecurityChannel:
+  SecurityChannelApp:
     Consortium: SampleConsortium
     Application:
-      <<: *Application
-      Organizations:
-        - *Org1
-        - *Org2
-        - *Org3
-        - *Org4
-        - *Org5
-        - *Org6
-        - *Org7
-        - *Org8
-        - *Org9
-        - *Org10
+      Organizations: [Org1, Org2, Org3, Org4, Org5, Org6, Org7, Org8, Org9, Org10]
       Capabilities: *ApplicationCapabilities
-  MonitoringChannel:
+  MonitoringChannelApp:
     Consortium: SampleConsortium
     Application:
-      <<: *Application
-      Organizations:
-        - *Org1
-        - *Org2
-        - *Org3
-        - *Org4
-        - *Org5
-        - *Org6
-        - *Org7
-        - *Org8
-        - *Org9
-        - *Org10
+      Organizations: [Org1, Org2, Org3, Org4, Org5, Org6, Org7, Org8, Org9, Org10]
       Capabilities: *ApplicationCapabilities
-  Org1Channel:
+  Org1ChannelApp:
     Consortium: SampleConsortium
     Application:
-      <<: *Application
-      Organizations:
-        - *Org1
+      Organizations: [Org1]
       Capabilities: *ApplicationCapabilities
-  Org2Channel:
+  Org2ChannelApp:
     Consortium: SampleConsortium
     Application:
-      <<: *Application
-      Organizations:
-        - *Org2
+      Organizations: [Org2]
       Capabilities: *ApplicationCapabilities
-  Org3Channel:
+  Org3ChannelApp:
     Consortium: SampleConsortium
     Application:
-      <<: *Application
-      Organizations:
-        - *Org3
+      Organizations: [Org3]
       Capabilities: *ApplicationCapabilities
-  Org4Channel:
+  Org4ChannelApp:
     Consortium: SampleConsortium
     Application:
-      <<: *Application
-      Organizations:
-        - *Org4
+      Organizations: [Org4]
       Capabilities: *ApplicationCapabilities
-  Org5Channel:
+  Org5ChannelApp:
     Consortium: SampleConsortium
     Application:
-      <<: *Application
-      Organizations:
-        - *Org5
+      Organizations: [Org5]
       Capabilities: *ApplicationCapabilities
-  Org6Channel:
+  Org6ChannelApp:
     Consortium: SampleConsortium
     Application:
-      <<: *Application
-      Organizations:
-        - *Org6
+      Organizations: [Org6]
       Capabilities: *ApplicationCapabilities
-  Org7Channel:
+  Org7ChannelApp:
     Consortium: SampleConsortium
     Application:
-      <<: *Application
-      Organizations:
-        - *Org7
+      Organizations: [Org7]
       Capabilities: *ApplicationCapabilities
-  Org8Channel:
+  Org8ChannelApp:
     Consortium: SampleConsortium
     Application:
-      <<: *Application
-      Organizations:
-        - *Org8
+      Organizations: [Org8]
       Capabilities: *ApplicationCapabilities
-  Org9Channel:
+  Org9ChannelApp:
     Consortium: SampleConsortium
     Application:
-      <<: *Application
-      Organizations:
-        - *Org9
+      Organizations: [Org9]
       Capabilities: *ApplicationCapabilities
-  Org10Channel:
+  Org10ChannelApp:
     Consortium: SampleConsortium
     Application:
-      <<: *Application
-      Organizations:
-        - *Org10
+      Organizations: [Org10]
       Capabilities: *ApplicationCapabilities
-```
