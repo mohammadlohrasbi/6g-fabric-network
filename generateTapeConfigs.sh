@@ -1,109 +1,92 @@
 #!/bin/bash
 
-# تابع بررسی خطا
-check_error() {
-    if [ $? -ne 0 ]; then
-        echo "خطا: $1"
-        exit 1
-    fi
+CHAINCODES=(
+  "ResourceAllocate" "BandwidthShare" "DynamicRouting" "LoadBalance" "LatencyOptimize"
+  "EnergyOptimize" "NetworkOptimize" "SpectrumManage" "ResourceScale" "ResourcePrioritize"
+  "UserAuth" "DeviceAuth" "AccessControl" "TokenAuth" "RoleBasedAuth"
+  "IdentityVerify" "SessionAuth" "MultiFactorAuth" "AuthPolicy" "AuthAudit"
+  "NetworkMonitor" "PerformanceMonitor" "TrafficMonitor" "ResourceMonitor" "HealthMonitor"
+  "AlertMonitor" "LogMonitor" "EventMonitor" "MetricsCollector" "StatusMonitor"
+  "Encryption" "IntrusionDetect" "FirewallRules" "SecureChannel" "ThreatMonitor"
+  "AccessLog" "SecurityPolicy" "VulnerabilityScan" "DataIntegrity" "SecureBackup"
+  "TransactionAudit" "ComplianceAudit" "AccessAudit" "EventAudit" "PolicyAudit"
+  "DataAudit" "UserAudit" "SystemAudit" "PerformanceAudit" "SecurityAudit"
+  "ConfigManage" "PolicyManage" "ResourceManage" "NetworkManage" "DeviceManage"
+  "UserManage" "ServiceManage" "EventManage" "AlertManage" "LogManage"
+  "DataAnalytics" "FaultDetect" "AnomalyDetect" "PredictiveMaintenance" "PerformanceAnalytics"
+  "TrafficAnalytics" "SecurityAnalytics" "ResourceAnalytics" "EventAnalytics" "LogAnalytics"
+)
+
+CHANNELS=(
+  "generalchannelapp" "iotchannelapp" "securitychannelapp" "monitoringchannelapp"
+  "org1channelapp" "org2channelapp" "org3channelapp" "org4channelapp" "org5channelapp"
+  "org6channelapp" "org7channelapp" "org8channelapp" "org9channelapp" "org10channelapp"
+)
+
+# Function to determine function names and arguments based on chaincode
+get_function_names() {
+  local chaincode=$1
+  case $chaincode in
+    ResourceAllocate)
+      echo "AssignResource" "QueryResource" '["resource1", "100", "200", "1000"]' '["resource1"]'
+      ;;
+    BandwidthShare|DynamicRouting|LoadBalance|LatencyOptimize|EnergyOptimize|NetworkOptimize)
+      echo "AssignEntity" "QueryAssignment" '["entity1", "100", "200", "1000"]' '["entity1"]'
+      ;;
+    SpectrumManage)
+      echo "AssignSpectrum" "QuerySpectrum" '["spectrum1", "100", "200"]' '["spectrum1"]'
+      ;;
+    ResourceScale)
+      echo "ScaleResource" "QueryScale" '["resource1", "500"]' '["resource1"]'
+      ;;
+    ResourcePrioritize)
+      echo "PrioritizeResource" "QueryPriority" '["resource1", "high"]' '["resource1"]'
+      ;;
+    UserAuth|DeviceAuth|AccessControl|TokenAuth|RoleBasedAuth|IdentityVerify|SessionAuth|MultiFactorAuth|AuthPolicy|AuthAudit)
+      echo "RegisterUser" "QueryUser" '["user1", "role1"]' '["user1"]'
+      ;;
+    NetworkMonitor|PerformanceMonitor|TrafficMonitor|ResourceMonitor|HealthMonitor|AlertMonitor|LogMonitor|EventMonitor|MetricsCollector|StatusMonitor)
+      echo "RecordMetric" "QueryMetric" '["metric1", "value1"]' '["metric1"]'
+      ;;
+    Encryption|IntrusionDetect|FirewallRules|SecureChannel|ThreatMonitor|AccessLog|SecurityPolicy|VulnerabilityScan|DataIntegrity|SecureBackup)
+      echo "LogEvent" "QueryEvent" '["event1", "details1"]' '["event1"]'
+      ;;
+    TransactionAudit|ComplianceAudit|AccessAudit|EventAudit|PolicyAudit|DataAudit|UserAudit|SystemAudit|PerformanceAudit|SecurityAudit)
+      echo "LogAudit" "QueryAudit" '["audit1", "details1"]' '["audit1"]'
+      ;;
+    ConfigManage|PolicyManage|ResourceManage|NetworkManage|DeviceManage|UserManage|ServiceManage|EventManage|AlertManage|LogManage)
+      echo "UpdateConfig" "QueryConfig" '["config1", "value1"]' '["config1"]'
+      ;;
+    DataAnalytics|FaultDetect|AnomalyDetect|PredictiveMaintenance|PerformanceAnalytics|TrafficAnalytics|SecurityAnalytics|ResourceAnalytics|EventAnalytics|LogAnalytics)
+      echo "AnalyzeData" "QueryAnalysis" '["data1", "value1"]' '["data1"]'
+      ;;
+    *)
+      echo "Register" "Query" '["item1", "value1"]' '["item1"]'
+      ;;
+  esac
 }
 
-echo "تولید فایل‌های tapeConfig.yaml برای تمام قراردادها و کانال‌ها..."
-
-# لیست قراردادها
-chaincodes=(
-  "GeoAssign" "GeoUpdate" "GeoHandover" "AuthUser" "AuthIoT" "ConnectUser" "ConnectIoT"
-  "BandwidthAlloc" "AuthAntenna" "RegisterUser" "RegisterIoT" "RevokeUser" "RevokeIoT"
-  "RoleAssign" "AccessControl" "AuditIdentity" "IoTBandwidth" "AntennaLoad" "ResourceRequest"
-  "QoSManage" "SpectrumShare" "PriorityAssign" "ResourceAudit" "LoadBalance" "DynamicAlloc"
-  "AntennaStatus" "IoTStatus" "NetworkPerf" "UserActivity" "FaultDetect" "IoTFault"
-  "TrafficMonitor" "ReportGenerate" "LatencyTrack" "EnergyMonitor" "Roaming" "SessionTrack"
-  "IoTSession" "Disconnect" "Billing" "TransactionLog" "ConnectionAudit" "DataEncrypt"
-  "IoTEncrypt" "AccessLog" "IntrusionDetect" "KeyManage" "PrivacyPolicy" "SecureChannel"
-  "AuditSecurity" "EnergyOptimize" "NetworkOptimize" "IoTAnalytics" "UserAnalytics"
-  "SecurityMonitor" "QuantumEncrypt" "MultiAntenna" "EdgeCompute" "IoTHealth" "NetworkHealth"
-  "DataIntegrity" "PolicyEnforce" "DynamicRouting" "BandwidthShare" "LatencyOptimize"
-  "FaultPredict" "IoTConfig" "UserConfig" "AntennaConfig" "PerformanceAudit" "SecurityAudit"
-  "DataAnalytics" "RealTimeMonitor"
-)
-
-# لیست کانال‌ها و قراردادهای مرتبط
-declare -A channel_chaincodes
-channel_chaincodes=(
-  ["generalchannelapp"]="GeoAssign GeoUpdate GeoHandover AuthUser ConnectUser BandwidthAlloc AuthAntenna RegisterUser RegisterIoT RevokeUser RevokeIoT RoleAssign AccessControl AuditIdentity AntennaLoad ResourceRequest QoSManage SpectrumShare PriorityAssign ResourceAudit LoadBalance DynamicAlloc AntennaStatus NetworkPerf UserActivity FaultDetect ReportGenerate LatencyTrack EnergyMonitor Roaming SessionTrack Disconnect Billing TransactionLog ConnectionAudit DataEncrypt AccessLog KeyManage PrivacyPolicy EnergyOptimize NetworkOptimize UserAnalytics MultiAntenna EdgeCompute NetworkHealth DataIntegrity PolicyEnforce DynamicRouting BandwidthShare LatencyOptimize FaultPredict UserConfig AntennaConfig PerformanceAudit DataAnalytics RealTimeMonitor"
-  ["iotchannelapp"]="AuthIoT ConnectIoT IoTBandwidth IoTStatus IoTFault IoTSession IoTEncrypt IoTAnalytics IoTHealth IoTConfig"
-  ["securitychannelapp"]="IntrusionDetect KeyManage PrivacyPolicy SecureChannel AuditSecurity SecurityMonitor QuantumEncrypt SecurityAudit"
-  ["monitoringchannelapp"]="TrafficMonitor ReportGenerate LatencyTrack EnergyMonitor NetworkPerf NetworkHealth PerformanceAudit RealTimeMonitor DataAnalytics"
-)
-
-# ایجاد دایرکتوری tape
 mkdir -p tape
-check_error "ایجاد دایرکتوری tape"
-
-# تولید فایل tapeConfig.yaml برای هر قرارداد و کانال
-for channel in "${!channel_chaincodes[@]}"; do
-  for cc in ${channel_chaincodes[$channel]}; do
-    cat > tape/tape-${cc,,}-${channel}.yaml << EOL
----
-number: 1000
-rate: 100
-chaincodeID: ${cc}
+for chaincode in "${CHAINCODES[@]}"; do
+  for channel in "${CHANNELS[@]}"; do
+    read -r invoke_func query_func invoke_args query_args < <(get_function_names "$chaincode")
+    cat << EOF > tape/tape-${chaincode}-${channel}.yaml
+target: grpc://localhost:7051
 channel: ${channel}
-contractFunction: AssignEntity
-contractArguments:
-  - entity\${i}
-  - \${Math.random() * 500}
-  - \${Math.random() * 500}
-orderer: grpc://orderer1.example.com:7050
-tls:
-  enabled: true
-  caFile: crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-peers:
-  - grpc://peer0.org1.example.com:7051
-  - grpc://peer0.org2.example.com:8051
-  - grpc://peer0.org3.example.com:9051
-  - grpc://peer0.org4.example.com:10051
-  - grpc://peer0.org5.example.com:11051
-  - grpc://peer0.org6.example.com:12051
-  - grpc://peer0.org7.example.com:13051
-  - grpc://peer0.org8.example.com:14051
-  - grpc://peer0.org9.example.com:15051
-  - grpc://peer0.org10.example.com:16051
-msp:
-  id: Org1MSP
-  path: crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-EOL
-    check_error "تولید tapeConfig برای ${cc} در کانال ${channel}"
+chaincode: ${chaincode}
+ccType: golang
+nProc: 10
+testRound: 1
+txNumber: [1000]
+rate: [100]
+arguments:
+  - ["${invoke_func}", ${invoke_args}]
+  - ["${query_func}", ${query_args}]
+contractConfig:
+  endorsement:
+    orgs: ["Org1MSP", "Org2MSP", "Org3MSP", "Org4MSP", "Org5MSP", "Org6MSP", "Org7MSP", "Org8MSP", "Org9MSP", "Org10MSP"]
+EOF
   done
 done
 
-# تولید فایل‌های tapeConfig.yaml برای کانال‌های سازمانی
-for i in {1..10}; do
-  channel="org${i}channelapp"
-  for cc in "${chaincodes[@]}"; do
-    cat > tape/tape-${cc,,}-${channel}.yaml << EOL
----
-number: 1000
-rate: 100
-chaincodeID: ${cc}
-channel: ${channel}
-contractFunction: AssignEntity
-contractArguments:
-  - entity\${i}
-  - \${Math.random() * 500}
-  - \${Math.random() * 500}
-orderer: grpc://orderer1.example.com:7050
-tls:
-  enabled: true
-  caFile: crypto/peerOrganizations/org${i}.example.com/peers/peer0.org${i}.example.com/tls/ca.crt
-peers:
-  - grpc://peer0.org${i}.example.com:$((7051 + (i-1)*1000))
-msp:
-  id: Org${i}MSP
-  path: crypto/peerOrganizations/org${i}.example.com/users/Admin@org${i}.example.com/msp
-EOL
-    check_error "تولید tapeConfig برای ${cc} در کانال ${channel}"
-  done
-done
-
-echo "فایل‌های tapeConfig.yaml با موفقیت تولید شدند!"
+echo "Generated tape configs for ${#CHAINCODES[@]} chaincodes across ${#CHANNELS[@]} channels"
