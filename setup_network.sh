@@ -53,12 +53,16 @@ docker compose up -d || { echo "Failed to start Docker network"; exit 1; }
 
 # Wait for network to stabilize
 echo "Waiting for network to stabilize..."
-sleep 10
+sleep 30
+
+# Verify Orderer is accessible
+echo "Checking Orderer connectivity..."
+docker exec peer0.org1.example.com nc -zv orderer.example.com 7050 || { echo "Orderer not accessible at orderer.example.com:7050"; exit 1; }
 
 # Create and join channels
 for channel in generalchannelapp iotchannelapp securitychannelapp monitoringchannelapp org{1..10}channelapp; do
   echo "Creating channel $channel..."
-  docker exec peer0.org1.example.com peer channel create -o localhost:7050 -c $channel -f ./channel-artifacts/${channel}.tx --outputBlock ./channel-artifacts/${channel}.block --tls --cafile /var/hyperledger/peer/tls/ca.crt || { echo "Failed to create channel $channel"; exit 1; }
+  docker exec peer0.org1.example.com peer channel create -o orderer.example.com:7050 -c $channel -f ./channel-artifacts/${channel}.tx --outputBlock ./channel-artifacts/${channel}.block --tls --cafile /etc/hyperledger/fabric/tls/ca.crt || { echo "Failed to create channel $channel"; exit 1; }
   for i in {1..10}; do
     echo "Joining peer0.org${i}.example.com to $channel..."
     docker exec peer0.org${i}.example.com peer channel join -b ./channel-artifacts/${channel}.block || { echo "Failed to join peer0.org${i}.example.com to $channel"; exit 1; }
@@ -90,7 +94,7 @@ for chaincode in "${CHAINCODES[@]}"; do
   done
   for channel in generalchannelapp iotchannelapp securitychannelapp monitoringchannelapp org{1..10}channelapp; do
     echo "Instantiating chaincode $chaincode on $channel..."
-    docker exec peer0.org1.example.com peer chaincode instantiate -o localhost:7050 -C $channel -n $chaincode -v 1.0 -c '{"Args":["init"]}' -P "OR('Org1MSP.member','Org2MSP.member','Org3MSP.member','Org4MSP.member','Org5MSP.member','Org6MSP.member','Org7MSP.member','Org8MSP.member','Org9MSP.member','Org10MSP.member')" --tls --cafile /var/hyperledger/peer/tls/ca.crt || { echo "Failed to instantiate chaincode $chaincode on $channel"; exit 1; }
+    docker exec peer0.org1.example.com peer chaincode instantiate -o orderer.example.com:7050 -C $channel -n $chaincode -v 1.0 -c '{"Args":["init"]}' -P "OR('Org1MSP.member','Org2MSP.member','Org3MSP.member','Org4MSP.member','Org5MSP.member','Org6MSP.member','Org7MSP.member','Org8MSP.member','Org9MSP.member','Org10MSP.member')" --tls --cafile /etc/hyperledger/fabric/tls/ca.crt || { echo "Failed to instantiate chaincode $chaincode on $channel"; exit 1; }
     sleep 5 # Wait for instantiation to complete
   done
 done
