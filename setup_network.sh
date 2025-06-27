@@ -4,7 +4,7 @@
 command -v cryptogen >/dev/null 2>&1 || { echo "cryptogen is required but not installed. Aborting."; exit 1; }
 command -v configtxgen >/dev/null 2>&1 || { echo "configtxgen is required but not installed. Aborting."; exit 1; }
 command -v docker >/dev/null 2>&1 || { echo "docker is required but not installed. Aborting."; exit 1; }
-command -v docker-compose >/dev/null 2>&1 || { echo "docker-compose is required but not installed. Aborting."; exit 1; }
+#command -v docker-compose >/dev/null 2>&1 || { echo "docker-compose is required but not installed. Aborting."; exit 1; }
 
 # Clean up previous artifacts
 rm -rf channel-artifacts crypto-config
