@@ -357,6 +357,12 @@ Profiles:
       Capabilities:
         <<: *ApplicationCapabilities
       Policies:
+        Readers:
+          Type: ImplicitMeta
+          Rule: "ANY Readers"
+        Writers:
+          Type: ImplicitMeta
+          Rule: "ANY Writers"
         Admins:
           Type: ImplicitMeta
           Rule: "ANY Admins"
@@ -371,6 +377,12 @@ Profiles:
       Capabilities:
         <<: *ApplicationCapabilities
       Policies:
+        Readers:
+          Type: ImplicitMeta
+          Rule: "ANY Readers"
+        Writers:
+          Type: ImplicitMeta
+          Rule: "ANY Writers"
         Admins:
           Type: ImplicitMeta
           Rule: "ANY Admins"
@@ -385,6 +397,12 @@ Profiles:
       Capabilities:
         <<: *ApplicationCapabilities
       Policies:
+        Readers:
+          Type: ImplicitMeta
+          Rule: "ANY Readers"
+        Writers:
+          Type: ImplicitMeta
+          Rule: "ANY Writers"
         Admins:
           Type: ImplicitMeta
           Rule: "ANY Admins"
@@ -399,6 +417,12 @@ Profiles:
       Capabilities:
         <<: *ApplicationCapabilities
       Policies:
+        Readers:
+          Type: ImplicitMeta
+          Rule: "ANY Readers"
+        Writers:
+          Type: ImplicitMeta
+          Rule: "ANY Writers"
         Admins:
           Type: ImplicitMeta
           Rule: "ANY Admins"
@@ -413,6 +437,12 @@ Profiles:
       Capabilities:
         <<: *ApplicationCapabilities
       Policies:
+        Readers:
+          Type: ImplicitMeta
+          Rule: "ANY Readers"
+        Writers:
+          Type: ImplicitMeta
+          Rule: "ANY Writers"
         Admins:
           Type: ImplicitMeta
           Rule: "ANY Admins"
@@ -427,6 +457,12 @@ Profiles:
       Capabilities:
         <<: *ApplicationCapabilities
       Policies:
+        Readers:
+          Type: ImplicitMeta
+          Rule: "ANY Readers"
+        Writers:
+          Type: ImplicitMeta
+          Rule: "ANY Writers"
         Admins:
           Type: ImplicitMeta
           Rule: "ANY Admins"
@@ -441,6 +477,12 @@ Profiles:
       Capabilities:
         <<: *ApplicationCapabilities
       Policies:
+        Readers:
+          Type: ImplicitMeta
+          Rule: "ANY Readers"
+        Writers:
+          Type: ImplicitMeta
+          Rule: "ANY Writers"
         Admins:
           Type: ImplicitMeta
           Rule: "ANY Admins"
@@ -455,6 +497,12 @@ Profiles:
       Capabilities:
         <<: *ApplicationCapabilities
       Policies:
+        Readers:
+          Type: ImplicitMeta
+          Rule: "ANY Readers"
+        Writers:
+          Type: ImplicitMeta
+          Rule: "ANY Writers"
         Admins:
           Type: ImplicitMeta
           Rule: "ANY Admins"
@@ -469,6 +517,12 @@ Profiles:
       Capabilities:
         <<: *ApplicationCapabilities
       Policies:
+        Readers:
+          Type: ImplicitMeta
+          Rule: "ANY Readers"
+        Writers:
+          Type: ImplicitMeta
+          Rule: "ANY Writers"
         Admins:
           Type: ImplicitMeta
           Rule: "ANY Admins"
@@ -483,6 +537,12 @@ Profiles:
       Capabilities:
         <<: *ApplicationCapabilities
       Policies:
+        Readers:
+          Type: ImplicitMeta
+          Rule: "ANY Readers"
+        Writers:
+          Type: ImplicitMeta
+          Rule: "ANY Writers"
         Admins:
           Type: ImplicitMeta
           Rule: "ANY Admins"
