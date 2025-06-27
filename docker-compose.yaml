@@ -81,6 +81,7 @@ services:
       - ./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
+      - ./crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp:/etc/hyperledger/fabric/users/Admin@org1.example.com/msp
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org1:/var/hyperledger/production
@@ -140,6 +141,7 @@ services:
       - ./crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
+      - ./crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp:/etc/hyperledger/fabric/users/Admin@org2.example.com/msp
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org2:/var/hyperledger/production
@@ -199,6 +201,7 @@ services:
       - ./crypto-config/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
+      - ./crypto-config/peerOrganizations/org3.example.com/users/Admin@org3.example.com/msp:/etc/hyperledger/fabric/users/Admin@org3.example.com/msp
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org3:/var/hyperledger/production
@@ -258,6 +261,7 @@ services:
       - ./crypto-config/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
+      - ./crypto-config/peerOrganizations/org4.example.com/users/Admin@org4.example.com/msp:/etc/hyperledger/fabric/users/Admin@org4.example.com/msp
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org4:/var/hyperledger/production
@@ -317,6 +321,7 @@ services:
       - ./crypto-config/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
+      - ./crypto-config/peerOrganizations/org5.example.com/users/Admin@org5.example.com/msp:/etc/hyperledger/fabric/users/Admin@org5.example.com/msp
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org5:/var/hyperledger/production
@@ -376,6 +381,7 @@ services:
       - ./crypto-config/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
+      - ./crypto-config/peerOrganizations/org6.example.com/users/Admin@org6.example.com/msp:/etc/hyperledger/fabric/users/Admin@org6.example.com/msp
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org6:/var/hyperledger/production
@@ -435,6 +441,7 @@ services:
       - ./crypto-config/peerOrganizations/org7.example.com/peers/peer0.org7.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org7.example.com/peers/peer0.org7.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
+      - ./crypto-config/peerOrganizations/org7.example.com/users/Admin@org7.example.com/msp:/etc/hyperledger/fabric/users/Admin@org7.example.com/msp
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org7:/var/hyperledger/production
@@ -494,6 +501,7 @@ services:
       - ./crypto-config/peerOrganizations/org8.example.com/peers/peer0.org8.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org8.example.com/peers/peer0.org8.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
+      - ./crypto-config/peerOrganizations/org8.example.com/users/Admin@org8.example.com/msp:/etc/hyperledger/fabric/users/Admin@org8.example.com/msp
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org8:/var/hyperledger/production
@@ -553,6 +561,7 @@ services:
       - ./crypto-config/peerOrganizations/org9.example.com/peers/peer0.org9.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org9.example.com/peers/peer0.org9.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
+      - ./crypto-config/peerOrganizations/org9.example.com/users/Admin@org9.example.com/msp:/etc/hyperledger/fabric/users/Admin@org9.example.com/msp
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org9:/var/hyperledger/production
@@ -612,6 +621,7 @@ services:
       - ./crypto-config/peerOrganizations/org10.example.com/peers/peer0.org10.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org10.example.com/peers/peer0.org10.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
+      - ./crypto-config/peerOrganizations/org10.example.com/users/Admin@org10.example.com/msp:/etc/hyperledger/fabric/users/Admin@org10.example.com/msp
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org10:/var/hyperledger/production
