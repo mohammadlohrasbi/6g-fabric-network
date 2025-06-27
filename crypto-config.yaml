@@ -1,3 +1,4 @@
+# crypto-config.yaml
 OrdererOrgs:
   - Name: Orderer
     Domain: example.com
