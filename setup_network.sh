@@ -6,6 +6,12 @@ command -v configtxgen >/dev/null 2>&1 || { echo "configtxgen is required but no
 command -v docker >/dev/null 2>&1 || { echo "docker is required but not installed. Aborting."; exit 1; }
 #command -v docker-compose >/dev/null 2>&1 || { echo "docker-compose is required but not installed. Aborting."; exit 1; }
 
+# Verify configtx.yaml exists
+if [ ! -f "configtx.yaml" ]; then
+  echo "configtx.yaml not found in current directory. Aborting."
+  exit 1
+fi
+
 # Clean up previous artifacts
 rm -rf channel-artifacts crypto-config
 mkdir -p channel-artifacts
@@ -29,6 +35,8 @@ fi
 # Generate genesis block and channel artifacts
 export FABRIC_CFG_PATH=$PWD
 echo "Generating genesis block and channel artifacts..."
+echo "Verifying configtx.yaml content:"
+cat configtx.yaml
 configtxgen -profile OrdererGenesis -outputBlock ./channel-artifacts/genesis.block || { echo "Failed to generate genesis.block"; exit 1; }
 configtxgen -profile GeneralChannelApp -outputCreateChannelTx ./channel-artifacts/generalchannelapp.tx -channelID generalchannelapp || { echo "Failed to generate generalchannelapp.tx"; exit 1; }
 configtxgen -profile IoTChannelApp -outputCreateChannelTx ./channel-artifacts/iotchannelapp.tx -channelID iotchannelapp || { echo "Failed to generate iotchannelapp.tx"; exit 1; }
