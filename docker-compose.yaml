@@ -1,4 +1,3 @@
-# docker-compose.yaml
 version: '2'
 
 networks:
@@ -83,6 +82,7 @@ services:
       - ./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org1:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
@@ -91,6 +91,11 @@ services:
       - 9443:9443
     depends_on:
       - orderer.example.com
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "7051"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - fabric
 
@@ -136,6 +141,7 @@ services:
       - ./crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org2:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
@@ -144,6 +150,11 @@ services:
       - 10443:10443
     depends_on:
       - orderer.example.com
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9051"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - fabric
 
@@ -189,6 +200,7 @@ services:
       - ./crypto-config/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org3:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
@@ -197,6 +209,11 @@ services:
       - 11443:11443
     depends_on:
       - orderer.example.com
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "11051"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - fabric
 
@@ -242,6 +259,7 @@ services:
       - ./crypto-config/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org4:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
@@ -250,6 +268,11 @@ services:
       - 13443:13443
     depends_on:
       - orderer.example.com
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "13051"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - fabric
 
@@ -295,6 +318,7 @@ services:
       - ./crypto-config/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org5:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
@@ -303,6 +327,11 @@ services:
       - 15443:15443
     depends_on:
       - orderer.example.com
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "15051"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - fabric
 
@@ -348,6 +377,7 @@ services:
       - ./crypto-config/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org6:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
@@ -356,6 +386,11 @@ services:
       - 17443:17443
     depends_on:
       - orderer.example.com
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "17051"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - fabric
 
@@ -401,6 +436,7 @@ services:
       - ./crypto-config/peerOrganizations/org7.example.com/peers/peer0.org7.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org7:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
@@ -409,6 +445,11 @@ services:
       - 19443:19443
     depends_on:
       - orderer.example.com
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "19051"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - fabric
 
@@ -454,6 +495,7 @@ services:
       - ./crypto-config/peerOrganizations/org8.example.com/peers/peer0.org8.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org8:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
@@ -462,6 +504,11 @@ services:
       - 21443:21443
     depends_on:
       - orderer.example.com
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "21051"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - fabric
 
@@ -507,6 +554,7 @@ services:
       - ./crypto-config/peerOrganizations/org9.example.com/peers/peer0.org9.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org9:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
@@ -515,6 +563,11 @@ services:
       - 23443:23443
     depends_on:
       - orderer.example.com
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "23051"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - fabric
 
@@ -560,6 +613,7 @@ services:
       - ./crypto-config/peerOrganizations/org10.example.com/peers/peer0.org10.example.com/tls:/etc/hyperledger/fabric/tls
       - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./chaincode:/opt/gopath/src/github.com/chaincode
       - ./production/peer0.org10:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
@@ -568,5 +622,10 @@ services:
       - 25443:25443
     depends_on:
       - orderer.example.com
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "25051"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - fabric
