@@ -33,6 +33,11 @@ services:
     ports:
       - 7050:7050
       - 8443:8443
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "7050"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - fabric
 
@@ -76,6 +81,7 @@ services:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls:/etc/hyperledger/fabric/tls
+      - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./production/peer0.org1:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
@@ -128,6 +134,7 @@ services:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls:/etc/hyperledger/fabric/tls
+      - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./production/peer0.org2:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
@@ -180,6 +187,7 @@ services:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls:/etc/hyperledger/fabric/tls
+      - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./production/peer0.org3:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
@@ -232,6 +240,7 @@ services:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls:/etc/hyperledger/fabric/tls
+      - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./production/peer0.org4:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
@@ -284,6 +293,7 @@ services:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org5.example.com/peers/peer0.org5.example.com/tls:/etc/hyperledger/fabric/tls
+      - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./production/peer0.org5:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
@@ -336,6 +346,7 @@ services:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org6.example.com/peers/peer0.org6.example.com/tls:/etc/hyperledger/fabric/tls
+      - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./production/peer0.org6:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
@@ -388,6 +399,7 @@ services:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org7.example.com/peers/peer0.org7.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org7.example.com/peers/peer0.org7.example.com/tls:/etc/hyperledger/fabric/tls
+      - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./production/peer0.org7:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
@@ -440,6 +452,7 @@ services:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org8.example.com/peers/peer0.org8.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org8.example.com/peers/peer0.org8.example.com/tls:/etc/hyperledger/fabric/tls
+      - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./production/peer0.org8:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
@@ -492,6 +505,7 @@ services:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org9.example.com/peers/peer0.org9.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org9.example.com/peers/peer0.org9.example.com/tls:/etc/hyperledger/fabric/tls
+      - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./production/peer0.org9:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
@@ -544,6 +558,7 @@ services:
       - /var/run/:/host/var/run/
       - ./crypto-config/peerOrganizations/org10.example.com/peers/peer0.org10.example.com/msp:/etc/hyperledger/fabric/msp
       - ./crypto-config/peerOrganizations/org10.example.com/peers/peer0.org10.example.com/tls:/etc/hyperledger/fabric/tls
+      - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt:/etc/hyperledger/fabric/tls/orderer-ca.crt
       - ./channel-artifacts:/etc/hyperledger/configtx
       - ./production/peer0.org10:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
