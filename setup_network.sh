@@ -1,3 +1,4 @@
+```bash
 #!/bin/bash
 
 # Check prerequisites
@@ -14,7 +15,7 @@ fi
 
 # Clean up previous artifacts
 rm -rf channel-artifacts crypto-config production
-mkdir -p channel-artifacts production
+mkdir -p channel-artifacts production chaincode
 
 # Generate crypto material
 echo "Generating crypto material..."
@@ -24,6 +25,10 @@ cryptogen generate --config=./crypto-config.yaml || { echo "Failed to generate c
 for org in {1..10}; do
   if [ ! -d "crypto-config/peerOrganizations/org${org}.example.com/msp" ]; then
     echo "MSP directory for Org${org} not found. Aborting."
+    exit 1
+  fi
+  if [ ! -d "crypto-config/peerOrganizations/org${org}.example.com/users/Admin@org${org}.example.com/msp" ]; then
+    echo "Admin MSP directory for Org${org} not found. Aborting."
     exit 1
   fi
 done
@@ -61,7 +66,7 @@ docker compose up -d || { echo "Failed to start Docker network"; exit 1; }
 
 # Wait for network to stabilize
 echo "Waiting for network to stabilize..."
-sleep 60
+sleep 90
 
 # Verify Orderer is accessible
 echo "Checking Orderer connectivity..."
@@ -73,13 +78,17 @@ for channel in generalchannelapp iotchannelapp securitychannelapp monitoringchan
   docker exec peer0.org1.example.com ls -l /etc/hyperledger/configtx/${channel}.tx || { echo "Channel artifact ${channel}.tx not found in container"; exit 1; }
 done
 
+# Verify TLS CA certificate
+echo "Verifying TLS CA certificate in peer0.org1.example.com..."
+docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/tls/orderer-ca.crt || { echo "TLS CA certificate not found in container"; exit 1; }
+
 # Create and join channels
 for channel in generalchannelapp iotchannelapp securitychannelapp monitoringchannelapp org{1..10}channelapp; do
   echo "Creating channel $channel..."
-  docker exec peer0.org1.example.com peer channel create -o orderer.example.com:7050 -c $channel -f /etc/hyperledger/configtx/${channel}.tx --outputBlock /etc/hyperledger/configtx/${channel}.block --tls --cafile /etc/hyperledger/fabric/tls/orderer-ca.crt || { echo "Failed to create channel $channel"; exit 1; }
+  docker exec -e CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org1.example.com/msp peer0.org1.example.com peer channel create -o orderer.example.com:7050 -c $channel -f /etc/hyperledger/configtx/${channel}.tx --outputBlock /etc/hyperledger/configtx/${channel}.block --tls --cafile /etc/hyperledger/fabric/tls/orderer-ca.crt || { echo "Failed to create channel $channel"; exit 1; }
   for i in {1..10}; do
     echo "Joining peer0.org${i}.example.com to $channel..."
-    docker exec peer0.org${i}.example.com peer channel join -b /etc/hyperledger/configtx/${channel}.block || { echo "Failed to join peer0.org${i}.example.com to $channel"; exit 1; }
+    docker exec -e CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org${i}.example.com/msp peer0.org${i}.example.com peer channel join -b /etc/hyperledger/configtx/${channel}.block || { echo "Failed to join peer0.org${i}.example.com to $channel"; exit 1; }
   done
 done
 
@@ -104,11 +113,11 @@ CHAINCODES=(
 for chaincode in "${CHAINCODES[@]}"; do
   for i in {1..10}; do
     echo "Installing chaincode $chaincode on peer0.org${i}.example.com..."
-    docker exec peer0.org${i}.example.com peer chaincode install -n $chaincode -v 1.0 -p /opt/gopath/src/github.com/chaincode/$chaincode || { echo "Failed to install chaincode $chaincode on peer0.org${i}.example.com"; exit 1; }
+    docker exec -e CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org${i}.example.com/msp peer0.org${i}.example.com peer chaincode install -n $chaincode -v 1.0 -p /opt/gopath/src/github.com/chaincode/$chaincode || { echo "Failed to install chaincode $chaincode on peer0.org${i}.example.com"; exit 1; }
   done
   for channel in generalchannelapp iotchannelapp securitychannelapp monitoringchannelapp org{1..10}channelapp; do
     echo "Instantiating chaincode $chaincode on $channel..."
-    docker exec peer0.org1.example.com peer chaincode instantiate -o orderer.example.com:7050 -C $channel -n $chaincode -v 1.0 -c '{"Args":["init"]}' -P "OR('Org1MSP.member','Org2MSP.member','Org3MSP.member','Org4MSP.member','Org5MSP.member','Org6MSP.member','Org7MSP.member','Org8MSP.member','Org9MSP.member','Org10MSP.member')" --tls --cafile /etc/hyperledger/fabric/tls/orderer-ca.crt || { echo "Failed to instantiate chaincode $chaincode on $channel"; exit 1; }
+    docker exec -e CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org1.example.com/msp peer0.org1.example.com peer chaincode instantiate -o orderer.example.com:7050 -C $channel -n $chaincode -v 1.0 -c '{"Args":["init"]}' -P "OR('Org1MSP.member','Org2MSP.member','Org3MSP.member','Org4MSP.member','Org5MSP.member','Org6MSP.member','Org7MSP.member','Org8MSP.member','Org9MSP.member','Org10MSP.member')" --tls --cafile /etc/hyperledger/fabric/tls/orderer-ca.crt || { echo "Failed to instantiate chaincode $chaincode on $channel"; exit 1; }
     sleep 5 # Wait for instantiation to complete
   done
 done
