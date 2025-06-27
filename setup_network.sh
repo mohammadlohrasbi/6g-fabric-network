@@ -14,6 +14,18 @@ mkdir -p channel-artifacts
 echo "Generating crypto material..."
 cryptogen generate --config=./crypto-config.yaml || { echo "Failed to generate crypto material"; exit 1; }
 
+# Verify MSP directories
+for org in {1..10}; do
+  if [ ! -d "crypto-config/peerOrganizations/org${org}.example.com/msp" ]; then
+    echo "MSP directory for Org${org} not found. Aborting."
+    exit 1
+  fi
+done
+if [ ! -d "crypto-config/ordererOrganizations/example.com/msp" ]; then
+  echo "MSP directory for Orderer not found. Aborting."
+  exit 1
+fi
+
 # Generate genesis block and channel artifacts
 export FABRIC_CFG_PATH=$PWD
 echo "Generating genesis block and channel artifacts..."
