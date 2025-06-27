@@ -192,6 +192,17 @@ Capabilities:
   Application: &ApplicationCapabilities
     V2_0: true
 Application: &Application
+  Organizations:
+    - *Org1
+    - *Org2
+    - *Org3
+    - *Org4
+    - *Org5
+    - *Org6
+    - *Org7
+    - *Org8
+    - *Org9
+    - *Org10
   Policies:
     Readers:
       Type: ImplicitMeta
@@ -221,6 +232,19 @@ Orderer: &Orderer
     PreferredMaxBytes: 512 KB
   Organizations:
     - *OrdererOrg
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
   Capabilities:
     *OrdererCapabilities
 Channel: &Channel
@@ -239,6 +263,7 @@ Channel: &Channel
 Profiles:
   GeneralChannelApp:
     Consortium: SampleConsortium
+    <<: *Channel
     Application:
       <<: *Application
       Organizations:
@@ -254,6 +279,7 @@ Profiles:
         - *Org10
   IoTChannelApp:
     Consortium: SampleConsortium
+    <<: *Channel
     Application:
       <<: *Application
       Organizations:
@@ -269,6 +295,7 @@ Profiles:
         - *Org10
   SecurityChannelApp:
     Consortium: SampleConsortium
+    <<: *Channel
     Application:
       <<: *Application
       Organizations:
@@ -284,6 +311,7 @@ Profiles:
         - *Org10
   MonitoringChannelApp:
     Consortium: SampleConsortium
+    <<: *Channel
     Application:
       <<: *Application
       Organizations:
@@ -299,60 +327,70 @@ Profiles:
         - *Org10
   Org1ChannelApp:
     Consortium: SampleConsortium
+    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org1
   Org2ChannelApp:
     Consortium: SampleConsortium
+    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org2
   Org3ChannelApp:
     Consortium: SampleConsortium
+    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org3
   Org4ChannelApp:
     Consortium: SampleConsortium
+    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org4
   Org5ChannelApp:
     Consortium: SampleConsortium
+    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org5
   Org6ChannelApp:
     Consortium: SampleConsortium
+    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org6
   Org7ChannelApp:
     Consortium: SampleConsortium
+    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org7
   Org8ChannelApp:
     Consortium: SampleConsortium
+    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org8
   Org9ChannelApp:
     Consortium: SampleConsortium
+    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org9
   Org10ChannelApp:
     Consortium: SampleConsortium
+    <<: *Channel
     Application:
       <<: *Application
       Organizations:
