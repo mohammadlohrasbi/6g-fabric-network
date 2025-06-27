@@ -1,16 +1,33 @@
+---
 Organizations:
   - &OrdererOrg
     Name: OrdererOrg
     ID: OrdererMSP
     MSPDir: crypto-config/ordererOrganizations/example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.admin')"
   - &Org1
     Name: Org1MSP
     ID: Org1MSP
     MSPDir: crypto-config/peerOrganizations/org1.example.com/msp
     Policies:
-      Readers: { Type: Signature, Rule: "OR('Org1MSP.member')" }
-      Writers: { Type: Signature, Rule: "OR('Org1MSP.member')" }
-      Admins: { Type: Signature, Rule: "OR('Org1MSP.admin')" }
+      Readers:
+        Type: Signature
+        Rule: "OR('Org1MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org1MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org1MSP.admin')"
     AnchorPeers:
       - Host: peer0.org1.example.com
         Port: 7051
@@ -19,9 +36,15 @@ Organizations:
     ID: Org2MSP
     MSPDir: crypto-config/peerOrganizations/org2.example.com/msp
     Policies:
-      Readers: { Type: Signature, Rule: "OR('Org2MSP.member')" }
-      Writers: { Type: Signature, Rule: "OR('Org2MSP.member')" }
-      Admins: { Type: Signature, Rule: "OR('Org2MSP.admin')" }
+      Readers:
+        Type: Signature
+        Rule: "OR('Org2MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org2MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org2MSP.admin')"
     AnchorPeers:
       - Host: peer0.org2.example.com
         Port: 8051
@@ -30,9 +53,15 @@ Organizations:
     ID: Org3MSP
     MSPDir: crypto-config/peerOrganizations/org3.example.com/msp
     Policies:
-      Readers: { Type: Signature, Rule: "OR('Org3MSP.member')" }
-      Writers: { Type: Signature, Rule: "OR('Org3MSP.member')" }
-      Admins: { Type: Signature, Rule: "OR('Org3MSP.admin')" }
+      Readers:
+        Type: Signature
+        Rule: "OR('Org3MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org3MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org3MSP.admin')"
     AnchorPeers:
       - Host: peer0.org3.example.com
         Port: 9051
@@ -41,9 +70,15 @@ Organizations:
     ID: Org4MSP
     MSPDir: crypto-config/peerOrganizations/org4.example.com/msp
     Policies:
-      Readers: { Type: Signature, Rule: "OR('Org4MSP.member')" }
-      Writers: { Type: Signature, Rule: "OR('Org4MSP.member')" }
-      Admins: { Type: Signature, Rule: "OR('Org4MSP.admin')" }
+      Readers:
+        Type: Signature
+        Rule: "OR('Org4MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org4MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org4MSP.admin')"
     AnchorPeers:
       - Host: peer0.org4.example.com
         Port: 10051
@@ -52,9 +87,15 @@ Organizations:
     ID: Org5MSP
     MSPDir: crypto-config/peerOrganizations/org5.example.com/msp
     Policies:
-      Readers: { Type: Signature, Rule: "OR('Org5MSP.member')" }
-      Writers: { Type: Signature, Rule: "OR('Org5MSP.member')" }
-      Admins: { Type: Signature, Rule: "OR('Org5MSP.admin')" }
+      Readers:
+        Type: Signature
+        Rule: "OR('Org5MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org5MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org5MSP.admin')"
     AnchorPeers:
       - Host: peer0.org5.example.com
         Port: 11051
@@ -63,9 +104,15 @@ Organizations:
     ID: Org6MSP
     MSPDir: crypto-config/peerOrganizations/org6.example.com/msp
     Policies:
-      Readers: { Type: Signature, Rule: "OR('Org6MSP.member')" }
-      Writers: { Type: Signature, Rule: "OR('Org6MSP.member')" }
-      Admins: { Type: Signature, Rule: "OR('Org6MSP.admin')" }
+      Readers:
+        Type: Signature
+        Rule: "OR('Org6MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org6MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org6MSP.admin')"
     AnchorPeers:
       - Host: peer0.org6.example.com
         Port: 12051
@@ -74,9 +121,15 @@ Organizations:
     ID: Org7MSP
     MSPDir: crypto-config/peerOrganizations/org7.example.com/msp
     Policies:
-      Readers: { Type: Signature, Rule: "OR('Org7MSP.member')" }
-      Writers: { Type: Signature, Rule: "OR('Org7MSP.member')" }
-      Admins: { Type: Signature, Rule: "OR('Org7MSP.admin')" }
+      Readers:
+        Type: Signature
+        Rule: "OR('Org7MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org7MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org7MSP.admin')"
     AnchorPeers:
       - Host: peer0.org7.example.com
         Port: 13051
@@ -85,9 +138,15 @@ Organizations:
     ID: Org8MSP
     MSPDir: crypto-config/peerOrganizations/org8.example.com/msp
     Policies:
-      Readers: { Type: Signature, Rule: "OR('Org8MSP.member')" }
-      Writers: { Type: Signature, Rule: "OR('Org8MSP.member')" }
-      Admins: { Type: Signature, Rule: "OR('Org8MSP.admin')" }
+      Readers:
+        Type: Signature
+        Rule: "OR('Org8MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org8MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org8MSP.admin')"
     AnchorPeers:
       - Host: peer0.org8.example.com
         Port: 14051
@@ -96,9 +155,15 @@ Organizations:
     ID: Org9MSP
     MSPDir: crypto-config/peerOrganizations/org9.example.com/msp
     Policies:
-      Readers: { Type: Signature, Rule: "OR('Org9MSP.member')" }
-      Writers: { Type: Signature, Rule: "OR('Org9MSP.member')" }
-      Admins: { Type: Signature, Rule: "OR('Org9MSP.admin')" }
+      Readers:
+        Type: Signature
+        Rule: "OR('Org9MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org9MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org9MSP.admin')"
     AnchorPeers:
       - Host: peer0.org9.example.com
         Port: 15051
@@ -107,9 +172,15 @@ Organizations:
     ID: Org10MSP
     MSPDir: crypto-config/peerOrganizations/org10.example.com/msp
     Policies:
-      Readers: { Type: Signature, Rule: "OR('Org10MSP.member')" }
-      Writers: { Type: Signature, Rule: "OR('Org10MSP.member')" }
-      Admins: { Type: Signature, Rule: "OR('Org10MSP.admin')" }
+      Readers:
+        Type: Signature
+        Rule: "OR('Org10MSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org10MSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org10MSP.admin')"
     AnchorPeers:
       - Host: peer0.org10.example.com
         Port: 16051
@@ -121,87 +192,140 @@ Capabilities:
   Application: &ApplicationCapabilities
     V2_0: true
 Application:
-  Organizations: [Org1, Org2, Org3, Org4, Org5, Org6, Org7, Org8, Org9, Org10]
+  Organizations:
+    - *Org1
+    - *Org2
+    - *Org3
+    - *Org4
+    - *Org5
+    - *Org6
+    - *Org7
+    - *Org8
+    - *Org9
+    - *Org10
+  Capabilities:
+    *ApplicationCapabilities
 Orderer:
   OrdererType: etcdraft
-  Addresses: [orderer.example.com:7050]
+  Addresses:
+    - orderer.example.com:7050
   BatchTimeout: 2s
   BatchSize:
     MaxMessageCount: 10
     AbsoluteMaxBytes: 99 MB
     PreferredMaxBytes: 512 KB
-  Organizations: [OrdererOrg]
-  Capabilities: *OrdererCapabilities
+  Organizations:
+    - *OrdererOrg
+  Capabilities:
+    *OrdererCapabilities
 Channel:
-  Capabilities: *ChannelCapabilities
+  Capabilities:
+    *ChannelCapabilities
 Profiles:
   GeneralChannelApp:
     Consortium: SampleConsortium
-    Application:
-      Organizations: [Org1, Org2, Org3, Org4, Org5, Org6, Org7, Org8, Org9, Org10]
-      Capabilities: *ApplicationCapabilities
+    <<: *Application
+    Organizations:
+      - *Org1
+      - *Org2
+      - *Org3
+      - *Org4
+      - *Org5
+      - *Org6
+      - *Org7
+      - *Org8
+      - *Org9
+      - *Org10
   IoTChannelApp:
     Consortium: SampleConsortium
-    Application:
-      Organizations: [Org1, Org2, Org3, Org4, Org5, Org6, Org7, Org8, Org9, Org10]
-      Capabilities: *ApplicationCapabilities
+    <<: *Application
+    Organizations:
+      - *Org1
+      - *Org2
+      - *Org3
+      - *Org4
+      - *Org5
+      - *Org6
+      - *Org7
+      - *Org8
+      - *Org9
+      - *Org10
   SecurityChannelApp:
     Consortium: SampleConsortium
-    Application:
-      Organizations: [Org1, Org2, Org3, Org4, Org5, Org6, Org7, Org8, Org9, Org10]
-      Capabilities: *ApplicationCapabilities
+    <<: *Application
+    Organizations:
+      - *Org1
+      - *Org2
+      - *Org3
+      - *Org4
+      - *Org5
+      - *Org6
+      - *Org7
+      - *Org8
+      - *Org9
+      - *Org10
   MonitoringChannelApp:
     Consortium: SampleConsortium
-    Application:
-      Organizations: [Org1, Org2, Org3, Org4, Org5, Org6, Org7, Org8, Org9, Org10]
-      Capabilities: *ApplicationCapabilities
+    <<: *Application
+    Organizations:
+      - *Org1
+      - *Org2
+      - *Org3
+      - *Org4
+      - *Org5
+      - *Org6
+      - *Org7
+      - *Org8
+      - *Org9
+      - *Org10
   Org1ChannelApp:
     Consortium: SampleConsortium
-    Application:
-      Organizations: [Org1]
-      Capabilities: *ApplicationCapabilities
+    <<: *Application
+    Organizations:
+      - *Org1
   Org2ChannelApp:
     Consortium: SampleConsortium
-    Application:
-      Organizations: [Org2]
-      Capabilities: *ApplicationCapabilities
+    <<: *Application
+    Organizations:
+      - *Org2
   Org3ChannelApp:
     Consortium: SampleConsortium
-    Application:
-      Organizations: [Org3]
-      Capabilities: *ApplicationCapabilities
+    <<: *Application
+    Organizations:
+      - *Org3
   Org4ChannelApp:
     Consortium: SampleConsortium
-    Application:
-      Organizations: [Org4]
-      Capabilities: *ApplicationCapabilities
+    <<: *Application
+    Organizations:
+      - *Org4
   Org5ChannelApp:
     Consortium: SampleConsortium
-    Application:
-      Organizations: [Org5]
-      Capabilities: *ApplicationCapabilities
+    <<: *Application
+    Organizations:
+      - *Org5
   Org6ChannelApp:
     Consortium: SampleConsortium
-    Application:
-      Organizations: [Org6]
-      Capabilities: *ApplicationCapabilities
+    <<: *Application
+    Organizations:
+      - *Org6
   Org7ChannelApp:
     Consortium: SampleConsortium
-    Application:
-      Organizations: [Org7]
-      Capabilities: *ApplicationCapabilities
+    <<: *Application
+    Organizations:
+      - *Org7
   Org8ChannelApp:
     Consortium: SampleConsortium
-    Application:
-      Organizations: [Org8]
-      Capabilities: *ApplicationCapabilities
+    <<: *Application
+    Organizations:
+      - *Org8
   Org9ChannelApp:
     Consortium: SampleConsortium
-    Application:
-      Organizations: [Org9]
-      Capabilities: *ApplicationCapabilities
+    <<: *Application
+    Organizations:
+      - *Org9
   Org10ChannelApp:
     Consortium: SampleConsortium
-    Application:
-      Organizations: [Org10]
-      Capabilities: *ApplicationCapabilities
+    <<: *Application
+    Organizations:
+      - *Org10
+---
