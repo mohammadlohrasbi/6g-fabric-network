@@ -29,6 +29,7 @@ fi
 # Generate genesis block and channel artifacts
 export FABRIC_CFG_PATH=$PWD
 echo "Generating genesis block and channel artifacts..."
+configtxgen -profile OrdererGenesis -outputBlock ./channel-artifacts/genesis.block || { echo "Failed to generate genesis.block"; exit 1; }
 configtxgen -profile GeneralChannelApp -outputCreateChannelTx ./channel-artifacts/generalchannelapp.tx -channelID generalchannelapp || { echo "Failed to generate generalchannelapp.tx"; exit 1; }
 configtxgen -profile IoTChannelApp -outputCreateChannelTx ./channel-artifacts/iotchannelapp.tx -channelID iotchannelapp || { echo "Failed to generate iotchannelapp.tx"; exit 1; }
 configtxgen -profile SecurityChannelApp -outputCreateChannelTx ./channel-artifacts/securitychannelapp.tx -channelID securitychannelapp || { echo "Failed to generate securitychannelapp.tx"; exit 1; }
@@ -36,7 +37,6 @@ configtxgen -profile MonitoringChannelApp -outputCreateChannelTx ./channel-artif
 for i in {1..10}; do
   configtxgen -profile Org${i}ChannelApp -outputCreateChannelTx ./channel-artifacts/org${i}channelapp.tx -channelID org${i}channelapp || { echo "Failed to generate org${i}channelapp.tx"; exit 1; }
 done
-configtxgen -profile GeneralChannelApp -outputBlock ./channel-artifacts/genesis.block || { echo "Failed to generate genesis.block"; exit 1; }
 
 # Start network
 echo "Starting Docker network..."
