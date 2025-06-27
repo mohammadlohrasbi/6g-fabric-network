@@ -63,7 +63,7 @@ The project directory (`~/6g-fabric-network`) is organized as follows:
 1. **Prepare the Environment**:
    ```bash
    cd ~/6g-fabric-network
-   docker-compose -f docker-compose.yaml down
+   docker compose down
    docker rm -f $(docker ps -a -q)
    docker network rm 6g-fabric-network_fabric
    rm -rf channel-artifacts crypto-config production
