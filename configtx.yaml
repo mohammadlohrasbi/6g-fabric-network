@@ -1,7 +1,7 @@
----
+# configtx.yaml
 Organizations:
   - &OrdererOrg
-    Name: OrdererOrg
+    Name: OrdererMSP
     ID: OrdererMSP
     MSPDir: crypto-config/ordererOrganizations/example.com/msp
     Policies:
@@ -28,6 +28,9 @@ Organizations:
       Admins:
         Type: Signature
         Rule: "OR('Org1MSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('Org1MSP.member')"
     AnchorPeers:
       - Host: peer0.org1.example.com
         Port: 7051
@@ -45,9 +48,12 @@ Organizations:
       Admins:
         Type: Signature
         Rule: "OR('Org2MSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('Org2MSP.member')"
     AnchorPeers:
       - Host: peer0.org2.example.com
-        Port: 8051
+        Port: 9051
   - &Org3
     Name: Org3MSP
     ID: Org3MSP
@@ -62,9 +68,12 @@ Organizations:
       Admins:
         Type: Signature
         Rule: "OR('Org3MSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('Org3MSP.member')"
     AnchorPeers:
       - Host: peer0.org3.example.com
-        Port: 9051
+        Port: 11051
   - &Org4
     Name: Org4MSP
     ID: Org4MSP
@@ -79,9 +88,12 @@ Organizations:
       Admins:
         Type: Signature
         Rule: "OR('Org4MSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('Org4MSP.member')"
     AnchorPeers:
       - Host: peer0.org4.example.com
-        Port: 10051
+        Port: 13051
   - &Org5
     Name: Org5MSP
     ID: Org5MSP
@@ -96,9 +108,12 @@ Organizations:
       Admins:
         Type: Signature
         Rule: "OR('Org5MSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('Org5MSP.member')"
     AnchorPeers:
       - Host: peer0.org5.example.com
-        Port: 11051
+        Port: 15051
   - &Org6
     Name: Org6MSP
     ID: Org6MSP
@@ -113,9 +128,12 @@ Organizations:
       Admins:
         Type: Signature
         Rule: "OR('Org6MSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('Org6MSP.member')"
     AnchorPeers:
       - Host: peer0.org6.example.com
-        Port: 12051
+        Port: 17051
   - &Org7
     Name: Org7MSP
     ID: Org7MSP
@@ -130,9 +148,12 @@ Organizations:
       Admins:
         Type: Signature
         Rule: "OR('Org7MSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('Org7MSP.member')"
     AnchorPeers:
       - Host: peer0.org7.example.com
-        Port: 13051
+        Port: 19051
   - &Org8
     Name: Org8MSP
     ID: Org8MSP
@@ -147,9 +168,12 @@ Organizations:
       Admins:
         Type: Signature
         Rule: "OR('Org8MSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('Org8MSP.member')"
     AnchorPeers:
       - Host: peer0.org8.example.com
-        Port: 14051
+        Port: 21051
   - &Org9
     Name: Org9MSP
     ID: Org9MSP
@@ -164,9 +188,12 @@ Organizations:
       Admins:
         Type: Signature
         Rule: "OR('Org9MSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('Org9MSP.member')"
     AnchorPeers:
       - Host: peer0.org9.example.com
-        Port: 15051
+        Port: 23051
   - &Org10
     Name: Org10MSP
     ID: Org10MSP
@@ -181,9 +208,13 @@ Organizations:
       Admins:
         Type: Signature
         Rule: "OR('Org10MSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('Org10MSP.member')"
     AnchorPeers:
       - Host: peer0.org10.example.com
-        Port: 16051
+        Port: 25051
+
 Capabilities:
   Channel: &ChannelCapabilities
     V2_0: true
@@ -191,63 +222,9 @@ Capabilities:
     V2_0: true
   Application: &ApplicationCapabilities
     V2_0: true
-Orderer: &Orderer
-  OrdererType: etcdraft
-  Addresses:
-    - orderer.example.com:7050
-  BatchTimeout: 2s
-  BatchSize:
-    MaxMessageCount: 10
-    AbsoluteMaxBytes: 99 MB
-    PreferredMaxBytes: 512 KB
-  EtcdRaft:
-    Consenters:
-      - Host: orderer.example.com
-        Port: 7050
-        ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
-        ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
+
+Application: &ApplicationDefaults
   Organizations:
-    - *OrdererOrg
-  Policies:
-    Readers:
-      Type: ImplicitMeta
-      Rule: "ANY Readers"
-    Writers:
-      Type: ImplicitMeta
-      Rule: "ANY Writers"
-    Admins:
-      Type: ImplicitMeta
-      Rule: "MAJORITY Admins"
-    BlockValidation:
-      Type: ImplicitMeta
-      Rule: "ANY Writers"
-  Capabilities:
-    *OrdererCapabilities
-Channel: &Channel
-  Policies:
-    Readers:
-      Type: ImplicitMeta
-      Rule: "ANY Readers"
-    Writers:
-      Type: ImplicitMeta
-      Rule: "ANY Writers"
-    Admins:
-      Type: ImplicitMeta
-      Rule: "MAJORITY Admins"
-  Capabilities:
-    *ChannelCapabilities
-Application: &Application
-  Organizations:
-    - *Org1
-    - *Org2
-    - *Org3
-    - *Org4
-    - *Org5
-    - *Org6
-    - *Org7
-    - *Org8
-    - *Org9
-    - *Org10
   Policies:
     Readers:
       Type: ImplicitMeta
@@ -265,14 +242,59 @@ Application: &Application
       Type: ImplicitMeta
       Rule: "MAJORITY Endorsement"
   Capabilities:
-    *ApplicationCapabilities
+    <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+  OrdererType: etcdraft
+  EtcdRaft:
+    Consenters:
+      - Host: orderer.example.com
+        Port: 7050
+        ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
+        ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
 Profiles:
   OrdererGenesis:
-    <<: *Channel
+    <<: *ChannelDefaults
     Orderer:
-      <<: *Orderer
+      <<: *OrdererDefaults
       Organizations:
         - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
     Consortiums:
       SampleConsortium:
         Organizations:
@@ -288,9 +310,9 @@ Profiles:
           - *Org10
   GeneralChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
+    <<: *ChannelDefaults
     Application:
-      <<: *Application
+      <<: *ApplicationDefaults
       Organizations:
         - *Org1
         - *Org2
@@ -302,11 +324,13 @@ Profiles:
         - *Org8
         - *Org9
         - *Org10
+      Capabilities:
+        <<: *ApplicationCapabilities
   IoTChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
+    <<: *ChannelDefaults
     Application:
-      <<: *Application
+      <<: *ApplicationDefaults
       Organizations:
         - *Org1
         - *Org2
@@ -318,11 +342,13 @@ Profiles:
         - *Org8
         - *Org9
         - *Org10
+      Capabilities:
+        <<: *ApplicationCapabilities
   SecurityChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
+    <<: *ChannelDefaults
     Application:
-      <<: *Application
+      <<: *ApplicationDefaults
       Organizations:
         - *Org1
         - *Org2
@@ -334,11 +360,13 @@ Profiles:
         - *Org8
         - *Org9
         - *Org10
+      Capabilities:
+        <<: *ApplicationCapabilities
   MonitoringChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
+    <<: *ChannelDefaults
     Application:
-      <<: *Application
+      <<: *ApplicationDefaults
       Organizations:
         - *Org1
         - *Org2
@@ -350,74 +378,95 @@ Profiles:
         - *Org8
         - *Org9
         - *Org10
+      Capabilities:
+        <<: *ApplicationCapabilities
   Org1ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
+    <<: *ChannelDefaults
     Application:
-      <<: *Application
+      <<: *ApplicationDefaults
       Organizations:
         - *Org1
+      Capabilities:
+        <<: *ApplicationCapabilities
   Org2ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
+    <<: *ChannelDefaults
     Application:
-      <<: *Application
+      <<: *ApplicationDefaults
       Organizations:
         - *Org2
+      Capabilities:
+        <<: *ApplicationCapabilities
   Org3ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
+    <<: *ChannelDefaults
     Application:
-      <<: *Application
+      <<: *ApplicationDefaults
       Organizations:
         - *Org3
+      Capabilities:
+        <<: *ApplicationCapabilities
   Org4ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
+    <<: *ChannelDefaults
     Application:
-      <<: *Application
+      <<: *ApplicationDefaults
       Organizations:
         - *Org4
+      Capabilities:
+        <<: *ApplicationCapabilities
   Org5ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
+    <<: *ChannelDefaults
     Application:
-      <<: *Application
+      <<: *ApplicationDefaults
       Organizations:
         - *Org5
+      Capabilities:
+        <<: *ApplicationCapabilities
   Org6ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
+    <<: *ChannelDefaults
     Application:
-      <<: *Application
+      <<: *ApplicationDefaults
       Organizations:
         - *Org6
+      Capabilities:
+        <<: *ApplicationCapabilities
   Org7ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
+    <<: *ChannelDefaults
     Application:
-      <<: *Application
+      <<: *ApplicationDefaults
       Organizations:
         - *Org7
+      Capabilities:
+        <<: *ApplicationCapabilities
   Org8ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
+    <<: *ChannelDefaults
     Application:
-      <<: *Application
+      <<: *ApplicationDefaults
       Organizations:
         - *Org8
+      Capabilities:
+        <<: *ApplicationCapabilities
   Org9ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
+    <<: *ChannelDefaults
     Application:
-      <<: *Application
+      <<: *ApplicationDefaults
       Organizations:
         - *Org9
+      Capabilities:
+        <<: *ApplicationCapabilities
   Org10ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
+    <<: *ChannelDefaults
     Application:
-      <<: *Application
+      <<: *ApplicationDefaults
       Organizations:
         - *Org10
----
+      Capabilities:
+        <<: *ApplicationCapabilities
