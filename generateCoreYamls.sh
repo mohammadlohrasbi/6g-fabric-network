@@ -15,6 +15,14 @@ peer:
     externalEndpoint: peer0.org${i}.example.com:$((7051 + (i-1)*1000))
   logging:
     level: info
+  tls:
+    enabled: true
+    cert:
+      file: /var/hyperledger/peer/tls/server.crt
+    key:
+      file: /var/hyperledger/peer/tls/server.key
+    rootcert:
+      file: /var/hyperledger/peer/tls/ca.crt
 EOF
 done
 
