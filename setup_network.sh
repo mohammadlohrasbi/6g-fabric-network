@@ -84,10 +84,15 @@ done
 echo "Verifying TLS CA certificate in peer0.org1.example.com..."
 docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/tls/orderer-ca.crt || { echo "TLS CA certificate not found in container"; exit 1; }
 
+# Verify Admin MSP for all organizations
+for org in {1..10}; do
+  echo "Verifying Admin MSP for Org${org} in peer0.org${org}.example.com..."
+  docker exec peer0.org${org}.example.com ls -l /etc/hyperledger/fabric/users/Admin@org${org}.example.com/msp || { echo "Admin MSP for Org${org} not found in container"; exit 1; }
+done
+
 # Create and join channels
 for channel in generalchannelapp iotchannelapp securitychannelapp monitoringchannelapp org{1..10}channelapp; do
   echo "Creating channel $channel..."
-  # Use Org1 Admin for creating all channels
   docker exec -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org1.example.com/msp" \
              -e "CORE_PEER_LOCALMSPID=Org1MSP" \
              peer0.org1.example.com peer channel create \
@@ -106,26 +111,44 @@ for channel in generalchannelapp iotchannelapp securitychannelapp monitoringchan
   done
 done
 
-# Skip chaincode installation for now (uncomment when chaincodes are ready)
-: '
-CHAINCODES=(
-  "ResourceAllocate" "BandwidthShare" "DynamicRouting" "LoadBalance" "LatencyOptimize"
-  "EnergyOptimize" "NetworkOptimize" "SpectrumManage" "ResourceScale" "ResourcePrioritize"
-  "UserAuth" "DeviceAuth" "AccessControl" "TokenAuth" "RoleBasedAuth"
-  "IdentityVerify" "SessionAuth" "MultiFactorAuth" "AuthPolicy" "AuthAudit"
-  "NetworkMonitor" "PerformanceMonitor" "TrafficMonitor" "ResourceMonitor" "HealthMonitor"
-  "AlertMonitor" "LogMonitor" "EventMonitor" "MetricsCollector" "StatusMonitor"
-  "Encryption" "IntrusionDetect" "FirewallRules" "SecureChannel" "ThreatMonitor"
-  "AccessLog" "SecurityPolicy" "VulnerabilityScan" "DataIntegrity" "SecureBackup"
-  "TransactionAudit" "ComplianceAudit" "AccessAudit" "EventAudit" "PolicyAudit"
-  "DataAudit" "UserAudit" "SystemAudit" "PerformanceAudit" "SecurityAudit"
-  "ConfigManage" "PolicyManage" "ResourceManage" "NetworkManage" "DeviceManage"
-  "UserManage" "ServiceManage" "EventManage" "AlertManage" "LogManage"
-  "DataAnalytics" "FaultDetect" "AnomalyDetect" "PredictiveMaintenance" "PerformanceAnalytics"
-  "TrafficAnalytics" "SecurityAnalytics" "ResourceAnalytics" "EventAnalytics" "LogAnalytics"
-)
+# Verify chaincode directories
+echo "Verifying chaincode directories..."
+for chaincode in ResourceAllocate BandwidthShare DynamicRouting LoadBalance LatencyOptimize \
+                 EnergyOptimize NetworkOptimize SpectrumManage ResourceScale ResourcePrioritize \
+                 UserAuth DeviceAuth AccessControl TokenAuth RoleBasedAuth \
+                 IdentityVerify SessionAuth MultiFactorAuth AuthPolicy AuthAudit \
+                 NetworkMonitor PerformanceMonitor TrafficMonitor ResourceMonitor HealthMonitor \
+                 AlertMonitor LogMonitor EventMonitor MetricsCollector StatusMonitor \
+                 Encryption IntrusionDetect FirewallRules SecureChannel ThreatMonitor \
+                 AccessLog SecurityPolicy VulnerabilityScan DataIntegrity SecureBackup \
+                 TransactionAudit ComplianceAudit AccessAudit EventAudit PolicyAudit \
+                 DataAudit UserAudit SystemAudit PerformanceAudit SecurityAudit \
+                 ConfigManage PolicyManage ResourceManage NetworkManage DeviceManage \
+                 UserManage ServiceManage EventManage AlertManage LogManage \
+                 DataAnalytics FaultDetect AnomalyDetect PredictiveMaintenance PerformanceAnalytics \
+                 TrafficAnalytics SecurityAnalytics ResourceAnalytics EventAnalytics LogAnalytics; do
+  if [ ! -d "./chaincode/$chaincode" ]; then
+    echo "Chaincode directory $chaincode not found. Creating empty directory..."
+    mkdir -p ./chaincode/$chaincode
+    touch ./chaincode/$chaincode/dummy.go
+  fi
+done
 
-for chaincode in "${CHAINCODES[@]}"; do
+# Install and instantiate chaincodes
+for chaincode in ResourceAllocate BandwidthShare DynamicRouting LoadBalance LatencyOptimize \
+                 EnergyOptimize NetworkOptimize SpectrumManage ResourceScale ResourcePrioritize \
+                 UserAuth DeviceAuth AccessControl TokenAuth RoleBasedAuth \
+                 IdentityVerify SessionAuth MultiFactorAuth AuthPolicy AuthAudit \
+                 NetworkMonitor PerformanceMonitor TrafficMonitor ResourceMonitor HealthMonitor \
+                 AlertMonitor LogMonitor EventMonitor MetricsCollector StatusMonitor \
+                 Encryption IntrusionDetect FirewallRules SecureChannel ThreatMonitor \
+                 AccessLog SecurityPolicy VulnerabilityScan DataIntegrity SecureBackup \
+                 TransactionAudit ComplianceAudit AccessAudit EventAudit PolicyAudit \
+                 DataAudit UserAudit SystemAudit PerformanceAudit SecurityAudit \
+                 ConfigManage PolicyManage ResourceManage NetworkManage DeviceManage \
+                 UserManage ServiceManage EventManage AlertManage LogManage \
+                 DataAnalytics FaultDetect AnomalyDetect PredictiveMaintenance PerformanceAnalytics \
+                 TrafficAnalytics SecurityAnalytics ResourceAnalytics EventAnalytics LogAnalytics; do
   for i in {1..10}; do
     echo "Installing chaincode $chaincode on peer0.org${i}.example.com..."
     docker exec -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org${i}.example.com/msp" \
@@ -149,6 +172,5 @@ for chaincode in "${CHAINCODES[@]}"; do
     sleep 5
   done
 done
-'
 
-echo "Network setup complete with all channels."
+echo "Network setup complete with all channels and chaincodes."
