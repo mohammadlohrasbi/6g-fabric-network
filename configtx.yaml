@@ -191,36 +191,6 @@ Capabilities:
     V2_0: true
   Application: &ApplicationCapabilities
     V2_0: true
-Application: &Application
-  Organizations:
-    - *Org1
-    - *Org2
-    - *Org3
-    - *Org4
-    - *Org5
-    - *Org6
-    - *Org7
-    - *Org8
-    - *Org9
-    - *Org10
-  Policies:
-    Readers:
-      Type: ImplicitMeta
-      Rule: "ANY Readers"
-    Writers:
-      Type: ImplicitMeta
-      Rule: "ANY Writers"
-    Admins:
-      Type: ImplicitMeta
-      Rule: "MAJORITY Admins"
-    LifecycleEndorsement:
-      Type: ImplicitMeta
-      Rule: "MAJORITY Endorsement"
-    Endorsement:
-      Type: ImplicitMeta
-      Rule: "MAJORITY Endorsement"
-  Capabilities:
-    *ApplicationCapabilities
 Orderer: &Orderer
   OrdererType: etcdraft
   Addresses:
@@ -266,9 +236,38 @@ Channel: &Channel
       Rule: "MAJORITY Admins"
   Capabilities:
     *ChannelCapabilities
+Application: &Application
+  Organizations:
+    - *Org1
+    - *Org2
+    - *Org3
+    - *Org4
+    - *Org5
+    - *Org6
+    - *Org7
+    - *Org8
+    - *Org9
+    - *Org10
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+  Capabilities:
+    *ApplicationCapabilities
 Profiles:
   OrdererGenesis:
-    <<: *Channel
     Orderer:
       <<: *Orderer
       Organizations:
@@ -286,9 +285,10 @@ Profiles:
           - *Org8
           - *Org9
           - *Org10
+    Capabilities:
+      <<: *ChannelCapabilities
   GeneralChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
     Application:
       <<: *Application
       Organizations:
@@ -302,9 +302,10 @@ Profiles:
         - *Org8
         - *Org9
         - *Org10
+    Capabilities:
+      <<: *ChannelCapabilities
   IoTChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
     Application:
       <<: *Application
       Organizations:
@@ -318,9 +319,10 @@ Profiles:
         - *Org8
         - *Org9
         - *Org10
+    Capabilities:
+      <<: *ChannelCapabilities
   SecurityChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
     Application:
       <<: *Application
       Organizations:
@@ -334,9 +336,10 @@ Profiles:
         - *Org8
         - *Org9
         - *Org10
+    Capabilities:
+      <<: *ChannelCapabilities
   MonitoringChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
     Application:
       <<: *Application
       Organizations:
@@ -350,74 +353,86 @@ Profiles:
         - *Org8
         - *Org9
         - *Org10
+    Capabilities:
+      <<: *ChannelCapabilities
   Org1ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org1
+    Capabilities:
+      <<: *ChannelCapabilities
   Org2ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org2
+    Capabilities:
+      <<: *ChannelCapabilities
   Org3ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org3
+    Capabilities:
+      <<: *ChannelCapabilities
   Org4ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org4
+    Capabilities:
+      <<: *ChannelCapabilities
   Org5ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org5
+    Capabilities:
+      <<: *ChannelCapabilities
   Org6ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org6
+    Capabilities:
+      <<: *ChannelCapabilities
   Org7ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org7
+    Capabilities:
+      <<: *ChannelCapabilities
   Org8ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org8
+    Capabilities:
+      <<: *ChannelCapabilities
   Org9ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org9
+    Capabilities:
+      <<: *ChannelCapabilities
   Org10ChannelApp:
     Consortium: SampleConsortium
-    <<: *Channel
     Application:
       <<: *Application
       Organizations:
         - *Org10
+    Capabilities:
+      <<: *ChannelCapabilities
 ---
