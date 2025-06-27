@@ -1,6 +1,6 @@
 # 6G Hyperledger Fabric Network
 
-This project implements a Hyperledger Fabric network for 6G applications, featuring 10 organizations (Org1 to Org10), 14 channels (General, IoT, Security, Monitoring, and organization-specific channels), and up to 70 chaincodes for resource allocation, bandwidth sharing, security, and monitoring. The network uses an `etcdraft` consensus mechanism with one Orderer node, multiple Peer nodes, and Certificate Authorities (CAs) per organization. This README provides detailed instructions for setting up, running, and testing the network using `tape` and `caliper`, along with explanations of all shell scripts.
+This project implements a Hyperledger Fabric network for 6G applications, featuring 10 organizations (Org1 to Org10), 14 channels (General, IoT, Security, Monitoring, and organization-specific channels), and 70 chaincodes for resource allocation, bandwidth sharing, security, and monitoring. The network uses an `etcdraft` consensus mechanism with one Orderer node, multiple Peer nodes, and Certificate Authorities (CAs) per organization. This README provides detailed instructions for setting up, running, and testing the network using `tape` and `caliper`, along with explanations of all shell scripts.
 
 ## Project Structure
 The project directory (`~/6g-fabric-network`) is organized as follows:
@@ -13,7 +13,7 @@ The project directory (`~/6g-fabric-network`) is organized as follows:
 - **`workload/`**:
   - `callback.js`: Defines the workload module for Caliper, specifying chaincode functions to invoke during benchmarking.
 - **`chaincode/`**:
-  - Contains directories for up to 70 chaincodes (e.g., `ResourceAllocate/`, `BandwidthShare/`), each with Go source code or placeholders (e.g., `dummy.go`).
+  - Contains directories for 70 chaincodes (e.g., `ResourceAllocate/`, `BandwidthShare/`), each with Go source code or placeholders (e.g., `dummy.go`).
 - **`channel-artifacts/`**:
   - Contains 14 channel transaction files (e.g., `generalchannelapp.tx`, `iotchannelapp.tx`, `org1channelapp.tx`) and the genesis block (`genesis.block`).
 - **`crypto-config/`**:
@@ -63,7 +63,7 @@ The project directory (`~/6g-fabric-network`) is organized as follows:
 1. **Prepare the Environment**:
    ```bash
    cd ~/6g-fabric-network
-   docker compose down
+   docker-compose -f docker-compose.yaml down
    docker rm -f $(docker ps -a -q)
    docker network rm 6g-fabric-network_fabric
    rm -rf channel-artifacts crypto-config production
@@ -112,7 +112,7 @@ The project directory (`~/6g-fabric-network`) is organized as follows:
    ```bash
    ./setup_network.sh
    ```
-   - This script generates cryptographic materials, channel artifacts, starts the network, creates/joins 14 channels, and installs/instantiates chaincodes.
+   - This script generates cryptographic materials, channel artifacts, starts the network, creates/joins 14 channels, and installs/instantiates 70 chaincodes.
    - Wait approximately 90 seconds for the network to stabilize.
 
 6. **Verify the Network**:
@@ -243,17 +243,17 @@ The `caliper` tool benchmarks the network using configurations in `caliper/` and
 - **Purpose**: Sets up the entire Hyperledger Fabric network.
 - **Key Steps**:
   - Verifies prerequisites (`cryptogen`, `configtxgen`, `docker`, `docker-compose`).
-  - Generates cryptographic materials using `crypto-config.yaml`.
+  - Generates cryptographic materials using `crypto-config.yaml`, with checks for `Org1` admin MSP.
   - Creates genesis block and 14 channel transactions using `configtx.yaml`.
   - Starts Docker containers using `docker-compose.yaml`.
   - Creates and joins 14 channels (e.g., `generalchannelapp`, `iotchannelapp`, `org1channelapp`).
-  - Installs and instantiates up to 70 chaincodes on all peers and channels.
-  - Includes checks for chaincode directories and creates placeholders if missing.
+  - Installs and instantiates 70 chaincodes on all peers and channels.
+  - Creates placeholder chaincode directories if missing.
 - **Usage**:
   ```bash
   ./setup_network.sh
   ```
-- **Notes**: Waits 90 seconds for network stabilization. Uses `core-org*.yaml` for peer configurations.
+- **Notes**: Includes a 90-second delay for network stabilization. Uses `core-org*.yaml` for peer configurations.
 
 ### generateCoreYamls.sh
 - **Purpose**: Generates `core-org1.yaml` to `core-org10.yaml` files for each organization’s Peer nodes.
@@ -344,10 +344,31 @@ The `caliper` tool benchmarks the network using configurations in `caliper/` and
 - **Notes**: Useful for sharing the project setup.
 
 ## Troubleshooting
-### Error: `no Readers policy defined`
-- **Cause**: Missing `Readers` policy in the `Application` group of `Org1ChannelApp` (or similar profiles) in `configtx.yaml`.
+### Error: `policy for [Group] /Channel/Application not satisfied`
+- **Cause**: The `Admins` policy for the `Application` group is not satisfied, likely due to a missing or invalid admin MSP.
 - **Solution**:
-  - Verify `configtx.yaml` includes `Readers` and `Writers` policies for organization-specific channels:
+  - Verify the admin MSP for `Org1`:
+    ```bash
+    ls -l crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+    ```
+  - If missing, regenerate cryptographic materials:
+    ```bash
+    rm -rf crypto-config
+    cryptogen generate --config=./crypto-config.yaml
+    ```
+  - Test channel creation manually:
+    ```bash
+    docker exec -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org1.example.com/msp" \
+               -e "CORE_PEER_LOCALMSPID=Org1MSP" \
+               peer0.org1.example.com peer channel create \
+               -o orderer.example.com:7050 \
+               -c generalchannelapp \
+               -f /etc/hyperledger/configtx/generalchannelapp.tx \
+               --outputBlock /etc/hyperledger/configtx/generalchannelapp.block \
+               --tls \
+               --cafile /etc/hyperledger/fabric/tls/orderer-ca.crt
+    ```
+  - Ensure `configtx.yaml` defines `ANY Admins` for `GeneralChannelApp`:
     ```yaml
     Policies:
       Readers:
@@ -360,7 +381,23 @@ The `caliper` tool benchmarks the network using configurations in `caliper/` and
         Type: ImplicitMeta
         Rule: "ANY Admins"
     ```
-  - Replace `configtx.yaml` with the updated version provided.
+
+### Error: `no Readers policy defined`
+- **Cause**: Missing `Readers` policy in organization-specific channel profiles.
+- **Solution**:
+  - Verify `configtx.yaml` includes `Readers` and `Writers` policies for `Org1ChannelApp` to `Org10ChannelApp`:
+    ```yaml
+    Policies:
+      Readers:
+        Type: ImplicitMeta
+        Rule: "ANY Readers"
+      Writers:
+        Type: ImplicitMeta
+        Rule: "ANY Writers"
+      Admins:
+        Type: ImplicitMeta
+        Rule: "ANY Admins"
+    ```
   - Regenerate channel artifacts:
     ```bash
     export FABRIC_CFG_PATH=$PWD
@@ -389,27 +426,6 @@ The `caliper` tool benchmarks the network using configurations in `caliper/` and
     configtxgen -profile OrdererGenesis -channelID system-channel -outputBlock ./channel-artifacts/genesis.block
     ```
 
-### Error: `policy for [Group] /Channel/Application not satisfied`
-- **Cause**: Invalid admin identity.
-- **Solution**:
-  - Verify `ANY Admins` policy in `configtx.yaml` for application channels.
-  - Check admin MSP:
-    ```bash
-    ls -l crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-    ```
-  - Test channel creation:
-    ```bash
-    docker exec -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org1.example.com/msp" \
-               -e "CORE_PEER_LOCALMSPID=Org1MSP" \
-               peer0.org1.example.com peer channel create \
-               -o orderer.example.com:7050 \
-               -c org1channelapp \
-               -f /etc/hyperledger/configtx/org1channelapp.tx \
-               --outputBlock /etc/hyperledger/configtx/org1channelapp.block \
-               --tls \
-               --cafile /etc/hyperledger/fabric/tls/orderer-ca.crt
-    ```
-
 ### Chaincode Installation Error
 - **Cause**: Missing chaincode directories or files.
 - **Solution**:
@@ -436,7 +452,7 @@ The `caliper` tool benchmarks the network using configurations in `caliper/` and
     ```
 
 ## Notes
-- **Chaincodes**: Ensure all 70 chaincode directories are populated with valid Go code or placeholders before running `setup_network.sh`.
+- **Chaincodes**: Ensure all 70 chaincode directories are populated with valid Go code or placeholders before running `setup_network.sh`. The script includes a list of 70 chaincodes (e.g., `ResourceAllocate`, `BandwidthShare`).
 - **Cleanup**: To reset the network:
   ```bash
   docker-compose -f docker-compose.yaml down
@@ -448,6 +464,7 @@ The `caliper` tool benchmarks the network using configurations in `caliper/` and
   docker logs orderer.example.com > orderer.log
   docker logs peer0.org1.example.com > peer0.org1.log
   ```
+- **Testing Scale**: Running 980 `tape` tests may be resource-intensive. Test a subset (e.g., `tape-ResourceAllocate-generalchannelapp.yaml`) initially.
 
 ## Support
 For issues, share the following logs:
