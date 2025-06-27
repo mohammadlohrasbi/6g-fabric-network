@@ -1,7 +1,6 @@
-# configtx.yaml
 Organizations:
   - &OrdererOrg
-    Name: OrdererMSP
+    Name: OrdererOrg
     ID: OrdererMSP
     MSPDir: crypto-config/ordererOrganizations/example.com/msp
     Policies:
@@ -21,19 +20,16 @@ Organizations:
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('Org1MSP.member')"
+        Rule: "OR('Org1MSP.admin', 'Org1MSP.peer', 'Org1MSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('Org1MSP.member')"
+        Rule: "OR('Org1MSP.admin', 'Org1MSP.client')"
       Admins:
         Type: Signature
         Rule: "OR('Org1MSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('Org1MSP.member')"
-    AnchorPeers:
-      - Host: peer0.org1.example.com
-        Port: 7051
+        Rule: "OR('Org1MSP.peer')"
   - &Org2
     Name: Org2MSP
     ID: Org2MSP
@@ -41,19 +37,16 @@ Organizations:
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('Org2MSP.member')"
+        Rule: "OR('Org2MSP.admin', 'Org2MSP.peer', 'Org2MSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('Org2MSP.member')"
+        Rule: "OR('Org2MSP.admin', 'Org2MSP.client')"
       Admins:
         Type: Signature
         Rule: "OR('Org2MSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('Org2MSP.member')"
-    AnchorPeers:
-      - Host: peer0.org2.example.com
-        Port: 9051
+        Rule: "OR('Org2MSP.peer')"
   - &Org3
     Name: Org3MSP
     ID: Org3MSP
@@ -61,19 +54,16 @@ Organizations:
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('Org3MSP.member')"
+        Rule: "OR('Org3MSP.admin', 'Org3MSP.peer', 'Org3MSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('Org3MSP.member')"
+        Rule: "OR('Org3MSP.admin', 'Org3MSP.client')"
       Admins:
         Type: Signature
         Rule: "OR('Org3MSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('Org3MSP.member')"
-    AnchorPeers:
-      - Host: peer0.org3.example.com
-        Port: 11051
+        Rule: "OR('Org3MSP.peer')"
   - &Org4
     Name: Org4MSP
     ID: Org4MSP
@@ -81,19 +71,16 @@ Organizations:
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('Org4MSP.member')"
+        Rule: "OR('Org4MSP.admin', 'Org4MSP.peer', 'Org4MSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('Org4MSP.member')"
+        Rule: "OR('Org4MSP.admin', 'Org4MSP.client')"
       Admins:
         Type: Signature
         Rule: "OR('Org4MSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('Org4MSP.member')"
-    AnchorPeers:
-      - Host: peer0.org4.example.com
-        Port: 13051
+        Rule: "OR('Org4MSP.peer')"
   - &Org5
     Name: Org5MSP
     ID: Org5MSP
@@ -101,19 +88,16 @@ Organizations:
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('Org5MSP.member')"
+        Rule: "OR('Org5MSP.admin', 'Org5MSP.peer', 'Org5MSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('Org5MSP.member')"
+        Rule: "OR('Org5MSP.admin', 'Org5MSP.client')"
       Admins:
         Type: Signature
         Rule: "OR('Org5MSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('Org5MSP.member')"
-    AnchorPeers:
-      - Host: peer0.org5.example.com
-        Port: 15051
+        Rule: "OR('Org5MSP.peer')"
   - &Org6
     Name: Org6MSP
     ID: Org6MSP
@@ -121,19 +105,16 @@ Organizations:
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('Org6MSP.member')"
+        Rule: "OR('Org6MSP.admin', 'Org6MSP.peer', 'Org6MSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('Org6MSP.member')"
+        Rule: "OR('Org6MSP.admin', 'Org6MSP.client')"
       Admins:
         Type: Signature
         Rule: "OR('Org6MSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('Org6MSP.member')"
-    AnchorPeers:
-      - Host: peer0.org6.example.com
-        Port: 17051
+        Rule: "OR('Org6MSP.peer')"
   - &Org7
     Name: Org7MSP
     ID: Org7MSP
@@ -141,19 +122,16 @@ Organizations:
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('Org7MSP.member')"
+        Rule: "OR('Org7MSP.admin', 'Org7MSP.peer', 'Org7MSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('Org7MSP.member')"
+        Rule: "OR('Org7MSP.admin', 'Org7MSP.client')"
       Admins:
         Type: Signature
         Rule: "OR('Org7MSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('Org7MSP.member')"
-    AnchorPeers:
-      - Host: peer0.org7.example.com
-        Port: 19051
+        Rule: "OR('Org7MSP.peer')"
   - &Org8
     Name: Org8MSP
     ID: Org8MSP
@@ -161,19 +139,16 @@ Organizations:
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('Org8MSP.member')"
+        Rule: "OR('Org8MSP.admin', 'Org8MSP.peer', 'Org8MSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('Org8MSP.member')"
+        Rule: "OR('Org8MSP.admin', 'Org8MSP.client')"
       Admins:
         Type: Signature
         Rule: "OR('Org8MSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('Org8MSP.member')"
-    AnchorPeers:
-      - Host: peer0.org8.example.com
-        Port: 21051
+        Rule: "OR('Org8MSP.peer')"
   - &Org9
     Name: Org9MSP
     ID: Org9MSP
@@ -181,19 +156,16 @@ Organizations:
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('Org9MSP.member')"
+        Rule: "OR('Org9MSP.admin', 'Org9MSP.peer', 'Org9MSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('Org9MSP.member')"
+        Rule: "OR('Org9MSP.admin', 'Org9MSP.client')"
       Admins:
         Type: Signature
         Rule: "OR('Org9MSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('Org9MSP.member')"
-    AnchorPeers:
-      - Host: peer0.org9.example.com
-        Port: 23051
+        Rule: "OR('Org9MSP.peer')"
   - &Org10
     Name: Org10MSP
     ID: Org10MSP
@@ -201,19 +173,16 @@ Organizations:
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('Org10MSP.member')"
+        Rule: "OR('Org10MSP.admin', 'Org10MSP.peer', 'Org10MSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('Org10MSP.member')"
+        Rule: "OR('Org10MSP.admin', 'Org10MSP.client')"
       Admins:
         Type: Signature
         Rule: "OR('Org10MSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('Org10MSP.member')"
-    AnchorPeers:
-      - Host: peer0.org10.example.com
-        Port: 25051
+        Rule: "OR('Org10MSP.peer')"
 
 Capabilities:
   Channel: &ChannelCapabilities
@@ -234,24 +203,18 @@ Application: &ApplicationDefaults
       Rule: "ANY Writers"
     Admins:
       Type: ImplicitMeta
-      Rule: "MAJORITY Admins"
+      Rule: "ANY Admins"
     LifecycleEndorsement:
       Type: ImplicitMeta
       Rule: "MAJORITY Endorsement"
     Endorsement:
       Type: ImplicitMeta
       Rule: "MAJORITY Endorsement"
-  Capabilities:
-    <<: *ApplicationCapabilities
 
 Orderer: &OrdererDefaults
   OrdererType: etcdraft
-  EtcdRaft:
-    Consenters:
-      - Host: orderer.example.com
-        Port: 7050
-        ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
-        ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
+  Addresses:
+    - orderer.example.com:7050
   BatchTimeout: 2s
   BatchSize:
     MaxMessageCount: 10
@@ -282,9 +245,7 @@ Channel: &ChannelDefaults
       Rule: "ANY Writers"
     Admins:
       Type: ImplicitMeta
-      Rule: "MAJORITY Admins"
-  Capabilities:
-    <<: *ChannelCapabilities
+      Rule: "ANY Admins"
 
 Profiles:
   OrdererGenesis:
@@ -389,84 +350,133 @@ Profiles:
         - *Org1
       Capabilities:
         <<: *ApplicationCapabilities
+      Policies:
+        Admins:
+          Type: ImplicitMeta
+          Rule: "ANY Admins"
   Org2ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
     Application:
       <<: *ApplicationDefaults
       Organizations:
+        - *Org1
         - *Org2
       Capabilities:
         <<: *ApplicationCapabilities
+      Policies:
+        Admins:
+          Type: ImplicitMeta
+          Rule: "ANY Admins"
   Org3ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
     Application:
       <<: *ApplicationDefaults
       Organizations:
+        - *Org1
         - *Org3
       Capabilities:
         <<: *ApplicationCapabilities
+      Policies:
+        Admins:
+          Type: ImplicitMeta
+          Rule: "ANY Admins"
   Org4ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
     Application:
       <<: *ApplicationDefaults
       Organizations:
+        - *Org1
         - *Org4
       Capabilities:
         <<: *ApplicationCapabilities
+      Policies:
+        Admins:
+          Type: ImplicitMeta
+          Rule: "ANY Admins"
   Org5ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
     Application:
       <<: *ApplicationDefaults
       Organizations:
+        - *Org1
         - *Org5
       Capabilities:
         <<: *ApplicationCapabilities
+      Policies:
+        Admins:
+          Type: ImplicitMeta
+          Rule: "ANY Admins"
   Org6ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
     Application:
       <<: *ApplicationDefaults
       Organizations:
+        - *Org1
         - *Org6
       Capabilities:
         <<: *ApplicationCapabilities
+      Policies:
+        Admins:
+          Type: ImplicitMeta
+          Rule: "ANY Admins"
   Org7ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
     Application:
       <<: *ApplicationDefaults
       Organizations:
+        - *Org1
         - *Org7
       Capabilities:
         <<: *ApplicationCapabilities
+      Policies:
+        Admins:
+          Type: ImplicitMeta
+          Rule: "ANY Admins"
   Org8ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
     Application:
       <<: *ApplicationDefaults
       Organizations:
+        - *Org1
         - *Org8
       Capabilities:
         <<: *ApplicationCapabilities
+      Policies:
+        Admins:
+          Type: ImplicitMeta
+          Rule: "ANY Admins"
   Org9ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
     Application:
       <<: *ApplicationDefaults
       Organizations:
+        - *Org1
         - *Org9
       Capabilities:
         <<: *ApplicationCapabilities
+      Policies:
+        Admins:
+          Type: ImplicitMeta
+          Rule: "ANY Admins"
   Org10ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
     Application:
       <<: *ApplicationDefaults
       Organizations:
+        - *Org1
         - *Org10
       Capabilities:
         <<: *ApplicationCapabilities
+      Policies:
+        Admins:
+          Type: ImplicitMeta
+          Rule: "ANY Admins"
