@@ -37,6 +37,7 @@ export FABRIC_CFG_PATH=$PWD
 echo "Generating genesis block and channel artifacts..."
 echo "Verifying configtx.yaml content:"
 cat configtx.yaml
+echo "FABRIC_CFG_PATH is set to: $FABRIC_CFG_PATH"
 configtxgen -profile OrdererGenesis -outputBlock ./channel-artifacts/genesis.block || { echo "Failed to generate genesis.block"; exit 1; }
 configtxgen -profile GeneralChannelApp -outputCreateChannelTx ./channel-artifacts/generalchannelapp.tx -channelID generalchannelapp || { echo "Failed to generate generalchannelapp.tx"; exit 1; }
 configtxgen -profile IoTChannelApp -outputCreateChannelTx ./channel-artifacts/iotchannelapp.tx -channelID iotchannelapp || { echo "Failed to generate iotchannelapp.tx"; exit 1; }
