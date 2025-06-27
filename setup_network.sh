@@ -47,25 +47,39 @@ for i in {1..10}; do
   configtxgen -profile Org${i}ChannelApp -outputCreateChannelTx ./channel-artifacts/org${i}channelapp.tx -channelID org${i}channelapp || { echo "Failed to generate org${i}channelapp.tx"; exit 1; }
 done
 
+# Verify channel artifacts
+for channel in generalchannelapp iotchannelapp securitychannelapp monitoringchannelapp org{1..10}channelapp; do
+  if [ ! -f "./channel-artifacts/${channel}.tx" ]; then
+    echo "Channel artifact ${channel}.tx not found. Aborting."
+    exit 1
+  fi
+done
+
 # Start network
 echo "Starting Docker network..."
 docker compose up -d || { echo "Failed to start Docker network"; exit 1; }
 
 # Wait for network to stabilize
 echo "Waiting for network to stabilize..."
-sleep 30
+sleep 60
 
 # Verify Orderer is accessible
 echo "Checking Orderer connectivity..."
 docker exec peer0.org1.example.com nc -zv orderer.example.com 7050 || { echo "Orderer not accessible at orderer.example.com:7050"; exit 1; }
 
+# Verify channel artifacts in container
+echo "Verifying channel artifacts in peer0.org1.example.com..."
+for channel in generalchannelapp iotchannelapp securitychannelapp monitoringchannelapp org{1..10}channelapp; do
+  docker exec peer0.org1.example.com ls -l /etc/hyperledger/configtx/${channel}.tx || { echo "Channel artifact ${channel}.tx not found in container"; exit 1; }
+done
+
 # Create and join channels
 for channel in generalchannelapp iotchannelapp securitychannelapp monitoringchannelapp org{1..10}channelapp; do
   echo "Creating channel $channel..."
-  docker exec peer0.org1.example.com peer channel create -o orderer.example.com:7050 -c $channel -f ./channel-artifacts/${channel}.tx --outputBlock ./channel-artifacts/${channel}.block --tls --cafile /etc/hyperledger/fabric/tls/orderer-ca.crt || { echo "Failed to create channel $channel"; exit 1; }
+  docker exec peer0.org1.example.com peer channel create -o orderer.example.com:7050 -c $channel -f /etc/hyperledger/configtx/${channel}.tx --outputBlock /etc/hyperledger/configtx/${channel}.block --tls --cafile /etc/hyperledger/fabric/tls/orderer-ca.crt || { echo "Failed to create channel $channel"; exit 1; }
   for i in {1..10}; do
     echo "Joining peer0.org${i}.example.com to $channel..."
-    docker exec peer0.org${i}.example.com peer channel join -b ./channel-artifacts/${channel}.block || { echo "Failed to join peer0.org${i}.example.com to $channel"; exit 1; }
+    docker exec peer0.org${i}.example.com peer channel join -b /etc/hyperledger/configtx/${channel}.block || { echo "Failed to join peer0.org${i}.example.com to $channel"; exit 1; }
   done
 done
 
