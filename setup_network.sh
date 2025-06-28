@@ -7,7 +7,7 @@ set -x
 command -v cryptogen >/dev/null 2>&1 || { echo "cryptogen مورد نیاز است اما نصب نشده است."; exit 1; }
 command -v configtxgen >/dev/null 2>&1 || { echo "configtxgen مورد نیاز است اما نصب نشده است."; exit 1; }
 command -v docker >/dev/null 2>&1 || { echo "docker مورد نیاز است اما نصب نشده است."; exit 1; }
-command -v docker-compose >/dev/null 2>&1 || { echo "docker-compose مورد نیاز است اما نصب نشده است."; exit 1; }
+#command -v docker-compose >/dev/null 2>&1 || { echo "docker-compose مورد نیاز است اما نصب نشده است."; exit 1; }
 
 # بررسی نسخه cryptogen
 cryptogen version
@@ -137,7 +137,7 @@ for channel in "${!channel_profiles[@]}"; do
 done
 
 # راه‌اندازی شبکه
-docker-compose -f docker-compose.yaml up -d
+docker compose up -d
 if [ $? -ne 0 ]; then
   echo "خطا در راه‌اندازی شبکه"
   exit 1
