@@ -1,45 +1,45 @@
 # شبکه هایپرلجر فابریک 6G
 
-این پروژه یک شبکه هایپرلجر فابریک برای کاربردهای 6G پیاده‌سازی می‌کند که شامل 10 سازمان (Org1 تا Org10)، 14 کانال (عمومی، IoT، امنیتی، نظارتی، و کانال‌های خاص سازمانی)، و 70 چین‌کد برای تخصیص منابع، اشتراک پهنای باند، امنیت، و نظارت است. شبکه از مکانیزم اجماع `etcdraft` با یک گره Orderer، چندین گره Peer، و مقامات گواهی (CA) برای هر سازمان استفاده می‌کند. این README دستورالعمل‌های جامعی برای راه‌اندازی، اجرا، و آزمایش شبکه با استفاده از `tape` و `caliper`، همراه با توضیحات تمام اسکریپت‌های شل و عیب‌یابی پیشرفته ارائه می‌دهد.
+این پروژه یک شبکه هایپرلجر فابریک برای کاربردهای 6G پیاده‌سازی می‌کند که شامل 10 سازمان (Org1 تا Org10)، 14 کانال (عمومی، IoT، امنیتی، نظارتی، و کانال‌های خاص سازمانی)، و 70 چین‌کد برای تخصیص منابع، اشتراک پهنای باند، امنیت، و نظارت است. شبکه از مکانیزم اجماع `etcdraft` با یک گره Orderer، چندین گره Peer، و مقامات گواهی (CA) برای هر سازمان استفاده می‌کند. این README دستورالعمل‌های جامعی برای راه‌اندازی، اجرا، و آزمایش شبکه با استفاده از `tape` و `caliper`، همراه با توضیحات اسکریپت‌های شل و عیب‌یابی پیشرفته ارائه می‌دهد.
 
 ## ساختار پروژه
 دایرکتوری پروژه (`~/6g-fabric-network`) به‌صورت زیر سازمان‌دهی شده است:
 
 - **`caliper/`**:
-  - `benchmarkConfig.yaml`: پارامترهای بنچمارک Caliper (مانند نرخ تراکنش، تعداد تراکنش‌ها).
-  - `networkConfig.yaml`: جزئیات شبکه برای Caliper، شامل نقاط انتهایی Orderer و Peer، MSPها، و گواهی‌های TLS.
+  - `benchmarkConfig.yaml`: پارامترهای بنچمارک Caliper (نرخ تراکنش، تعداد تراکنش).
+  - `networkConfig.yaml`: جزئیات شبکه برای Caliper (نقاط انتهایی، MSPها، گواهی‌های TLS).
 - **`tape/`**:
-  - 980 فایل تنظیمات (مانند `tape-ResourceAllocate-generalchannelapp.yaml`) برای آزمایش هر چین‌کد روی هر کانال با `tape`.
+  - 980 فایل تنظیمات (مانند `tape-ResourceAllocate-generalchannelapp.yaml`) برای آزمایش چین‌کدها با `tape`.
 - **`workload/`**:
-  - `callback.js`: ماژول بار کاری برای Caliper، مشخص‌کننده توابع چین‌کد برای بنچمارک.
+  - `callback.js`: ماژول بار کاری Caliper برای فراخوانی توابع چین‌کد.
 - **`chaincode/`**:
-  - دایرکتوری‌های 70 چین‌کد (مانند `ResourceAllocate/`، `BandwidthShare/`) با کد Go یا فایل‌های نگهدارنده (`dummy.go`).
+  - دایرکتوری‌های 70 چین‌کد (مانند `ResourceAllocate/`) با کد Go یا فایل‌های نگهدارنده (`dummy.go`).
 - **`channel-artifacts/`**:
   - 14 فایل تراکنش کانال (مانند `generalchannelapp.tx`) و بلاک جنسیس (`genesis.block`).
 - **`crypto-config/`**:
   - `peerOrganizations/`: MSP و TLS برای Org1 تا Org10.
   - `ordererOrganizations/`: MSP و TLS برای Orderer.
-- **`crypto-config.yaml`**: ساختار سازمانی برای تولید گواهی‌ها با `cryptogen`.
+- **`crypto-config.yaml`**: ساختار سازمانی برای `cryptogen`.
 - **`configtx.yaml`**: پروفایل‌های کانال، سیاست‌ها (`ANY Admins`، `ANY Readers`، `ANY Writers`)، و تنظیمات `etcdraft`.
 - **`docker-compose.yaml`**: سرویس‌های داکر برای Orderer، Peerها، و CAها.
-- **`core-org1.yaml` تا `core-org10.yaml`**: تنظیمات گره‌های Peer (لاگ، چین‌کد، لجر).
+- **`core-org1.yaml` تا `core-org10.yaml`**: تنظیمات Peer (لاگ، چین‌کد، لجر).
 - **`setup_network.sh`**: راه‌اندازی شبکه، تولید آرتیفکت‌ها، و استقرار چین‌کدها.
 - **`generateCoreYamls.sh`**: تولید فایل‌های `core-org*.yaml`.
 - **`generateConnectionProfiles.sh`**: تولید پروفایل‌های اتصال.
-- **`generateChaincodes.sh`**: تولید دایرکتوری‌های نگهدارنده چین‌کد.
+- **`generateChaincodes.sh`**: تولید دایرکتوری‌های چین‌کد.
 - **`generateWorkloadFiles.sh`**: تولید فایل‌های بار کاری Caliper.
-- **`generateTapeConfigs.sh`**: تولید 980 فایل تنظیمات `tape`.
+- **`generateTapeConfigs.sh`**: تولید فایل‌های تنظیمات `tape`.
 - **`create_zip.sh`**: بسته‌بندی پروژه به زیپ.
-- **`production/`**: داده‌های پایدار Orderer و Peerها (ایجاد در راه‌اندازی).
+- **`production/`**: داده‌های پایدار Orderer و Peerها.
 
 ## پیش‌نیازها
 - **نرم‌افزار**:
-  - داکر (نسخه 20.10 یا بالاتر)
-  - داکر کامپوز (نسخه 1.29 یا بالاتر)
-  - ابزارهای فابریک (`cryptogen`، `configtxgen`) نسخه 2.4.9
-  - Node.js (نسخه 16 یا بالاتر)
-  - Hyperledger Caliper (نسخه 0.5.0 یا بالاتر)
-  - Go (نسخه 1.18 یا بالاتر)
+  - داکر (20.10+)
+  - داکر کامپوز (1.29+)
+  - ابزارهای فابریک (`cryptogen`, `configtxgen`) نسخه 2.4.9
+  - Node.js (16+)
+  - Hyperledger Caliper (0.5.0+)
+  - Go (1.18+)
 - **سیستم**: لینوکس یا macOS.
 - **دستورات نصب**:
   ```bash
@@ -66,7 +66,7 @@
    ```
 
 2. **ذخیره فایل‌های تنظیمات**:
-   - فایل‌ها را در `~/6g-fabric-network` ذخیره کنید:
+   - فایل‌ها را ذخیره کنید:
      - `crypto-config.yaml`
      - `configtx.yaml`
      - `docker-compose.yaml`
@@ -94,19 +94,16 @@
    ```
 
 4. **آماده‌سازی چین‌کد**:
-   - اطمینان از وجود 70 دایرکتوری چین‌کد در `./chaincode`:
-     ```bash
-     ls -l ./chaincode
-     mkdir -p ./chaincode/ResourceAllocate
-     echo 'package main' > ./chaincode/ResourceAllocate/dummy.go
-     ```
+   ```bash
+   ls -l ./chaincode
+   mkdir -p ./chaincode/ResourceAllocate
+   echo 'package main' > ./chaincode/ResourceAllocate/dummy.go
+   ```
 
 5. **اجرای شبکه**:
    ```bash
    ./setup_network.sh
    ```
-   - تولید مواد رمزنگاری، آرتیفکت‌ها، راه‌اندازی شبکه، ایجاد/پیوستن 14 کانال، و نصب/نمونه‌سازی 70 چین‌کد.
-   - 90 ثانیه صبر کنید.
 
 6. **تأیید شبکه**:
    ```bash
@@ -155,7 +152,7 @@ args: '{"Function":"init","Args":[]}'
 
 ### استفاده از Caliper
 - **آماده‌سازی**:
-  - اطمینان از وجود `caliper/benchmarkConfig.yaml`، `caliper/networkConfig.yaml`، و `workload/callback.js`.
+  - اطمینان از وجود `caliper/benchmarkConfig.yaml`, `caliper/networkConfig.yaml`, `workload/callback.js`.
 - **اجرای آزمایش**:
   ```bash
   npx caliper launch manager \
@@ -200,38 +197,15 @@ args: '{"Function":"init","Args":[]}'
           tlsCACerts:
             path: ./crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
   ```
-- **callback.js**:
-  ```javascript
-  'use strict';
-  module.exports.info = 'فراخوانی چین‌کد';
-  let bc, contx;
-  module.exports.init = async function(blockchain, context, args) {
-      bc = blockchain;
-      contx = context;
-  };
-  module.exports.run = async function() {
-      let args = {
-          chaincodeFunction: 'init',
-          chaincodeArguments: []
-      };
-      return bc.invokeSmartContract(contx, 'ResourceAllocate', '1.0', args, 30);
-  };
-  module.exports.end = async function() {
-      return Promise.resolve();
-  };
-  ```
 
 ## توضیحات اسکریپت‌های شل
 ### setup_network.sh
 - **هدف**: راه‌اندازی شبکه فابریک.
 - **مراحل**:
   - بررسی پیش‌نیازها.
-  - تولید مواد رمزنگاری با بررسی MSPها و گواهی TLS.
-  - تولید بلاک جنسیس و 14 تراکنش کانال.
-  - راه‌اندازی کانتینرهای داکر.
-  - ایجاد/پیوستن 14 کانال.
-  - نصب/نمونه‌سازی 70 چین‌کد.
-  - ذخیره لاگ‌های دیباگ.
+  - تولید مواد رمزنگاری با بررسی MSP و TLS.
+  - تولید بلاک جنسیس و تراکنش‌های کانال با پروفایل‌های صحیح.
+  - راه‌اندازی کانتینرها، ایجاد/پیوستن کانال‌ها، نصب/نمونه‌سازی چین‌کدها.
 - **استفاده**:
   ```bash
   ./setup_network.sh
@@ -240,29 +214,16 @@ args: '{"Function":"init","Args":[]}'
 ### generateCoreYamls.sh
 - **هدف**: تولید `core-org1.yaml` تا `core-org10.yaml`.
 - **مراحل**:
-  - ایجاد فایل‌های YAML با تنظیمات Peer (لاگ، چین‌کد، دیتابیس لجر).
-  - نمونه:
-    ```yaml
-    peer:
-      id: peer0.org1.example.com
-      address: peer0.org1.example.com:7051
-      localMspId: Org1MSP
-      logLevel: info
-      chaincode:
-        builder: external
-        startuptimeout: 300s
-      state:
-        stateDatabase: goleveldb
-    ```
+  - ایجاد فایل‌های YAML برای تنظیمات Peer.
 - **استفاده**:
   ```bash
   ./generateCoreYamls.sh
   ```
 
 ### generateConnectionProfiles.sh
-- **هدف**: تولید پروفایل‌های اتصال (JSON).
+- **هدف**: تولید پروفایل‌های اتصال JSON.
 - **مراحل**:
-  - ایجاد پروفایل برای هر سازمان با نقاط انتهایی و MSP.
+  - ایجاد پروفایل برای هر سازمان.
 - **استفاده**:
   ```bash
   ./generateConnectionProfiles.sh
@@ -280,7 +241,7 @@ args: '{"Function":"init","Args":[]}'
 ### generateWorkloadFiles.sh
 - **هدف**: تولید فایل‌های بار کاری Caliper.
 - **مراحل**:
-  - ایجاد `callback.js` برای فراخوانی توابع چین‌کد.
+  - ایجاد `callback.js`.
 - **استفاده**:
   ```bash
   ./generateWorkloadFiles.sh
@@ -305,14 +266,32 @@ args: '{"Function":"init","Args":[]}'
   ```
 
 ## عیب‌یابی
-### خطا: `policy for [Group] /Channel/Application not satisfied`
-- **علت**: سیاست `Admins` برآورده نشده، احتمالاً به دلیل MSP نامعتبر.
+### خطا: `Could not find profile: Generalchannelapp`
+- **علت**: نام پروفایل در `setup_network.sh` با `configtx.yaml` ناسازگار است.
 - **راه‌حل**:
-  - بررسی MSP مدیر برای Org1 تا Org10:
+  - بررسی `configtx.yaml` برای نام پروفایل صحیح (`GeneralChannelApp`):
+    ```bash
+    grep GeneralChannelApp configtx.yaml
+    ```
+  - اطمینان از استفاده از `GeneralChannelApp` در `setup_network.sh`.
+  - تست دستی:
+    ```bash
+    export FABRIC_CFG_PATH=$PWD
+    configtxgen -profile GeneralChannelApp -outputCreateChannelTx ./channel-artifacts/generalchannelapp.tx -channelID generalchannelapp
+    ```
+  - بررسی وجود `configtx.yaml`:
+    ```bash
+    ls -l $FABRIC_CFG_PATH/configtx.yaml
+    ```
+
+### خطا: `policy for [Group] /Channel/Application not satisfied`
+- **علت**: MSP مدیر نامعتبر یا غایب.
+- **راه‌حل**:
+  - بررسی MSP:
     ```bash
     for org in {1..10}; do ls -l crypto-config/peerOrganizations/org${org}.example.com/users/Admin@org${org}.example.com/msp; done
     ```
-  - بررسی فایل‌های گواهی:
+  - بررسی گواهی‌ها:
     ```bash
     ls -l crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts
     ls -l crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore
@@ -322,11 +301,11 @@ args: '{"Function":"init","Args":[]}'
     rm -rf crypto-config
     cryptogen generate --config=./crypto-config.yaml
     ```
-  - بررسی گواهی TLS Orderer:
+  - بررسی TLS:
     ```bash
     ls -l crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt
     ```
-  - آزمایش دستی ایجاد کانال:
+  - تست دستی:
     ```bash
     docker exec -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org1.example.com/msp" \
                -e "CORE_PEER_LOCALMSPID=Org1MSP" \
@@ -338,32 +317,10 @@ args: '{"Function":"init","Args":[]}'
                --tls \
                --cafile /etc/hyperledger/fabric/tls/orderer-ca.crt
     ```
-  - بررسی لاگ‌های Orderer و Peer:
+  - بررسی لاگ‌ها:
     ```bash
     cat orderer.log
     cat peer0.org1.log
-    ```
-
-### خطا: `no Readers policy defined`
-- **علت**: نبود سیاست `Readers` در کانال‌های سازمانی.
-- **راه‌حل**:
-  - بررسی `configtx.yaml` برای سیاست‌های `Readers` و `Writers`:
-    ```yaml
-    Policies:
-      Readers:
-        Type: ImplicitMeta
-        Rule: "ANY Readers"
-      Writers:
-        Type: ImplicitMeta
-        Rule: "ANY Writers"
-      Admins:
-        Type: ImplicitMeta
-        Rule: "ANY Admins"
-    ```
-  - تولید مجدد آرتیفکت‌ها:
-    ```bash
-    export FABRIC_CFG_PATH=$PWD
-    configtxgen -profile GeneralChannelApp -outputCreateChannelTx ./channel-artifacts/generalchannelapp.tx -channelID generalchannelapp
     ```
 
 ### خطا: `etcdraft configuration missing`
@@ -384,32 +341,8 @@ args: '{"Function":"init","Args":[]}'
     configtxgen -profile OrdererGenesis -channelID system-channel -outputBlock ./channel-artifacts/genesis.block
     ```
 
-### خطای نصب چین‌کد
-- **علت**: نبود دایرکتوری‌های چین‌کد.
-- **راه‌حل**:
-  - بررسی:
-    ```bash
-    ls -l ./chaincode
-    ```
-  - اجرای `generateChaincodes.sh`:
-    ```bash
-    ./generateChaincodes.sh
-    ```
-
-### خطای اتصال به Orderer
-- **علت**: Orderer غیرقابل دسترسی یا TLS نادرست.
-- **راه‌حل**:
-  - بررسی لاگ‌ها:
-    ```bash
-    docker logs orderer.example.com | grep -i "error"
-    ```
-  - بررسی گواهی‌های TLS:
-    ```bash
-    ls -l crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls
-    ```
-
 ## یادداشت‌ها
-- **چین‌کدها**: 70 چین‌کد (مانند `ResourceAllocate`) باید با کد Go معتبر یا نگهدارنده پر شوند.
+- **چین‌کدها**: 70 چین‌کد باید با کد Go یا نگهدارنده پر شوند.
 - **پاک‌سازی**:
   ```bash
   docker-compose -f docker-compose.yaml down
@@ -421,7 +354,6 @@ args: '{"Function":"init","Args":[]}'
   docker logs orderer.example.com > orderer.log
   docker logs peer0.org1.example.com > peer0.org1.log
   ```
-- **مقیاس آزمایش**: آزمایش 980 تست `tape` منابع زیادی نیاز دارد. ابتدا یک زیرمجموعه آزمایش کنید.
 
 ## پشتیبانی
 لاگ‌ها را به اشتراک بگذارید:
