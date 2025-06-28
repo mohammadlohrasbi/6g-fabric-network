@@ -1,66 +1,61 @@
-# 6G Hyperledger Fabric Network
+# شبکه هایپرلجر فابریک 6G
 
-This project implements a Hyperledger Fabric network for 6G applications, featuring 10 organizations (Org1 to Org10), 14 channels (General, IoT, Security, Monitoring, and organization-specific channels), and 70 chaincodes for resource allocation, bandwidth sharing, security, and monitoring. The network uses an `etcdraft` consensus mechanism with one Orderer node, multiple Peer nodes, and Certificate Authorities (CAs) per organization. This README provides detailed instructions for setting up, running, and testing the network using `tape` and `caliper`, along with explanations of all shell scripts.
+این پروژه یک شبکه هایپرلجر فابریک برای کاربردهای 6G پیاده‌سازی می‌کند که شامل 10 سازمان (Org1 تا Org10)، 14 کانال (عمومی، IoT، امنیتی، نظارتی، و کانال‌های خاص سازمانی)، و 70 چین‌کد برای تخصیص منابع، اشتراک پهنای باند، امنیت، و نظارت است. شبکه از مکانیزم اجماع `etcdraft` با یک گره Orderer، چندین گره Peer، و مقامات گواهی (CA) برای هر سازمان استفاده می‌کند. این README دستورالعمل‌های جامعی برای راه‌اندازی، اجرا، و آزمایش شبکه با استفاده از `tape` و `caliper`، همراه با توضیحات تمام اسکریپت‌های شل و عیب‌یابی پیشرفته ارائه می‌دهد.
 
-## Project Structure
-The project directory (`~/6g-fabric-network`) is organized as follows:
+## ساختار پروژه
+دایرکتوری پروژه (`~/6g-fabric-network`) به‌صورت زیر سازمان‌دهی شده است:
 
 - **`caliper/`**:
-  - `benchmarkConfig.yaml`: Defines Caliper benchmarking parameters (e.g., transaction rate, number of transactions).
-  - `networkConfig.yaml`: Specifies network details for Caliper, including Orderer and Peer endpoints, MSPs, and TLS certificates.
+  - `benchmarkConfig.yaml`: پارامترهای بنچمارک Caliper (مانند نرخ تراکنش، تعداد تراکنش‌ها).
+  - `networkConfig.yaml`: جزئیات شبکه برای Caliper، شامل نقاط انتهایی Orderer و Peer، MSPها، و گواهی‌های TLS.
 - **`tape/`**:
-  - Contains 980 configuration files (e.g., `tape-ResourceAllocate-generalchannelapp.yaml`, `tape-BandwidthShare-iotchannelapp.yaml`) for testing each chaincode on each channel using `tape`.
+  - 980 فایل تنظیمات (مانند `tape-ResourceAllocate-generalchannelapp.yaml`) برای آزمایش هر چین‌کد روی هر کانال با `tape`.
 - **`workload/`**:
-  - `callback.js`: Defines the workload module for Caliper, specifying chaincode functions to invoke during benchmarking.
+  - `callback.js`: ماژول بار کاری برای Caliper، مشخص‌کننده توابع چین‌کد برای بنچمارک.
 - **`chaincode/`**:
-  - Contains directories for 70 chaincodes (e.g., `ResourceAllocate/`, `BandwidthShare/`), each with Go source code or placeholders (e.g., `dummy.go`).
+  - دایرکتوری‌های 70 چین‌کد (مانند `ResourceAllocate/`، `BandwidthShare/`) با کد Go یا فایل‌های نگهدارنده (`dummy.go`).
 - **`channel-artifacts/`**:
-  - Contains 14 channel transaction files (e.g., `generalchannelapp.tx`, `iotchannelapp.tx`, `org1channelapp.tx`) and the genesis block (`genesis.block`).
+  - 14 فایل تراکنش کانال (مانند `generalchannelapp.tx`) و بلاک جنسیس (`genesis.block`).
 - **`crypto-config/`**:
-  - `peerOrganizations/`: Stores MSP and TLS certificates for Org1 to Org10.
-  - `ordererOrganizations/`: Stores MSP and TLS certificates for the Orderer.
-- **`crypto-config.yaml`**: Configures the organizational structure for `cryptogen` to generate certificates.
-- **`configtx.yaml`**: Defines channel profiles, policies (e.g., `ANY Admins`, `ANY Readers`, `ANY Writers`), and `etcdraft` consensus settings.
-- **`docker-compose.yaml`**: Defines Docker services for the Orderer, Peers, and CAs.
-- **`core-org1.yaml` to `core-org10.yaml`**: Configuration files for each organization’s Peer nodes (e.g., logging, chaincode, ledger settings).
-- **`setup_network.sh`**: Script to set up the network, generate artifacts, and deploy chaincodes.
-- **`generateCoreYamls.sh`**: Script to generate `core-org*.yaml` files for each organization.
-- **`generateConnectionProfiles.sh`**: Script to generate connection profiles for client applications.
-- **`generateChaincodes.sh`**: Script to generate placeholder chaincode directories and files.
-- **`generateWorkloadFiles.sh`**: Script to generate Caliper workload files (e.g., `callback.js`).
-- **`generateTapeConfigs.sh`**: Script to generate 980 `tape` configuration files.
-- **`create_zip.sh`**: Script to package the project into a zip archive.
-- **`production/`**: Directory for persistent data of Orderer and Peer nodes (created during setup).
+  - `peerOrganizations/`: MSP و TLS برای Org1 تا Org10.
+  - `ordererOrganizations/`: MSP و TLS برای Orderer.
+- **`crypto-config.yaml`**: ساختار سازمانی برای تولید گواهی‌ها با `cryptogen`.
+- **`configtx.yaml`**: پروفایل‌های کانال، سیاست‌ها (`ANY Admins`، `ANY Readers`، `ANY Writers`)، و تنظیمات `etcdraft`.
+- **`docker-compose.yaml`**: سرویس‌های داکر برای Orderer، Peerها، و CAها.
+- **`core-org1.yaml` تا `core-org10.yaml`**: تنظیمات گره‌های Peer (لاگ، چین‌کد، لجر).
+- **`setup_network.sh`**: راه‌اندازی شبکه، تولید آرتیفکت‌ها، و استقرار چین‌کدها.
+- **`generateCoreYamls.sh`**: تولید فایل‌های `core-org*.yaml`.
+- **`generateConnectionProfiles.sh`**: تولید پروفایل‌های اتصال.
+- **`generateChaincodes.sh`**: تولید دایرکتوری‌های نگهدارنده چین‌کد.
+- **`generateWorkloadFiles.sh`**: تولید فایل‌های بار کاری Caliper.
+- **`generateTapeConfigs.sh`**: تولید 980 فایل تنظیمات `tape`.
+- **`create_zip.sh`**: بسته‌بندی پروژه به زیپ.
+- **`production/`**: داده‌های پایدار Orderer و Peerها (ایجاد در راه‌اندازی).
 
-## Prerequisites
-- **Software**:
-  - Docker (version 20.10 or higher)
-  - Docker Compose (version 1.29 or higher)
-  - Hyperledger Fabric tools (`cryptogen`, `configtxgen`) version 2.4.9
-  - Node.js (version 16 or higher, for `tape` and `caliper`)
-  - Hyperledger Caliper (version 0.5.0 or higher)
-  - Go (version 1.18 or higher, for chaincode development)
-- **System**: Linux or macOS is recommended.
-- **Installation Commands**:
+## پیش‌نیازها
+- **نرم‌افزار**:
+  - داکر (نسخه 20.10 یا بالاتر)
+  - داکر کامپوز (نسخه 1.29 یا بالاتر)
+  - ابزارهای فابریک (`cryptogen`، `configtxgen`) نسخه 2.4.9
+  - Node.js (نسخه 16 یا بالاتر)
+  - Hyperledger Caliper (نسخه 0.5.0 یا بالاتر)
+  - Go (نسخه 1.18 یا بالاتر)
+- **سیستم**: لینوکس یا macOS.
+- **دستورات نصب**:
   ```bash
-  # Install Fabric binaries
   curl -sSL https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/bootstrap.sh | bash -s -- 2.4.9
-  # Install Node.js
   curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
   apt-get install -y nodejs
-  # Install tape
   npm install -g tape
-  # Install Caliper
   npm install -g @hyperledger/caliper-cli@0.5.0
   npx caliper bind --caliper-bind-sut fabric:2.4
-  # Install Go
   wget https://golang.org/dl/go1.18.10.linux-amd64.tar.gz
   tar -C /usr/local -xzf go1.18.10.linux-amd64.tar.gz
   export PATH=$PATH:/usr/local/go/bin
   ```
 
-## Setup Instructions
-1. **Prepare the Environment**:
+## دستورالعمل‌های راه‌اندازی
+1. **آماده‌سازی محیط**:
    ```bash
    cd ~/6g-fabric-network
    docker compose down
@@ -70,12 +65,12 @@ The project directory (`~/6g-fabric-network`) is organized as follows:
    mkdir -p channel-artifacts production chaincode caliper tape workload
    ```
 
-2. **Save Configuration Files**:
-   - Save the following files in `~/6g-fabric-network`:
+2. **ذخیره فایل‌های تنظیمات**:
+   - فایل‌ها را در `~/6g-fabric-network` ذخیره کنید:
      - `crypto-config.yaml`
      - `configtx.yaml`
      - `docker-compose.yaml`
-     - `core-org1.yaml` to `core-org10.yaml`
+     - `core-org1.yaml` تا `core-org10.yaml`
      - `setup_network.sh`
      - `generateCoreYamls.sh`
      - `generateConnectionProfiles.sh`
@@ -83,51 +78,46 @@ The project directory (`~/6g-fabric-network`) is organized as follows:
      - `generateWorkloadFiles.sh`
      - `generateTapeConfigs.sh`
      - `create_zip.sh`
-   - Make shell scripts executable:
+   - اسکریپت‌ها را اجرایی کنید:
      ```bash
      chmod +x *.sh
      dos2unix *.sh
      ```
 
-3. **Generate Configuration Files**:
-   - Run scripts to generate necessary configurations:
-     ```bash
-     ./generateCoreYamls.sh
-     ./generateConnectionProfiles.sh
-     ./generateChaincodes.sh
-     ./generateWorkloadFiles.sh
-     ./generateTapeConfigs.sh
-     ```
+3. **تولید فایل‌های تنظیمات**:
+   ```bash
+   ./generateCoreYamls.sh
+   ./generateConnectionProfiles.sh
+   ./generateChaincodes.sh
+   ./generateWorkloadFiles.sh
+   ./generateTapeConfigs.sh
+   ```
 
-4. **Prepare Chaincode**:
-   - Ensure all 70 chaincode directories exist in `./chaincode`. The `generateChaincodes.sh` script creates placeholders if needed:
+4. **آماده‌سازی چین‌کد**:
+   - اطمینان از وجود 70 دایرکتوری چین‌کد در `./chaincode`:
      ```bash
      ls -l ./chaincode
-     # Example: Create a placeholder if missing
      mkdir -p ./chaincode/ResourceAllocate
      echo 'package main' > ./chaincode/ResourceAllocate/dummy.go
      ```
 
-5. **Run the Network**:
+5. **اجرای شبکه**:
    ```bash
    ./setup_network.sh
    ```
-   - This script generates cryptographic materials, channel artifacts, starts the network, creates/joins 14 channels, and installs/instantiates 70 chaincodes.
-   - Wait approximately 90 seconds for the network to stabilize.
+   - تولید مواد رمزنگاری، آرتیفکت‌ها، راه‌اندازی شبکه، ایجاد/پیوستن 14 کانال، و نصب/نمونه‌سازی 70 چین‌کد.
+   - 90 ثانیه صبر کنید.
 
-6. **Verify the Network**:
+6. **تأیید شبکه**:
    ```bash
    docker ps
-   docker logs orderer.example.com
-   docker logs peer0.org1.example.com
+   docker logs orderer.example.com > orderer.log
+   docker logs peer0.org1.example.com > peer0.org1.log
    ```
 
-## Testing the Network
-### Using Tape
-The `tape` tool tests transaction performance for each chaincode on each channel using the 980 configuration files in the `tape/` directory.
-
-#### Running Tape Tests
-- **Single Test Example**:
+## آزمایش شبکه
+### استفاده از Tape
+- **آزمایش تکی**:
   ```bash
   export CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org1.example.com/msp
   export CORE_PEER_LOCALMSPID=Org1MSP
@@ -143,36 +133,30 @@ The `tape` tool tests transaction performance for each chaincode on each channel
     --n 100 \
     --cps 10
   ```
-- **Batch Testing**:
-  - Run all 980 tests:
-    ```bash
-    for config in tape/*.yaml; do
-      docker exec peer0.org1.example.com tape \
-        --config $config \
-        --orderer orderer.example.com:7050 \
-        --tls \
-        --cafile $ORDERER_CA \
-        --n 100 \
-        --cps 10
-    done
-    ```
+- **آزمایش دسته‌ای**:
+  ```bash
+  for config in tape/*.yaml; do
+    docker exec peer0.org1.example.com tape \
+      --config $config \
+      --orderer orderer.example.com:7050 \
+      --tls \
+      --cafile $ORDERER_CA \
+      --n 100 \
+      --cps 10
+  done
+  ```
 
-#### Example Tape Configuration (`tape-ResourceAllocate-generalchannelapp.yaml`)
+#### نمونه تنظیمات Tape
 ```yaml
 channel: generalchannelapp
 chaincode: ResourceAllocate
 args: '{"Function":"init","Args":[]}'
 ```
-- **Purpose**: Specifies the channel, chaincode, and function to test.
-- **Output**: Generates metrics (e.g., throughput, latency).
 
-### Using Caliper
-The `caliper` tool benchmarks the network using configurations in `caliper/` and `workload/`.
-
-#### Running Caliper Tests
-- **Setup**:
-  - Ensure `caliper/benchmarkConfig.yaml`, `caliper/networkConfig.yaml`, and `workload/callback.js` exist (generated by `generateWorkloadFiles.sh`).
-- **Run Test**:
+### استفاده از Caliper
+- **آماده‌سازی**:
+  - اطمینان از وجود `caliper/benchmarkConfig.yaml`، `caliper/networkConfig.yaml`، و `workload/callback.js`.
+- **اجرای آزمایش**:
   ```bash
   npx caliper launch manager \
     --caliper-workspace ./ \
@@ -180,14 +164,13 @@ The `caliper` tool benchmarks the network using configurations in `caliper/` and
     --caliper-benchconfig ./caliper/benchmarkConfig.yaml \
     --caliper-fabric-gateway-enabled
   ```
-- **Output**: Generates an HTML report with metrics (e.g., throughput, latency, resource usage).
 
-#### Example Caliper Configurations
+#### نمونه تنظیمات Caliper
 - **benchmarkConfig.yaml**:
   ```yaml
   test:
     name: 6g-fabric-benchmark
-    description: Benchmark for 6G Fabric network
+    description: بنچمارک شبکه فابریک 6G
     workers:
       number: 5
     rounds:
@@ -220,7 +203,7 @@ The `caliper` tool benchmarks the network using configurations in `caliper/` and
 - **callback.js**:
   ```javascript
   'use strict';
-  module.exports.info = 'Invoking chaincode';
+  module.exports.info = 'فراخوانی چین‌کد';
   let bc, contx;
   module.exports.init = async function(blockchain, context, args) {
       bc = blockchain;
@@ -238,28 +221,27 @@ The `caliper` tool benchmarks the network using configurations in `caliper/` and
   };
   ```
 
-## Shell Script Explanations
+## توضیحات اسکریپت‌های شل
 ### setup_network.sh
-- **Purpose**: Sets up the entire Hyperledger Fabric network.
-- **Key Steps**:
-  - Verifies prerequisites (`cryptogen`, `configtxgen`, `docker`, `docker-compose`).
-  - Generates cryptographic materials using `crypto-config.yaml`, with checks for `Org1` admin MSP.
-  - Creates genesis block and 14 channel transactions using `configtx.yaml`.
-  - Starts Docker containers using `docker-compose.yaml`.
-  - Creates and joins 14 channels (e.g., `generalchannelapp`, `iotchannelapp`, `org1channelapp`).
-  - Installs and instantiates 70 chaincodes on all peers and channels.
-  - Creates placeholder chaincode directories if missing.
-- **Usage**:
+- **هدف**: راه‌اندازی شبکه فابریک.
+- **مراحل**:
+  - بررسی پیش‌نیازها.
+  - تولید مواد رمزنگاری با بررسی MSPها و گواهی TLS.
+  - تولید بلاک جنسیس و 14 تراکنش کانال.
+  - راه‌اندازی کانتینرهای داکر.
+  - ایجاد/پیوستن 14 کانال.
+  - نصب/نمونه‌سازی 70 چین‌کد.
+  - ذخیره لاگ‌های دیباگ.
+- **استفاده**:
   ```bash
   ./setup_network.sh
   ```
-- **Notes**: Includes a 90-second delay for network stabilization. Uses `core-org*.yaml` for peer configurations.
 
 ### generateCoreYamls.sh
-- **Purpose**: Generates `core-org1.yaml` to `core-org10.yaml` files for each organization’s Peer nodes.
-- **Key Steps**:
-  - Creates YAML files with peer configurations (e.g., logging levels, chaincode execution settings, ledger state database).
-  - Example content for `core-org1.yaml`:
+- **هدف**: تولید `core-org1.yaml` تا `core-org10.yaml`.
+- **مراحل**:
+  - ایجاد فایل‌های YAML با تنظیمات Peer (لاگ، چین‌کد، دیتابیس لجر).
+  - نمونه:
     ```yaml
     peer:
       id: peer0.org1.example.com
@@ -272,91 +254,79 @@ The `caliper` tool benchmarks the network using configurations in `caliper/` and
       state:
         stateDatabase: goleveldb
     ```
-  - Loops through Org1 to Org10 to create 10 files.
-- **Usage**:
+- **استفاده**:
   ```bash
   ./generateCoreYamls.sh
   ```
-- **Notes**: Ensures consistent peer configurations across organizations.
 
 ### generateConnectionProfiles.sh
-- **Purpose**: Generates connection profiles (e.g., JSON files) for client applications to interact with the network.
-- **Key Steps**:
-  - Creates a connection profile per organization, specifying Orderer and Peer endpoints, MSPs, and TLS certificates.
-  - Example output: `connection-org1.json`.
-- **Usage**:
+- **هدف**: تولید پروفایل‌های اتصال (JSON).
+- **مراحل**:
+  - ایجاد پروفایل برای هر سازمان با نقاط انتهایی و MSP.
+- **استفاده**:
   ```bash
   ./generateConnectionProfiles.sh
   ```
-- **Notes**: Used by `caliper` and other client applications.
 
 ### generateChaincodes.sh
-- **Purpose**: Generates placeholder directories and files for the 70 chaincodes in `./chaincode`.
-- **Key Steps**:
-  - Creates directories like `ResourceAllocate/`, `BandwidthShare/`, etc.
-  - Adds a minimal Go file (e.g., `dummy.go`) to each directory:
-    ```go
-    package main
-    ```
-  - Ensures `setup_network.sh` can install chaincodes without errors.
-- **Usage**:
+- **هدف**: تولید دایرکتوری‌های 70 چین‌کد.
+- **مراحل**:
+  - ایجاد دایرکتوری‌ها و فایل‌های `dummy.go`.
+- **استفاده**:
   ```bash
   ./generateChaincodes.sh
   ```
-- **Notes**: Replace placeholders with actual chaincode logic before deployment.
 
 ### generateWorkloadFiles.sh
-- **Purpose**: Generates Caliper workload files, such as `callback.js` in the `workload/` directory.
-- **Key Steps**:
-  - Creates `callback.js` with a template for invoking chaincode functions.
-  - Supports multiple chaincodes by generating workload files per chaincode if needed.
-- **Usage**:
+- **هدف**: تولید فایل‌های بار کاری Caliper.
+- **مراحل**:
+  - ایجاد `callback.js` برای فراخوانی توابع چین‌کد.
+- **استفاده**:
   ```bash
   ./generateWorkloadFiles.sh
   ```
-- **Notes**: Ensures Caliper can run benchmarks with the correct workload.
 
 ### generateTapeConfigs.sh
-- **Purpose**: Generates 980 `tape` configuration files in the `tape/` directory for each chaincode-channel combination.
-- **Key Steps**:
-  - Iterates over 70 chaincodes and 14 channels to create YAML files like `tape-ResourceAllocate-generalchannelapp.yaml`.
-  - Example content:
-    ```yaml
-    channel: generalchannelapp
-    chaincode: ResourceAllocate
-    args: '{"Function":"init","Args":[]}'
-    ```
-- **Usage**:
+- **هدف**: تولید 980 فایل تنظیمات `tape`.
+- **مراحل**:
+  - ایجاد فایل‌های YAML برای هر ترکیب چین‌کد-کانال.
+- **استفاده**:
   ```bash
   ./generateTapeConfigs.sh
   ```
-- **Notes**: Enables comprehensive performance testing with `tape`.
 
 ### create_zip.sh
-- **Purpose**: Packages the project directory into a zip archive for distribution or backup.
-- **Key Steps**:
-  - Creates a zip file (e.g., `6g-fabric-network.zip`) including all configurations, scripts, and chaincode.
-  - Excludes `production/` to avoid including runtime data.
-- **Usage**:
+- **هدف**: بسته‌بندی پروژه به زیپ.
+- **مراحل**:
+  - ایجاد زیپ بدون `production/`.
+- **استفاده**:
   ```bash
   ./create_zip.sh
   ```
-- **Notes**: Useful for sharing the project setup.
 
-## Troubleshooting
-### Error: `policy for [Group] /Channel/Application not satisfied`
-- **Cause**: The `Admins` policy for the `Application` group is not satisfied, likely due to a missing or invalid admin MSP.
-- **Solution**:
-  - Verify the admin MSP for `Org1`:
+## عیب‌یابی
+### خطا: `policy for [Group] /Channel/Application not satisfied`
+- **علت**: سیاست `Admins` برآورده نشده، احتمالاً به دلیل MSP نامعتبر.
+- **راه‌حل**:
+  - بررسی MSP مدیر برای Org1 تا Org10:
     ```bash
-    ls -l crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+    for org in {1..10}; do ls -l crypto-config/peerOrganizations/org${org}.example.com/users/Admin@org${org}.example.com/msp; done
     ```
-  - If missing, regenerate cryptographic materials:
+  - بررسی فایل‌های گواهی:
+    ```bash
+    ls -l crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts
+    ls -l crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore
+    ```
+  - تولید مجدد مواد رمزنگاری:
     ```bash
     rm -rf crypto-config
     cryptogen generate --config=./crypto-config.yaml
     ```
-  - Test channel creation manually:
+  - بررسی گواهی TLS Orderer:
+    ```bash
+    ls -l crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt
+    ```
+  - آزمایش دستی ایجاد کانال:
     ```bash
     docker exec -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org1.example.com/msp" \
                -e "CORE_PEER_LOCALMSPID=Org1MSP" \
@@ -368,24 +338,16 @@ The `caliper` tool benchmarks the network using configurations in `caliper/` and
                --tls \
                --cafile /etc/hyperledger/fabric/tls/orderer-ca.crt
     ```
-  - Ensure `configtx.yaml` defines `ANY Admins` for `GeneralChannelApp`:
-    ```yaml
-    Policies:
-      Readers:
-        Type: ImplicitMeta
-        Rule: "ANY Readers"
-      Writers:
-        Type: ImplicitMeta
-        Rule: "ANY Writers"
-      Admins:
-        Type: ImplicitMeta
-        Rule: "ANY Admins"
+  - بررسی لاگ‌های Orderer و Peer:
+    ```bash
+    cat orderer.log
+    cat peer0.org1.log
     ```
 
-### Error: `no Readers policy defined`
-- **Cause**: Missing `Readers` policy in organization-specific channel profiles.
-- **Solution**:
-  - Verify `configtx.yaml` includes `Readers` and `Writers` policies for `Org1ChannelApp` to `Org10ChannelApp`:
+### خطا: `no Readers policy defined`
+- **علت**: نبود سیاست `Readers` در کانال‌های سازمانی.
+- **راه‌حل**:
+  - بررسی `configtx.yaml` برای سیاست‌های `Readers` و `Writers`:
     ```yaml
     Policies:
       Readers:
@@ -398,16 +360,16 @@ The `caliper` tool benchmarks the network using configurations in `caliper/` and
         Type: ImplicitMeta
         Rule: "ANY Admins"
     ```
-  - Regenerate channel artifacts:
+  - تولید مجدد آرتیفکت‌ها:
     ```bash
     export FABRIC_CFG_PATH=$PWD
-    configtxgen -profile Org1ChannelApp -outputCreateChannelTx ./channel-artifacts/org1channelapp.tx -channelID org1channelapp
+    configtxgen -profile GeneralChannelApp -outputCreateChannelTx ./channel-artifacts/generalchannelapp.tx -channelID generalchannelapp
     ```
 
-### Error: `etcdraft configuration missing`
-- **Cause**: Missing `EtcdRaft` configuration in `configtx.yaml`.
-- **Solution**:
-  - Verify `configtx.yaml` includes:
+### خطا: `etcdraft configuration missing`
+- **علت**: نبود تنظیمات `EtcdRaft`.
+- **راه‌حل**:
+  - بررسی `configtx.yaml`:
     ```yaml
     EtcdRaft:
       Consenters:
@@ -416,58 +378,53 @@ The `caliper` tool benchmarks the network using configurations in `caliper/` and
           ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
           ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
     ```
-  - Check TLS certificates:
-    ```bash
-    ls -l crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
-    ```
-  - Regenerate genesis block:
+  - تولید مجدد بلاک جنسیس:
     ```bash
     export FABRIC_CFG_PATH=$PWD
     configtxgen -profile OrdererGenesis -channelID system-channel -outputBlock ./channel-artifacts/genesis.block
     ```
 
-### Chaincode Installation Error
-- **Cause**: Missing chaincode directories or files.
-- **Solution**:
-  - Verify chaincode directories:
+### خطای نصب چین‌کد
+- **علت**: نبود دایرکتوری‌های چین‌کد.
+- **راه‌حل**:
+  - بررسی:
     ```bash
     ls -l ./chaincode
-    docker exec peer0.org1.example.com ls -l /opt/gopath/src/github.com/chaincode
     ```
-  - Run `generateChaincodes.sh`:
+  - اجرای `generateChaincodes.sh`:
     ```bash
     ./generateChaincodes.sh
     ```
 
-### Orderer Connection Error
-- **Cause**: Orderer is inaccessible or TLS is misconfigured.
-- **Solution**:
-  - Check Orderer logs:
+### خطای اتصال به Orderer
+- **علت**: Orderer غیرقابل دسترسی یا TLS نادرست.
+- **راه‌حل**:
+  - بررسی لاگ‌ها:
     ```bash
     docker logs orderer.example.com | grep -i "error"
     ```
-  - Verify TLS certificates:
+  - بررسی گواهی‌های TLS:
     ```bash
     ls -l crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls
     ```
 
-## Notes
-- **Chaincodes**: Ensure all 70 chaincode directories are populated with valid Go code or placeholders before running `setup_network.sh`. The script includes a list of 70 chaincodes (e.g., `ResourceAllocate`, `BandwidthShare`).
-- **Cleanup**: To reset the network:
+## یادداشت‌ها
+- **چین‌کدها**: 70 چین‌کد (مانند `ResourceAllocate`) باید با کد Go معتبر یا نگهدارنده پر شوند.
+- **پاک‌سازی**:
   ```bash
   docker-compose -f docker-compose.yaml down
   docker rm -f $(docker ps -a -q)
   rm -rf channel-artifacts crypto-config production
   ```
-- **Logs**: For debugging, save logs:
+- **لاگ‌ها**:
   ```bash
   docker logs orderer.example.com > orderer.log
   docker logs peer0.org1.example.com > peer0.org1.log
   ```
-- **Testing Scale**: Running 980 `tape` tests may be resource-intensive. Test a subset (e.g., `tape-ResourceAllocate-generalchannelapp.yaml`) initially.
+- **مقیاس آزمایش**: آزمایش 980 تست `tape` منابع زیادی نیاز دارد. ابتدا یک زیرمجموعه آزمایش کنید.
 
-## Support
-For issues, share the following logs:
+## پشتیبانی
+لاگ‌ها را به اشتراک بگذارید:
 ```bash
 docker logs orderer.example.com > orderer.log
 docker logs peer0.org1.example.com > peer0.org1.log
