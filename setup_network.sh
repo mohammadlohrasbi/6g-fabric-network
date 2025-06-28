@@ -101,7 +101,7 @@ for channel in "${!channel_profiles[@]}"; do
 done
 
 # راه‌اندازی شبکه
-docker-compose -f docker-compose.yaml up -d
+docker compose up -d
 if [ $? -ne 0 ]; then
   echo "خطا در راه‌اندازی شبکه"
   exit 1
