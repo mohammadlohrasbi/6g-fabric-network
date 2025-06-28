@@ -7,7 +7,16 @@ set -x
 command -v cryptogen >/dev/null 2>&1 || { echo "cryptogen مورد نیاز است اما نصب نشده است."; exit 1; }
 command -v configtxgen >/dev/null 2>&1 || { echo "configtxgen مورد نیاز است اما نصب نشده است."; exit 1; }
 command -v docker >/dev/null 2>&1 || { echo "docker مورد نیاز است اما نصب نشده است."; exit 1; }
-#command -v docker-compose >/dev/null 2>&1 || { echo "docker-compose مورد نیاز است اما نصب نشده است."; exit 1; }
+
+# بررسی وجود docker-compose یا docker compose
+if command -v docker-compose >/dev/null 2>&1; then
+  DOCKER_COMPOSE="docker-compose"
+elif docker compose version >/dev/null 2>&1; then
+  DOCKER_COMPOSE="docker compose"
+else
+  echo "docker-compose یا docker compose نصب نشده است. لطفاً یکی را نصب کنید."
+  exit 1
+fi
 
 # بررسی نسخه cryptogen
 cryptogen version
@@ -30,6 +39,12 @@ fi
 # بررسی وجود crypto-config.yaml
 if [ ! -f "$FABRIC_CFG_PATH/crypto-config.yaml" ]; then
   echo "فایل crypto-config.yaml در $FABRIC_CFG_PATH یافت نشد"
+  exit 1
+fi
+
+# بررسی وجود docker-compose.yaml
+if [ ! -f "$FABRIC_CFG_PATH/docker-compose.yaml" ]; then
+  echo "فایل docker-compose.yaml در $FABRIC_CFG_PATH یافت نشد"
   exit 1
 fi
 
@@ -136,12 +151,18 @@ for channel in "${!channel_profiles[@]}"; do
   fi
 done
 
-# راه‌اندازی شبکه
-docker compose up -d
+# راه‌اندازی شبکه با فایل docker-compose.yaml صریح
+echo "راه‌اندازی شبکه با docker-compose.yaml..."
+$DOCKER_COMPOSE -f docker-compose.yaml up -d
 if [ $? -ne 0 ]; then
   echo "خطا در راه‌اندازی شبکه"
   exit 1
 fi
+
+# بررسی فایل‌های docker-compose دیگر
+echo "بررسی فایل‌های docker-compose در سیستم..."
+find / -name "docker-compose.yaml" -o -name "docker-compose.yml" 2>/dev/null > docker_compose_files.log
+cat docker_compose_files.log
 
 # انتظار برای پایداری شبکه
 echo "انتظار 120 ثانیه برای پایداری شبکه..."
@@ -154,10 +175,17 @@ docker logs peer0.org1.example.com > peer0.org1.log 2>&1
 
 # بررسی MSP داخل کانتینر
 echo "بررسی MSP داخل کانتینر peer0.org1.example.com..."
-docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp
-docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp/signcerts
-docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp/keystore
+docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp > msp_dir.log 2>&1
+docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp/signcerts >> msp_dir.log 2>&1
+docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp/keystore >> msp_dir.log 2>&1
 docker exec peer0.org1.example.com cat /etc/hyperledger/fabric/users/Admin@org1.example.com/msp/config.yaml > msp_config.log 2>&1
+cat msp_dir.log
+cat msp_config.log
+
+# بررسی گواهی TLS داخل کانتینر
+echo "بررسی گواهی TLS داخل کانتینر orderer.example.com..."
+docker exec orderer.example.com ls -l /etc/hyperledger/fabric/tls/orderer-ca.crt > tls_ca.log 2>&1
+cat tls_ca.log
 
 # ایجاد و پیوستن به کانال‌ها
 channels=("generalchannelapp" "iotchannelapp" "securitychannelapp" "monitoringchannelapp" "org1channelapp" "org2channelapp" "org3channelapp" "org4channelapp" "org5channelapp" "org6channelapp" "org7channelapp" "org8channelapp" "org9channelapp" "org10channelapp")
@@ -174,7 +202,7 @@ for channel in "${channels[@]}"; do
              --cafile /etc/hyperledger/fabric/tls/orderer-ca.crt
   if [ $? -ne 0 ]; then
     echo "خطا در ایجاد کانال $channel"
-    echo "لاگ‌های Orderer و Peer را بررسی کنید: orderer.log, peer0.org1.log, msp_config.log"
+    echo "لاگ‌های Orderer و Peer را بررسی کنید: orderer.log, peer0.org1.log, msp_config.log, msp_dir.log, tls_ca.log"
     exit 1
   fi
 
