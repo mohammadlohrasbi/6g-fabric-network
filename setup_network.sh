@@ -13,6 +13,12 @@ command -v docker >/dev/null 2>&1 || { echo "docker مورد نیاز است ا�
 export FABRIC_CFG_PATH=$PWD
 echo "FABRIC_CFG_PATH تنظیم شده است به: $FABRIC_CFG_PATH"
 
+# بررسی وجود configtx.yaml
+if [ ! -f "$FABRIC_CFG_PATH/configtx.yaml" ]; then
+  echo "فایل configtx.yaml در $FABRIC_CFG_PATH یافت نشد"
+  exit 1
+fi
+
 # تولید مواد رمزنگاری
 if [ ! -d "crypto-config" ]; then
   cryptogen generate --config=./crypto-config.yaml
@@ -59,8 +65,27 @@ if [ $? -ne 0 ]; then
 fi
 
 # تولید تراکنش‌های تنظیمات کانال
-for channel in "generalchannelapp" "iotchannelapp" "securitychannelapp" "monitoringchannelapp" "org1channelapp" "org2channelapp" "org3channelapp" "org4channelapp" "org5channelapp" "org6channelapp" "org7channelapp" "org8channelapp" "org9channelapp" "org10channelapp"; do
-  configtxgen -profile ${channel^} -outputCreateChannelTx ./channel-artifacts/${channel}.tx -channelID ${channel}
+declare -A channel_profiles=(
+  ["generalchannelapp"]="GeneralChannelApp"
+  ["iotchannelapp"]="IoTChannelApp"
+  ["securitychannelapp"]="SecurityChannelApp"
+  ["monitoringchannelapp"]="MonitoringChannelApp"
+  ["org1channelapp"]="Org1ChannelApp"
+  ["org2channelapp"]="Org2ChannelApp"
+  ["org3channelapp"]="Org3ChannelApp"
+  ["org4channelapp"]="Org4ChannelApp"
+  ["org5channelapp"]="Org5ChannelApp"
+  ["org6channelapp"]="Org6ChannelApp"
+  ["org7channelapp"]="Org7ChannelApp"
+  ["org8channelapp"]="Org8ChannelApp"
+  ["org9channelapp"]="Org9ChannelApp"
+  ["org10channelapp"]="Org10ChannelApp"
+)
+
+for channel in "${!channel_profiles[@]}"; do
+  profile=${channel_profiles[$channel]}
+  echo "تولید تراکنش برای کانال $channel با پروفایل $profile..."
+  configtxgen -profile $profile -outputCreateChannelTx ./channel-artifacts/${channel}.tx -channelID ${channel}
   if [ $? -ne 0 ]; then
     echo "خطا در تولید ${channel}.tx"
     exit 1
