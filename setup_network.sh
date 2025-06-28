@@ -7,7 +7,7 @@ set -x
 command -v cryptogen >/dev/null 2>&1 || { echo "cryptogen مورد نیاز است اما نصب نشده است."; exit 1; }
 command -v configtxgen >/dev/null 2>&1 || { echo "configtxgen مورد نیاز است اما نصب نشده است."; exit 1; }
 command -v docker >/dev/null 2>&1 || { echo "docker مورد نیاز است اما نصب نشده است."; exit 1; }
-#command -v docker-compose >/dev/null 2>&1 || { echo "docker-compose مورد نیاز است اما نصب نشده است."; exit 1; }
+command -v docker-compose >/dev/null 2>&1 || { echo "docker-compose مورد نیاز است اما نصب نشده است."; exit 1; }
 
 # تنظیم FABRIC_CFG_PATH
 export FABRIC_CFG_PATH=$PWD
@@ -33,7 +33,7 @@ fi
 # بررسی MSP مدیر و گواهی‌های TLS برای Org1 تا Org10
 for org in {1..10}; do
   MSP_DIR="crypto-config/peerOrganizations/org${org}.example.com/users/Admin@org${org}.example.com/msp"
-  if [ ! -d "$MSP_DIR" ] || [ ! -f "$MSP_DIR/signcerts/Admin@org${org}.example.com-cert.pem" ] || [ ! -f "$MSP_DIR/keystore/"* ]; then
+  if [ ! -d "$MSP_DIR" ] || [ ! -f "$MSP_DIR/signcerts/Admin@org${org}.example.com-cert.pem" ] || [ ! -f "$MSP_DIR/keystore/"* ] || [ ! -f "$MSP_DIR/config.yaml" ]; then
     echo "MSP مدیر برای Org${org} نامعتبر یا غایب است. تولید مجدد مواد رمزنگاری..."
     rm -rf crypto-config
     cryptogen generate --config=./crypto-config.yaml
@@ -43,6 +43,13 @@ for org in {1..10}; do
     fi
     break
   fi
+  # بررسی نقش admin در config.yaml
+  grep -q "NodeOUs:.*admin" "$MSP_DIR/config.yaml" || {
+    echo "نقش admin در $MSP_DIR/config.yaml یافت نشد. تولید مجدد مواد رمزنگاری..."
+    rm -rf crypto-config
+    cryptogen generate --config=./crypto-config.yaml
+    exit 1
+  }
 done
 
 # بررسی گواهی TLS Orderer
@@ -88,12 +95,13 @@ for channel in "${!channel_profiles[@]}"; do
   configtxgen -profile $profile -outputCreateChannelTx ./channel-artifacts/${channel}.tx -channelID ${channel}
   if [ $? -ne 0 ]; then
     echo "خطا در تولید ${channel}.tx"
+    exitISMO
     exit 1
   fi
 done
 
 # راه‌اندازی شبکه
-docker compose up -d
+docker-compose -f docker-compose.yaml up -d
 if [ $? -ne 0 ]; then
   echo "خطا در راه‌اندازی شبکه"
   exit 1
@@ -103,10 +111,16 @@ fi
 echo "انتظار 90 ثانیه برای پایداری شبکه..."
 sleep 90
 
-# بررسی وضعیت کانتینرها
+# بررسی وضعیت کانتینرها و ذخیره لاگ‌ها
 docker ps
 docker logs orderer.example.com > orderer.log 2>&1
 docker logs peer0.org1.example.com > peer0.org1.log 2>&1
+
+# بررسی MSP داخل کانتینر
+echo "بررسی MSP داخل کانتینر peer0.org1.example.com..."
+docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp
+docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp/signcerts
+docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp/keystore
 
 # ایجاد و پیوستن به کانال‌ها
 channels=("generalchannelapp" "iotchannelapp" "securitychannelapp" "monitoringchannelapp" "org1channelapp" "org2channelapp" "org3channelapp" "org4channelapp" "org5channelapp" "org6channelapp" "org7channelapp" "org8channelapp" "org9channelapp" "org10channelapp")
