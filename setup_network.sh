@@ -9,6 +9,14 @@ command -v configtxgen >/dev/null 2>&1 || { echo "configtxgen مورد نیاز 
 command -v docker >/dev/null 2>&1 || { echo "docker مورد نیاز است اما نصب نشده است."; exit 1; }
 #command -v docker-compose >/dev/null 2>&1 || { echo "docker-compose مورد نیاز است اما نصب نشده است."; exit 1; }
 
+# بررسی نسخه cryptogen
+cryptogen version
+EXPECTED_CRYPT_VERSION="2.4.9"
+if ! cryptogen version | grep -q "$EXPECTED_CRYPT_VERSION"; then
+  echo "نسخه cryptogen با $EXPECTED_CRYPT_VERSION سازگار نیست. لطفاً نسخه 2.4.9 را نصب کنید."
+  exit 1
+fi
+
 # تنظیم FABRIC_CFG_PATH
 export FABRIC_CFG_PATH=$PWD
 echo "FABRIC_CFG_PATH تنظیم شده است به: $FABRIC_CFG_PATH"
@@ -16,6 +24,12 @@ echo "FABRIC_CFG_PATH تنظیم شده است به: $FABRIC_CFG_PATH"
 # بررسی وجود configtx.yaml
 if [ ! -f "$FABRIC_CFG_PATH/configtx.yaml" ]; then
   echo "فایل configtx.yaml در $FABRIC_CFG_PATH یافت نشد"
+  exit 1
+fi
+
+# بررسی وجود crypto-config.yaml
+if [ ! -f "$FABRIC_CFG_PATH/crypto-config.yaml" ]; then
+  echo "فایل crypto-config.yaml در $FABRIC_CFG_PATH یافت نشد"
   exit 1
 fi
 
@@ -49,7 +63,10 @@ for org in {1..10}; do
   fi
   # بررسی نقش admin در config.yaml
   if ! grep -q "NodeOUs:.*admin" "$MSP_DIR/config.yaml"; then
-    echo "نقش admin در $MSP_DIR/config.yaml یافت نشد. تولید مجدد مواد رمزنگاری..."
+    echo "نقش admin در $MSP_DIR/config.yaml یافت نشد."
+    echo "محتوای فایل config.yaml برای Org${org}:"
+    cat "$MSP_DIR/config.yaml"
+    echo "تولید مجدد مواد رمزنگاری..."
     rm -rf crypto-config
     cryptogen generate --config=./crypto-config.yaml
     if [ $? -ne 0 ]; then
@@ -59,6 +76,8 @@ for org in {1..10}; do
     # بررسی مجدد
     if ! grep -q "NodeOUs:.*admin" "$MSP_DIR/config.yaml"; then
       echo "نقش admin پس از تولید مجدد همچنان در $MSP_DIR/config.yaml یافت نشد"
+      echo "محتوای فایل config.yaml پس از تولید مجدد:"
+      cat "$MSP_DIR/config.yaml"
       exit 1
     fi
   fi
@@ -132,7 +151,7 @@ echo "بررسی MSP داخل کانتینر peer0.org1.example.com..."
 docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp
 docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp/signcerts
 docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp/keystore
-docker exec peer0.org1.example.com cat /etc/hyperledger/fabric/users/Admin@org1.example.com/msp/config.yaml
+docker exec peer0.org1.example.com cat /etc/hyperledger/fabric/users/Admin@org1.example.com/msp/config.yaml > msp_config.log 2>&1
 
 # ایجاد و پیوستن به کانال‌ها
 channels=("generalchannelapp" "iotchannelapp" "securitychannelapp" "monitoringchannelapp" "org1channelapp" "org2channelapp" "org3channelapp" "org4channelapp" "org5channelapp" "org6channelapp" "org7channelapp" "org8channelapp" "org9channelapp" "org10channelapp")
@@ -149,7 +168,7 @@ for channel in "${channels[@]}"; do
              --cafile /etc/hyperledger/fabric/tls/orderer-ca.crt
   if [ $? -ne 0 ]; then
     echo "خطا در ایجاد کانال $channel"
-    echo "لاگ‌های Orderer و Peer را بررسی کنید: orderer.log, peer0.org1.log"
+    echo "لاگ‌های Orderer و Peer را بررسی کنید: orderer.log, peer0.org1.log, msp_config.log"
     exit 1
   fi
 
