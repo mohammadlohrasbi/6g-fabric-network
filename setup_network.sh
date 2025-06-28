@@ -7,7 +7,7 @@ set -x
 command -v cryptogen >/dev/null 2>&1 || { echo "cryptogen مورد نیاز است اما نصب نشده است."; exit 1; }
 command -v configtxgen >/dev/null 2>&1 || { echo "configtxgen مورد نیاز است اما نصب نشده است."; exit 1; }
 command -v docker >/dev/null 2>&1 || { echo "docker مورد نیاز است اما نصب نشده است."; exit 1; }
-#command -v docker-compose >/dev/null 2>&1 || { echo "docker-compose مورد نیاز است اما نصب نشده است."; exit 1; }
+command -v docker-compose >/dev/null 2>&1 || { echo "docker-compose مورد نیاز است اما نصب نشده است."; exit 1; }
 
 # بررسی نسخه cryptogen
 cryptogen version
@@ -35,9 +35,10 @@ fi
 
 # تولید مواد رمزنگاری
 if [ ! -d "crypto-config" ]; then
-  cryptogen generate --config=./crypto-config.yaml
+  cryptogen generate --config=./crypto-config.yaml 2> cryptogen.log
   if [ $? -ne 0 ]; then
-    echo "خطا در تولید مواد رمزنگاری"
+    echo "خطا در تولید مواد رمزنگاری. لاگ‌ها را بررسی کنید: cryptogen.log"
+    cat cryptogen.log
     exit 1
   fi
 else
@@ -47,12 +48,14 @@ fi
 # بررسی MSP مدیر و گواهی‌های TLS برای Org1 تا Org10
 for org in {1..10}; do
   MSP_DIR="crypto-config/peerOrganizations/org${org}.example.com/users/Admin@org${org}.example.com/msp"
+  echo "بررسی MSP برای Org${org} در $MSP_DIR..."
   if [ ! -d "$MSP_DIR" ] || [ ! -f "$MSP_DIR/signcerts/Admin@org${org}.example.com-cert.pem" ] || [ ! -f "$MSP_DIR/keystore/"* ] || [ ! -f "$MSP_DIR/config.yaml" ]; then
     echo "MSP مدیر برای Org${org} نامعتبر یا غایب است. تولید مجدد مواد رمزنگاری..."
     rm -rf crypto-config
-    cryptogen generate --config=./crypto-config.yaml
+    cryptogen generate --config=./crypto-config.yaml 2> cryptogen.log
     if [ $? -ne 0 ]; then
-      echo "خطا در تولید مواد رمزنگاری"
+      echo "خطا در تولید مواد رمزنگاری. لاگ‌ها را بررسی کنید: cryptogen.log"
+      cat cryptogen.log
       exit 1
     fi
     # بررسی مجدد پس از تولید
@@ -62,25 +65,27 @@ for org in {1..10}; do
     fi
   fi
   # بررسی نقش admin در config.yaml
-  if ! grep -q "NodeOUs:.*admin" "$MSP_DIR/config.yaml"; then
-    echo "نقش admin در $MSP_DIR/config.yaml یافت نشد."
+  if ! grep -q "AdminOUIdentifier" "$MSP_DIR/config.yaml"; then
+    echo "نقش AdminOUIdentifier در $MSP_DIR/config.yaml یافت نشد."
     echo "محتوای فایل config.yaml برای Org${org}:"
     cat "$MSP_DIR/config.yaml"
     echo "تولید مجدد مواد رمزنگاری..."
     rm -rf crypto-config
-    cryptogen generate --config=./crypto-config.yaml
+    cryptogen generate --config=./crypto-config.yaml 2> cryptogen.log
     if [ $? -ne 0 ]; then
-      echo "خطا در تولید مواد رمزنگاری"
+      echo "خطا در تولید مواد رمزنگاری. لاگ‌ها را بررسی کنید: cryptogen.log"
+      cat cryptogen.log
       exit 1
     fi
     # بررسی مجدد
-    if ! grep -q "NodeOUs:.*admin" "$MSP_DIR/config.yaml"; then
-      echo "نقش admin پس از تولید مجدد همچنان در $MSP_DIR/config.yaml یافت نشد"
+    if ! grep -q "AdminOUIdentifier" "$MSP_DIR/config.yaml"; then
+      echo "نقش AdminOUIdentifier پس از تولید مجدد همچنان در $MSP_DIR/config.yaml یافت نشد"
       echo "محتوای فایل config.yaml پس از تولید مجدد:"
       cat "$MSP_DIR/config.yaml"
       exit 1
     fi
   fi
+  echo "نقش admin برای Org${org} تأیید شد."
 done
 
 # بررسی گواهی TLS Orderer
@@ -88,9 +93,10 @@ TLS_CA="crypto-config/ordererOrganizations/example.com/orderers/orderer.example.
 if [ ! -f "$TLS_CA" ]; then
   echo "گواهی TLS Orderer یافت نشد. تولید مجدد مواد رمزنگاری..."
   rm -rf crypto-config
-  cryptogen generate --config=./crypto-config.yaml
+  cryptogen generate --config=./crypto-config.yaml 2> cryptogen.log
   if [ $? -ne 0 ]; then
-    echo "خطا در تولید مواد رمزنگاری"
+    echo "خطا در تولید مواد رمزنگاری. لاگ‌ها را بررسی کنید: cryptogen.log"
+    cat cryptogen.log
     exit 1
   fi
 fi
@@ -131,7 +137,7 @@ for channel in "${!channel_profiles[@]}"; do
 done
 
 # راه‌اندازی شبکه
-docker compose up -d
+docker-compose -f docker-compose.yaml up -d
 if [ $? -ne 0 ]; then
   echo "خطا در راه‌اندازی شبکه"
   exit 1
