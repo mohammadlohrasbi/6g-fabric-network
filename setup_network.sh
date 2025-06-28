@@ -41,15 +41,27 @@ for org in {1..10}; do
       echo "خطا در تولید مواد رمزنگاری"
       exit 1
     fi
-    break
+    # بررسی مجدد پس از تولید
+    if [ ! -f "$MSP_DIR/config.yaml" ]; then
+      echo "فایل config.yaml برای Org${org} پس از تولید مجدد یافت نشد"
+      exit 1
+    fi
   fi
   # بررسی نقش admin در config.yaml
-  grep -q "NodeOUs:.*admin" "$MSP_DIR/config.yaml" || {
+  if ! grep -q "NodeOUs:.*admin" "$MSP_DIR/config.yaml"; then
     echo "نقش admin در $MSP_DIR/config.yaml یافت نشد. تولید مجدد مواد رمزنگاری..."
     rm -rf crypto-config
     cryptogen generate --config=./crypto-config.yaml
-    exit 1
-  }
+    if [ $? -ne 0 ]; then
+      echo "خطا در تولید مواد رمزنگاری"
+      exit 1
+    fi
+    # بررسی مجدد
+    if ! grep -q "NodeOUs:.*admin" "$MSP_DIR/config.yaml"; then
+      echo "نقش admin پس از تولید مجدد همچنان در $MSP_DIR/config.yaml یافت نشد"
+      exit 1
+    fi
+  fi
 done
 
 # بررسی گواهی TLS Orderer
@@ -95,7 +107,6 @@ for channel in "${!channel_profiles[@]}"; do
   configtxgen -profile $profile -outputCreateChannelTx ./channel-artifacts/${channel}.tx -channelID ${channel}
   if [ $? -ne 0 ]; then
     echo "خطا در تولید ${channel}.tx"
-    exitISMO
     exit 1
   fi
 done
@@ -108,8 +119,8 @@ if [ $? -ne 0 ]; then
 fi
 
 # انتظار برای پایداری شبکه
-echo "انتظار 90 ثانیه برای پایداری شبکه..."
-sleep 90
+echo "انتظار 120 ثانیه برای پایداری شبکه..."
+sleep 120
 
 # بررسی وضعیت کانتینرها و ذخیره لاگ‌ها
 docker ps
@@ -121,6 +132,7 @@ echo "بررسی MSP داخل کانتینر peer0.org1.example.com..."
 docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp
 docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp/signcerts
 docker exec peer0.org1.example.com ls -l /etc/hyperledger/fabric/users/Admin@org1.example.com/msp/keystore
+docker exec peer0.org1.example.com cat /etc/hyperledger/fabric/users/Admin@org1.example.com/msp/config.yaml
 
 # ایجاد و پیوستن به کانال‌ها
 channels=("generalchannelapp" "iotchannelapp" "securitychannelapp" "monitoringchannelapp" "org1channelapp" "org2channelapp" "org3channelapp" "org4channelapp" "org5channelapp" "org6channelapp" "org7channelapp" "org8channelapp" "org9channelapp" "org10channelapp")
