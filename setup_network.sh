@@ -21,13 +21,14 @@ if [ ! -d "crypto-config" ]; then
     exit 1
   fi
 else
-  echo "مواد رمزنگاری از قبل وجود دارند، از تولید صرف‌نظر می‌شود"
+  echo "مواد رمزنگاری از قبل وجود دارند، بررسی صحت..."
 fi
 
-# بررسی MSP مدیر برای Org1 تا Org10
+# بررسی MSP مدیر و گواهی‌های TLS برای Org1 تا Org10
 for org in {1..10}; do
-  if [ ! -d "crypto-config/peerOrganizations/org${org}.example.com/users/Admin@org${org}.example.com/msp" ]; then
-    echo "MSP مدیر برای Org${org} یافت نشد. تولید مجدد مواد رمزنگاری..."
+  MSP_DIR="crypto-config/peerOrganizations/org${org}.example.com/users/Admin@org${org}.example.com/msp"
+  if [ ! -d "$MSP_DIR" ] || [ ! -f "$MSP_DIR/signcerts/Admin@org${org}.example.com-cert.pem" ] || [ ! -f "$MSP_DIR/keystore/"* ]; then
+    echo "MSP مدیر برای Org${org} نامعتبر یا غایب است. تولید مجدد مواد رمزنگاری..."
     rm -rf crypto-config
     cryptogen generate --config=./crypto-config.yaml
     if [ $? -ne 0 ]; then
@@ -38,6 +39,18 @@ for org in {1..10}; do
   fi
 done
 
+# بررسی گواهی TLS Orderer
+TLS_CA="crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt"
+if [ ! -f "$TLS_CA" ]; then
+  echo "گواهی TLS Orderer یافت نشد. تولید مجدد مواد رمزنگاری..."
+  rm -rf crypto-config
+  cryptogen generate --config=./crypto-config.yaml
+  if [ $? -ne 0 ]; then
+    echo "خطا در تولید مواد رمزنگاری"
+    exit 1
+  fi
+fi
+
 # تولید بلاک جنسیس
 configtxgen -profile OrdererGenesis -channelID system-channel -outputBlock ./channel-artifacts/genesis.block
 if [ $? -ne 0 ]; then
@@ -46,31 +59,10 @@ if [ $? -ne 0 ]; then
 fi
 
 # تولید تراکنش‌های تنظیمات کانال
-configtxgen -profile GeneralChannelApp -outputCreateChannelTx ./channel-artifacts/generalchannelapp.tx -channelID generalchannelapp
-if [ $? -ne 0 ]; then
-  echo "خطا در تولید generalchannelapp.tx"
-  exit 1
-fi
-configtxgen -profile IoTChannelApp -outputCreateChannelTx ./channel-artifacts/iotchannelapp.tx -channelID iotchannelapp
-if [ $? -ne 0 ]; then
-  echo "خطا در تولید iotchannelapp.tx"
-  exit 1
-fi
-configtxgen -profile SecurityChannelApp -outputCreateChannelTx ./channel-artifacts/securitychannelapp.tx -channelID securitychannelapp
-if [ $? -ne 0 ]; then
-  echo "خطا در تولید securitychannelapp.tx"
-  exit 1
-fi
-configtxgen -profile MonitoringChannelApp -outputCreateChannelTx ./channel-artifacts/monitoringchannelapp.tx -channelID monitoringchannelapp
-if [ $? -ne 0 ]; then
-  echo "خطا در تولید monitoringchannelapp.tx"
-  exit 1
-fi
-
-for i in {1..10}; do
-  configtxgen -profile Org${i}ChannelApp -outputCreateChannelTx ./channel-artifacts/org${i}channelapp.tx -channelID org${i}channelapp
+for channel in "generalchannelapp" "iotchannelapp" "securitychannelapp" "monitoringchannelapp" "org1channelapp" "org2channelapp" "org3channelapp" "org4channelapp" "org5channelapp" "org6channelapp" "org7channelapp" "org8channelapp" "org9channelapp" "org10channelapp"; do
+  configtxgen -profile ${channel^} -outputCreateChannelTx ./channel-artifacts/${channel}.tx -channelID ${channel}
   if [ $? -ne 0 ]; then
-    echo "خطا در تولید org${i}channelapp.tx"
+    echo "خطا در تولید ${channel}.tx"
     exit 1
   fi
 done
@@ -83,11 +75,18 @@ if [ $? -ne 0 ]; then
 fi
 
 # انتظار برای پایداری شبکه
+echo "انتظار 90 ثانیه برای پایداری شبکه..."
 sleep 90
+
+# بررسی وضعیت کانتینرها
+docker ps
+docker logs orderer.example.com > orderer.log 2>&1
+docker logs peer0.org1.example.com > peer0.org1.log 2>&1
 
 # ایجاد و پیوستن به کانال‌ها
 channels=("generalchannelapp" "iotchannelapp" "securitychannelapp" "monitoringchannelapp" "org1channelapp" "org2channelapp" "org3channelapp" "org4channelapp" "org5channelapp" "org6channelapp" "org7channelapp" "org8channelapp" "org9channelapp" "org10channelapp")
 for channel in "${channels[@]}"; do
+  echo "ایجاد کانال $channel..."
   docker exec -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org1.example.com/msp" \
              -e "CORE_PEER_LOCALMSPID=Org1MSP" \
              peer0.org1.example.com peer channel create \
@@ -99,10 +98,12 @@ for channel in "${channels[@]}"; do
              --cafile /etc/hyperledger/fabric/tls/orderer-ca.crt
   if [ $? -ne 0 ]; then
     echo "خطا در ایجاد کانال $channel"
+    echo "لاگ‌های Orderer و Peer را بررسی کنید: orderer.log, peer0.org1.log"
     exit 1
   fi
 
   for org in {1..10}; do
+    echo "پیوستن org${org} به کانال $channel..."
     docker exec -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org${org}.example.com/msp" \
                -e "CORE_PEER_LOCALMSPID=Org${org}MSP" \
                peer0.org${org}.example.com peer channel join \
@@ -127,6 +128,7 @@ done
 for channel in "${channels[@]}"; do
   for cc in "${chaincodes[@]}"; do
     for org in {1..10}; do
+      echo "نصب چین‌کد $cc روی org${org}..."
       docker exec -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org${org}.example.com/msp" \
                  -e "CORE_PEER_LOCALMSPID=Org${org}MSP" \
                  peer0.org${org}.example.com peer chaincode install \
@@ -136,6 +138,7 @@ for channel in "${channels[@]}"; do
         exit 1
       fi
     done
+    echo "نمونه‌سازی چین‌کد $cc روی کانال $channel..."
     docker exec -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org1.example.com/msp" \
                -e "CORE_PEER_LOCALMSPID=Org1MSP" \
                peer0.org1.example.com peer chaincode instantiate \
