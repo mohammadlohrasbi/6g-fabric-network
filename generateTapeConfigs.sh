@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# لیست چین‌کدها (70 مورد)
 CHAINCODES=(
   "ResourceAllocate" "BandwidthShare" "DynamicRouting" "LoadBalance" "LatencyOptimize"
   "EnergyOptimize" "NetworkOptimize" "SpectrumManage" "ResourceScale" "ResourcePrioritize"
@@ -17,13 +18,14 @@ CHAINCODES=(
   "TrafficAnalytics" "SecurityAnalytics" "ResourceAnalytics" "EventAnalytics" "LogAnalytics"
 )
 
+# لیست کانال‌ها (14 مورد)
 CHANNELS=(
   "generalchannelapp" "iotchannelapp" "securitychannelapp" "monitoringchannelapp"
   "org1channelapp" "org2channelapp" "org3channelapp" "org4channelapp" "org5channelapp"
   "org6channelapp" "org7channelapp" "org8channelapp" "org9channelapp" "org10channelapp"
 )
 
-# Function to determine function names and arguments based on chaincode
+# تابع برای تعیین نام توابع و آرگومان‌ها بر اساس چین‌کد
 get_function_names() {
   local chaincode=$1
   case $chaincode in
@@ -66,25 +68,48 @@ get_function_names() {
   esac
 }
 
+# ایجاد دایرکتوری برای فایل‌های تنظیمات Tape
 mkdir -p tape
+
+# تولید فایل‌های تنظیمات Tape
 for chaincode in "${CHAINCODES[@]}"; do
   for channel in "${CHANNELS[@]}"; do
     read -r invoke_func query_func invoke_args query_args < <(get_function_names "$chaincode")
     cat << EOF > tape/tape-${chaincode}-${channel}.yaml
-target: grpc://localhost:7051
-channel: ${channel}
-chaincode: ${chaincode}
-ccType: golang
-nProc: 10
-testRound: 1
-txNumber: [1000]
-rate: [100]
-arguments:
-  - ["${invoke_func}", ${invoke_args}]
-  - ["${query_func}", ${query_args}]
-contractConfig:
-  endorsement:
-    orgs: ["Org1MSP", "Org2MSP", "Org3MSP", "Org4MSP", "Org5MSP", "Org6MSP", "Org7MSP", "Org8MSP", "Org9MSP", "Org10MSP"]
+test:
+  network:
+    orderer:
+      url: grpc://localhost:7050
+      tlsCACerts:
+        path: crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt.gz
+    peer:
+EOF
+    for org in {1..10}; do
+      port=$((7051 + (org-1)*1000))
+      cat << EOF >> tape/tape-${chaincode}-${channel}.yaml
+      org${org}:
+        url: grpc://localhost:${port}
+        tlsCACerts:
+          path: crypto-config/peerOrganizations/org${org}.example.com/peers/peer0.org${org}.example.com/tls/ca.crt.gz
+EOF
+    done
+    cat << EOF >> tape/tape-${chaincode}-${channel}.yaml
+  channel: ${channel}
+  chaincode: ${chaincode}
+  ccType: golang
+  nProc: 10
+  testRound: 1
+  txNumber: [1000]
+  rate: [100]
+  arguments:
+    - ["${invoke_func}", ${invoke_args}]
+    - ["${query_func}", ${query_args}]
+  contractConfig:
+    endorsement:
+      orgs: ["Org1MSP", "Org2MSP", "Org3MSP", "Org4MSP", "Org5MSP", "Org6MSP", "Org7MSP", "Org8MSP", "Org9MSP", "Org10MSP"]
+  client:
+    credentialStore:
+      path: /tmp/hfc-kvs
 EOF
   done
 done
