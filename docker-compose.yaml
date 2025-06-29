@@ -7,15 +7,15 @@ networks:
 services:
   ca.orderer.example.com:
     container_name: ca.orderer.example.com
-    image: hyperledger/fabric-ca:1.5.7
+    image: hyperledger/fabric-ca:amd64-1.5.7
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-orderer
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server/tls-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server/tls-key.pem
-      - FABRIC_CA_SERVER_LOGLEVEL=debug
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+      - FABRIC_CA_SERVER_LOGLEVEL=info
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
     volumes:
       - ./crypto-config/ordererOrganizations/example.com/ca:/etc/hyperledger/fabric-ca-server
     ports:
@@ -25,20 +25,20 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '0.2'
+          memory: 200M
 
   ca.org1.example.com:
     container_name: ca.org1.example.com
-    image: hyperledger/fabric-ca:1.5.7
+    image: hyperledger/fabric-ca:amd64-1.5.7
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-org1
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server/tls-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server/tls-key.pem
-      - FABRIC_CA_SERVER_LOGLEVEL=debug
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+      - FABRIC_CA_SERVER_LOGLEVEL=info
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
     volumes:
       - ./crypto-config/peerOrganizations/org1.example.com/ca:/etc/hyperledger/fabric-ca-server
     ports:
@@ -48,20 +48,20 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '0.2'
+          memory: 200M
 
   ca.org2.example.com:
     container_name: ca.org2.example.com
-    image: hyperledger/fabric-ca:1.5.7
+    image: hyperledger/fabric-ca:amd64-1.5.7
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-org2
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server/tls-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server/tls-key.pem
-      - FABRIC_CA_SERVER_LOGLEVEL=debug
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+      - FABRIC_CA_SERVER_LOGLEVEL=info
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
     volumes:
       - ./crypto-config/peerOrganizations/org2.example.com/ca:/etc/hyperledger/fabric-ca-server
     ports:
@@ -71,20 +71,20 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '0.2'
+          memory: 200M
 
   ca.org3.example.com:
     container_name: ca.org3.example.com
-    image: hyperledger/fabric-ca:1.5.7
+    image: hyperledger/fabric-ca:amd64-1.5.7
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-org3
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server/tls-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server/tls-key.pem
-      - FABRIC_CA_SERVER_LOGLEVEL=debug
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+      - FABRIC_CA_SERVER_LOGLEVEL=info
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
     volumes:
       - ./crypto-config/peerOrganizations/org3.example.com/ca:/etc/hyperledger/fabric-ca-server
     ports:
@@ -94,20 +94,20 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '0.2'
+          memory: 200M
 
   ca.org4.example.com:
     container_name: ca.org4.example.com
-    image: hyperledger/fabric-ca:1.5.7
+    image: hyperledger/fabric-ca:amd64-1.5.7
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-org4
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server/tls-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server/tls-key.pem
-      - FABRIC_CA_SERVER_LOGLEVEL=debug
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+      - FABRIC_CA_SERVER_LOGLEVEL=info
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
     volumes:
       - ./crypto-config/peerOrganizations/org4.example.com/ca:/etc/hyperledger/fabric-ca-server
     ports:
@@ -117,20 +117,20 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '0.2'
+          memory: 200M
 
   ca.org5.example.com:
     container_name: ca.org5.example.com
-    image: hyperledger/fabric-ca:1.5.7
+    image: hyperledger/fabric-ca:amd64-1.5.7
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-org5
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server/tls-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server/tls-key.pem
-      - FABRIC_CA_SERVER_LOGLEVEL=debug
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+      - FABRIC_CA_SERVER_LOGLEVEL=info
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
     volumes:
       - ./crypto-config/peerOrganizations/org5.example.com/ca:/etc/hyperledger/fabric-ca-server
     ports:
@@ -140,20 +140,20 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '0.2'
+          memory: 200M
 
   ca.org6.example.com:
     container_name: ca.org6.example.com
-    image: hyperledger/fabric-ca:1.5.7
+    image: hyperledger/fabric-ca:amd64-1.5.7
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-org6
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server/tls-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server/tls-key.pem
-      - FABRIC_CA_SERVER_LOGLEVEL=debug
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+      - FABRIC_CA_SERVER_LOGLEVEL=info
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
     volumes:
       - ./crypto-config/peerOrganizations/org6.example.com/ca:/etc/hyperledger/fabric-ca-server
     ports:
@@ -163,20 +163,20 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '0.2'
+          memory: 200M
 
   ca.org7.example.com:
     container_name: ca.org7.example.com
-    image: hyperledger/fabric-ca:1.5.7
+    image: hyperledger/fabric-ca:amd64-1.5.7
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-org7
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server/tls-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server/tls-key.pem
-      - FABRIC_CA_SERVER_LOGLEVEL=debug
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+      - FABRIC_CA_SERVER_LOGLEVEL=info
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
     volumes:
       - ./crypto-config/peerOrganizations/org7.example.com/ca:/etc/hyperledger/fabric-ca-server
     ports:
@@ -186,20 +186,20 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '0.2'
+          memory: 200M
 
   ca.org8.example.com:
     container_name: ca.org8.example.com
-    image: hyperledger/fabric-ca:1.5.7
+    image: hyperledger/fabric-ca:amd64-1.5.7
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-org8
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server/tls-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server/tls-key.pem
-      - FABRIC_CA_SERVER_LOGLEVEL=debug
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+      - FABRIC_CA_SERVER_LOGLEVEL=info
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
     volumes:
       - ./crypto-config/peerOrganizations/org8.example.com/ca:/etc/hyperledger/fabric-ca-server
     ports:
@@ -209,20 +209,20 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '0.2'
+          memory: 200M
 
   ca.org9.example.com:
     container_name: ca.org9.example.com
-    image: hyperledger/fabric-ca:1.5.7
+    image: hyperledger/fabric-ca:amd64-1.5.7
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-org9
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server/tls-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server/tls-key.pem
-      - FABRIC_CA_SERVER_LOGLEVEL=debug
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+      - FABRIC_CA_SERVER_LOGLEVEL=info
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
     volumes:
       - ./crypto-config/peerOrganizations/org9.example.com/ca:/etc/hyperledger/fabric-ca-server
     ports:
@@ -232,20 +232,20 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '0.2'
+          memory: 200M
 
   ca.org10.example.com:
     container_name: ca.org10.example.com
-    image: hyperledger/fabric-ca:1.5.7
+    image: hyperledger/fabric-ca:amd64-1.5.7
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-org10
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server/tls-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server/tls-key.pem
-      - FABRIC_CA_SERVER_LOGLEVEL=debug
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+      - FABRIC_CA_SERVER_LOGLEVEL=info
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
     volumes:
       - ./crypto-config/peerOrganizations/org10.example.com/ca:/etc/hyperledger/fabric-ca-server
     ports:
@@ -255,14 +255,14 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '0.2'
+          memory: 200M
 
   orderer.example.com:
     container_name: orderer.example.com
-    image: hyperledger/fabric-orderer:2.4.9
+    image: hyperledger/fabric-orderer:amd64-2.4.9
     environment:
-      - FABRIC_LOGGING_SPEC=DEBUG
+      - FABRIC_LOGGING_SPEC=INFO
       - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
       - ORDERER_GENERAL_BOOTSTRAPMETHOD=file
       - ORDERER_GENERAL_BOOTSTRAPFILE=/etc/hyperledger/configtx/genesis.block
@@ -272,9 +272,11 @@ services:
       - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/fabric/tls/server.key
       - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/fabric/tls/server.crt
       - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/fabric/tls/ca.crt]
+      - ORDERER_FILELEDGER_MAXFILESIZE=10MB
     volumes:
       - ./crypto-config:/etc/hyperledger/fabric
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./production/orderer:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: orderer
     ports:
@@ -286,12 +288,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 1G
+          cpus: '0.4'
+          memory: 400M
 
   peer0.org1.example.com:
     container_name: peer0.org1.example.com
-    image: hyperledger/fabric-peer:2.4.9
+    image: hyperledger/fabric-peer:amd64-2.4.9
     environment:
       - CORE_PEER_ID=peer0.org1.example.com
       - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
@@ -306,10 +308,12 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCA_FILE=/etc/hyperledger/fabric/tls/ca.crt
-      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_LOGGING_LEVEL=INFO
+      - CORE_LEDGER_STATE_MAXFILESIZE=10MB
     volumes:
       - ./crypto-config:/etc/hyperledger/fabric
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./production/peer0.org1:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
     ports:
@@ -321,12 +325,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 1G
+          cpus: '0.4'
+          memory: 400M
 
   peer0.org2.example.com:
     container_name: peer0.org2.example.com
-    image: hyperledger/fabric-peer:2.4.9
+    image: hyperledger/fabric-peer:amd64-2.4.9
     environment:
       - CORE_PEER_ID=peer0.org2.example.com
       - CORE_PEER_ADDRESS=peer0.org2.example.com:8051
@@ -341,10 +345,12 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCA_FILE=/etc/hyperledger/fabric/tls/ca.crt
-      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_LOGGING_LEVEL=INFO
+      - CORE_LEDGER_STATE_MAXFILESIZE=10MB
     volumes:
       - ./crypto-config:/etc/hyperledger/fabric
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./production/peer0.org2:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
     ports:
@@ -356,12 +362,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 1G
+          cpus: '0.4'
+          memory: 400M
 
   peer0.org3.example.com:
     container_name: peer0.org3.example.com
-    image: hyperledger/fabric-peer:2.4.9
+    image: hyperledger/fabric-peer:amd64-2.4.9
     environment:
       - CORE_PEER_ID=peer0.org3.example.com
       - CORE_PEER_ADDRESS=peer0.org3.example.com:9051
@@ -376,10 +382,12 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCA_FILE=/etc/hyperledger/fabric/tls/ca.crt
-      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_LOGGING_LEVEL=INFO
+      - CORE_LEDGER_STATE_MAXFILESIZE=10MB
     volumes:
       - ./crypto-config:/etc/hyperledger/fabric
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./production/peer0.org3:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
     ports:
@@ -391,12 +399,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 1G
+          cpus: '0.4'
+          memory: 400M
 
   peer0.org4.example.com:
     container_name: peer0.org4.example.com
-    image: hyperledger/fabric-peer:2.4.9
+    image: hyperledger/fabric-peer:amd64-2.4.9
     environment:
       - CORE_PEER_ID=peer0.org4.example.com
       - CORE_PEER_ADDRESS=peer0.org4.example.com:10051
@@ -411,10 +419,12 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCA_FILE=/etc/hyperledger/fabric/tls/ca.crt
-      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_LOGGING_LEVEL=INFO
+      - CORE_LEDGER_STATE_MAXFILESIZE=10MB
     volumes:
       - ./crypto-config:/etc/hyperledger/fabric
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./production/peer0.org4:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
     ports:
@@ -426,12 +436,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 1G
+          cpus: '0.4'
+          memory: 400M
 
   peer0.org5.example.com:
     container_name: peer0.org5.example.com
-    image: hyperledger/fabric-peer:2.4.9
+    image: hyperledger/fabric-peer:amd64-2.4.9
     environment:
       - CORE_PEER_ID=peer0.org5.example.com
       - CORE_PEER_ADDRESS=peer0.org5.example.com:11051
@@ -446,10 +456,12 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCA_FILE=/etc/hyperledger/fabric/tls/ca.crt
-      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_LOGGING_LEVEL=INFO
+      - CORE_LEDGER_STATE_MAXFILESIZE=10MB
     volumes:
       - ./crypto-config:/etc/hyperledger/fabric
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./production/peer0.org5:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
     ports:
@@ -461,12 +473,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 1G
+          cpus: '0.4'
+          memory: 400M
 
   peer0.org6.example.com:
     container_name: peer0.org6.example.com
-    image: hyperledger/fabric-peer:2.4.9
+    image: hyperledger/fabric-peer:amd64-2.4.9
     environment:
       - CORE_PEER_ID=peer0.org6.example.com
       - CORE_PEER_ADDRESS=peer0.org6.example.com:12051
@@ -481,10 +493,12 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCA_FILE=/etc/hyperledger/fabric/tls/ca.crt
-      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_LOGGING_LEVEL=INFO
+      - CORE_LEDGER_STATE_MAXFILESIZE=10MB
     volumes:
       - ./crypto-config:/etc/hyperledger/fabric
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./production/peer0.org6:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
     ports:
@@ -496,12 +510,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 1G
+          cpus: '0.4'
+          memory: 400M
 
   peer0.org7.example.com:
     container_name: peer0.org7.example.com
-    image: hyperledger/fabric-peer:2.4.9
+    image: hyperledger/fabric-peer:amd64-2.4.9
     environment:
       - CORE_PEER_ID=peer0.org7.example.com
       - CORE_PEER_ADDRESS=peer0.org7.example.com:13051
@@ -516,10 +530,12 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCA_FILE=/etc/hyperledger/fabric/tls/ca.crt
-      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_LOGGING_LEVEL=INFO
+      - CORE_LEDGER_STATE_MAXFILESIZE=10MB
     volumes:
       - ./crypto-config:/etc/hyperledger/fabric
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./production/peer0.org7:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
     ports:
@@ -531,12 +547,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 1G
+          cpus: '0.4'
+          memory: 400M
 
   peer0.org8.example.com:
     container_name: peer0.org8.example.com
-    image: hyperledger/fabric-peer:2.4.9
+    image: hyperledger/fabric-peer:amd64-2.4.9
     environment:
       - CORE_PEER_ID=peer0.org8.example.com
       - CORE_PEER_ADDRESS=peer0.org8.example.com:14051
@@ -551,10 +567,12 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCA_FILE=/etc/hyperledger/fabric/tls/ca.crt
-      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_LOGGING_LEVEL=INFO
+      - CORE_LEDGER_STATE_MAXFILESIZE=10MB
     volumes:
       - ./crypto-config:/etc/hyperledger/fabric
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./production/peer0.org8:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
     ports:
@@ -566,12 +584,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 1G
+          cpus: '0.4'
+          memory: 400M
 
   peer0.org9.example.com:
     container_name: peer0.org9.example.com
-    image: hyperledger/fabric-peer:2.4.9
+    image: hyperledger/fabric-peer:amd64-2.4.9
     environment:
       - CORE_PEER_ID=peer0.org9.example.com
       - CORE_PEER_ADDRESS=peer0.org9.example.com:15051
@@ -586,10 +604,12 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCA_FILE=/etc/hyperledger/fabric/tls/ca.crt
-      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_LOGGING_LEVEL=INFO
+      - CORE_LEDGER_STATE_MAXFILESIZE=10MB
     volumes:
       - ./crypto-config:/etc/hyperledger/fabric
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./production/peer0.org9:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
     ports:
@@ -601,12 +621,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 1G
+          cpus: '0.4'
+          memory: 400M
 
   peer0.org10.example.com:
     container_name: peer0.org10.example.com
-    image: hyperledger/fabric-peer:2.4.9
+    image: hyperledger/fabric-peer:amd64-2.4.9
     environment:
       - CORE_PEER_ID=peer0.org10.example.com
       - CORE_PEER_ADDRESS=peer0.org10.example.com:16051
@@ -621,10 +641,12 @@ services:
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
       - CORE_PEER_TLS_ROOTCA_FILE=/etc/hyperledger/fabric/tls/ca.crt
-      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_LOGGING_LEVEL=INFO
+      - CORE_LEDGER_STATE_MAXFILESIZE=10MB
     volumes:
       - ./crypto-config:/etc/hyperledger/fabric
       - ./channel-artifacts:/etc/hyperledger/configtx
+      - ./production/peer0.org10:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: peer node start
     ports:
@@ -636,5 +658,5 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 1G
+          cpus: '0.4'
+          memory: 400M
