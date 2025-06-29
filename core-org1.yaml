@@ -5,9 +5,20 @@ peer:
   chaincodeListenAddress: 0.0.0.0:7052
   address: peer0.org1.example.com:7051
   localMspId: Org1MSP
-  mspConfigPath: /var/hyperledger/peer/msp
+  mspConfigPath: /etc/hyperledger/fabric/msp
+  tls:
+    enabled: true
+    cert:
+      file: /etc/hyperledger/fabric/tls/server.crt
+    key:
+      file: /etc/hyperledger/fabric/tls/server.key
+    rootcert:
+      file: /etc/hyperledger/fabric/tls/ca.crt
   gossip:
     bootstrap: peer0.org1.example.com:7051
     externalEndpoint: peer0.org1.example.com:7051
   logging:
     level: info
+  ledger:
+    state:
+      maxFileSize: 10MB
