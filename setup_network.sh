@@ -70,7 +70,7 @@ dos2unix *.sh
 
 # تولید بلاک جنسیس
 echo "Generating genesis block..."
-configtxgen -profile OrdererGenesis -outputBlock ./channel-artifacts/genesis.block 2> configtxgen_genesis.log
+configtxgen -profile OrdererGenesis -channelID orderer-system-channel -outputBlock ./channel-artifacts/genesis.block 2> configtxgen_genesis.log
 if [ $? -ne 0 ]; then
   echo "Error generating genesis block. Check configtxgen_genesis.log"
   exit 1
@@ -79,7 +79,7 @@ fi
 # تولید فایل‌های تراکنش کانال
 for channel in "${CHANNELS[@]}"; do
   echo "Generating channel transaction for $channel..."
-  configtxgen -profile Channel -outputCreateChannelTx ./channel-artifacts/${channel}.tx -channelID $channel 2>> configtxgen_channel.log
+  configtxgen -profile ${channel^} -outputCreateChannelTx ./channel-artifacts/${channel}.tx -channelID $channel 2>> configtxgen_channel.log
   if [ $? -ne 0 ]; then
     echo "Error generating channel transaction for $channel. Check configtxgen_channel.log"
     exit 1
