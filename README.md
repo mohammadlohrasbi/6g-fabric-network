@@ -45,6 +45,7 @@
 - **Go**: نسخه 1.18 یا بالاتر (برای چین‌کدها)
 - **Node.js**: نسخه 16 یا بالاتر (برای Caliper)
 - **Tape**: ابزار تست عملکرد Hyperledger
+- **اتصال شبکه**: دسترسی به Docker Hub برای دانلود تصاویر
 - **سیستم**: حداقل 8GB RAM آزاد، 4 CPU، و 10GB فضای دیسک
 
 دستورات نصب (برای Ubuntu/Debian):
@@ -76,6 +77,10 @@ npm install -g @hyperledger/tape
 
 # نصب yamllint برای بررسی سینتکس YAML
 sudo apt-get install -y yamllint
+
+# بررسی دسترسی به Docker Hub
+ping -4 registry-1.docker.io
+curl -I https://registry.hub.docker.com
 ```
 
 ## راه‌اندازی شبکه
@@ -157,6 +162,7 @@ sudo apt-get install -y yamllint
 
 10. **اجرای اسکریپت راه‌اندازی**:
     ```bash
+    export FABRIC_CFG_PATH=$PWD
     ./setup_network.sh
     ```
 
@@ -276,36 +282,73 @@ sudo apt-get install -y yamllint
 
 ## عیب‌یابی
 
-اگر با خطاهایی مانند "Could not find profile"، "Missing channelID"، "container is not running"، یا "no space left on device" مواجه شدید:
+اگر با خطاهایی مانند "manifest unknown"، "Could not find profile"، "Missing channelID"، "container is not running"، یا "no space left on device" مواجه شدید:
 
-1. **بررسی خطای Could not find profile**:
+1. **بررسی خطای manifest unknown**:
+   اگر خطای `manifest for hyperledger/fabric-ca:amd64-1.5.7 not found` رخ داد:
+   - فایل `docker-compose.yaml` را بررسی کنید و تگ `hyperledger/fabric-ca:amd64-1.5.7` را به `hyperledger/fabric-ca:1.5.7` یا `hyperledger/fabric-ca:1.5.6` تغییر دهید.
+   - تصویر را به‌صورت دستی دانلود کنید:
+     ```bash
+     docker pull hyperledger/fabric-ca:1.5.7
+     ```
+   - بررسی دسترسی به Docker Hub:
+     ```bash
+     ping -4 registry-1.docker.io
+     curl -I https://registry.hub.docker.com
+     ```
+   - بررسی تنظیمات DNS:
+     ```bash
+     cat /etc/resolv.conf
+     echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+     echo "nameserver 8.8.4.4" | sudo tee -a /etc/resolv.conf
+     ```
+   - غیرفعال کردن IPv6 (در صورت لزوم):
+     ```bash
+     sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+     sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+     ```
+   - ساخت تصویر محلی (در صورت عدم دسترسی به Docker Hub):
+     ```bash
+     git clone https://github.com/hyperledger/fabric-ca.git
+     cd fabric-ca
+     git checkout v1.5.7
+     make docker
+     docker tag hyperledger/fabric-ca:latest hyperledger/fabric-ca:1.5.7
+     ```
+
+2. **بررسی خطای Could not find profile**:
    اگر خطای `Could not find profile: Generalchannelapp` رخ داد، اطمینان حاصل کنید که نام پروفایل‌ها در `configtx.yaml` با نام‌های استفاده‌شده در `setup_network.sh` (مانند `Generalchannelapp`, `Iotchannelapp`) هماهنگ هستند:
    ```bash
+   export FABRIC_CFG_PATH=$PWD
    configtxgen -profile Generalchannelapp -outputCreateChannelTx ./channel-artifacts/generalchannelapp.tx -channelID generalchannelapp 2>> configtxgen_channel.log
    cat configtxgen_channel.log
    ```
 
-2. **بررسی خطای Missing channelID**:
+3. **بررسی خطای Missing channelID**:
    برای تولید بلاک جنسیس، از `-channelID system-channel` استفاده کنید:
    ```bash
+   export FABRIC_CFG_PATH=$PWD
    configtxgen -profile OrdererGenesis -outputBlock ./channel-artifacts/genesis.block -channelID system-channel 2> configtxgen_genesis.log
    cat configtxgen_genesis.log
    ```
 
-3. **بررسی متغیر FABRIC_CFG_PATH**:
-   اطمینان حاصل کنید که متغیر محیطی به دایرکتوری حاوی `configtx.yaml` اشاره می‌کند:
+4. **بررسی خطای ایجاد کانال**:
+   اگر خطای `Error creating channel generalchannelapp` رخ داد، لاگ را بررسی کنید:
    ```bash
-   export FABRIC_CFG_PATH=$PWD
-   echo $FABRIC_CFG_PATH
+   cat channel_create_generalchannelapp.log
+   ```
+   اطمینان حاصل کنید که فایل `generalchannelapp.tx` وجود دارد:
+   ```bash
+   ls -l channel-artifacts/generalchannelapp.tx
    ```
 
-4. **بررسی وضعیت کانتینرها**:
+5. **بررسی وضعیت کانتینرها**:
    ```bash
    docker ps -a
    cat container_status.log
    ```
 
-5. **بررسی لاگ‌های کانتینرها**:
+6. **بررسی لاگ‌های کانتینرها**:
    ```bash
    docker logs ca.orderer.example.com
    docker logs ca.org1.example.com
@@ -317,7 +360,7 @@ sudo apt-get install -y yamllint
    cat ca.orderer.log
    ```
 
-6. **بررسی منابع سیستم**:
+7. **بررسی منابع سیستم**:
    ```bash
    df -h
    free -m
@@ -330,7 +373,7 @@ sudo apt-get install -y yamllint
    docker volume prune -f
    ```
 
-7. **بررسی گواهی‌ها**:
+8. **بررسی گواهی‌ها**:
    ```bash
    ls -l crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
    ls -l crypto-config/peerOrganizations/org1.example.com/msp
@@ -338,22 +381,22 @@ sudo apt-get install -y yamllint
    cat crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/config.yaml
    ```
 
-8. **باز کردن فایل‌های فشرده**:
+9. **باز کردن فایل‌های فشرده**:
    اگر فایل‌های `crypto-config/` فشرده هستند، آن‌ها را باز کنید:
    ```bash
    find crypto-config -type f -name "*.gz" -exec gunzip {} \;
    ```
 
-9. **راه‌اندازی دستی کانتینرها**:
-   ```bash
-   docker-compose -f docker-compose.yaml up -d ca.orderer.example.com ca.org1.example.com ca.org2.example.com ca.org3.example.com ca.org4.example.com ca.org5.example.com ca.org6.example.com ca.org7.example.com ca.org8.example.com ca.org9.example.com ca.org10.example.com
-   sleep 60
-   docker-compose -f docker-compose.yaml up -d orderer.example.com peer0.org1.example.com peer0.org2.example.com peer0.org3.example.com peer0.org4.example.com peer0.org5.example.com peer0.org6.example.com peer0.org7.example.com peer0.org8.example.com peer0.org9.example.com peer0.org10.example.com
-   sleep 60
-   docker ps -a
-   ```
+10. **راه‌اندازی دستی کانتینرها**:
+    ```bash
+    docker-compose -f docker-compose.yaml up -d ca.orderer.example.com ca.org1.example.com ca.org2.example.com ca.org3.example.com ca.org4.example.com ca.org5.example.com ca.org6.example.com ca.org7.example.com ca.org8.example.com ca.org9.example.com ca.org10.example.com
+    sleep 60
+    docker-compose -f docker-compose.yaml up -d orderer.example.com peer0.org1.example.com peer0.org2.example.com peer0.org3.example.com peer0.org4.example.com peer0.org5.example.com peer0.org6.example.com peer0.org7.example.com peer0.org8.example.com peer0.org9.example.com peer0.org10.example.com
+    sleep 60
+    docker ps -a
+    ```
 
-10. **تست دستی ایجاد کانال**:
+11. **تست دستی ایجاد کانال**:
     ```bash
     docker exec -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org1.example.com/msp" \
                 -e "CORE_PEER_LOCALMSPID=Org1MSP" \
@@ -366,10 +409,11 @@ sudo apt-get install -y yamllint
                 --cafile /etc/hyperledger/fabric/tls/ca.crt
     ```
 
-11. **بررسی سینتکس فایل‌های YAML**:
+12. **بررسی سینتکس فایل‌های YAML**:
     ```bash
     yamllint configtx.yaml
     yamllint crypto-config.yaml
+    yamllint docker-compose.yaml
     ```
 
 ## لاگ‌های مهم
@@ -389,12 +433,14 @@ sudo apt-get install -y yamllint
 - `chaincode_instantiate_ResourceAllocate_generalchannelapp.log`: لاگ‌های نمونه‌سازی چین‌کد
 
 ## یادداشت‌ها
-- **نسخه‌ها**: از Hyperledger Fabric 2.4.9، Fabric CA 1.5.7، Caliper 0.5.0، و Tape استفاده کنید.
+- **نسخه‌ها**: از Hyperledger Fabric 2.4.9، Fabric CA 1.5.7 (یا 1.5.6 در صورت عدم دسترسی)، Caliper 0.5.0، و Tape استفاده کنید.
 - **منابع**: شبکه با 21 کانتینر بهینه‌سازی شده و حداقل 8GB RAM و 10GB فضای دیسک طراحی شده است.
 - **فشرده‌سازی**: فایل‌های `.pem` و `.crt` در `crypto-config/` فشرده شده‌اند (با `gzip`). قبل از اجرای `setup_network.sh`، آن‌ها را با `gunzip` باز کنید.
 - **بلاک جنسیس**: برای تولید بلاک جنسیس، از `-channelID system-channel` در دستور `configtxgen` استفاده کنید.
 - **پروفایل‌های کانال**: نام پروفایل‌ها در `configtx.yaml` باید با نام‌های استفاده‌شده در `setup_network.sh` (مانند `Generalchannelapp`, `Iotchannelapp`) هماهنگ باشند.
-- **زمان**: این فایل در تاریخ 2025-06-29 10:05 CEST به‌روزرسانی شده است.
-- **خطاها**: اگر با خطای "no space left on device" یا "Could not find profile" مواجه شدید، لاگ‌های مربوطه را بررسی کنید و دستورات عیب‌یابی بالا را اجرا کنید.
+- **تصاویر Docker**: از تگ‌های معتبر مانند `hyperledger/fabric-ca:1.5.7` یا `hyperledger/fabric-ca:1.5.6` استفاده کنید. در صورت عدم دسترسی به Docker Hub، تصویر را از سورس بسازید.
+- **شبکه**: اطمینان حاصل کنید که سرور به Docker Hub دسترسی دارد یا از تصاویر محلی استفاده کنید.
+- **زمان**: این فایل در تاریخ 2025-06-29 14:00 CEST به‌روزرسانی شده است.
+- **خطاها**: اگر با خطای "manifest unknown"، "no space left on device"، یا "Could not find profile" مواجه شدید، لاگ‌های مربوطه را بررسی کنید و دستورات عیب‌یابی بالا را اجرا کنید.
 
 برای گزارش مشکلات یا سؤالات، لاگ‌های بالا را بررسی و با تیم توسعه به اشتراک بگذارید.
