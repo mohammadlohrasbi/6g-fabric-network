@@ -1,6 +1,6 @@
 # شبکه بلاکچین 6G با Hyperledger Fabric
 
-این پروژه یک شبکه بلاکچین مبتنی بر Hyperledger Fabric را پیاده‌سازی می‌کند که برای برنامه‌های کاربردی 6G طراحی شده است. شبکه شامل 10 سازمان (Org1 تا Org10)، یک Orderer، و سرویس‌های CA برای تولید گواهی‌های MSP و TLS است. این پروژه از ابزارهای Caliper و Tape برای آزمایش عملکرد و استقرار 70 چین‌کد در 14 کانال استفاده می‌کند.
+این پروژه یک شبکه بلاکچین بهینه‌شده مبتنی بر Hyperledger Fabric را پیاده‌سازی می‌کند که برای برنامه‌های کاربردی 6G طراحی شده است. شبکه شامل 10 سازمان (Org1 تا Org10)، یک Orderer، و سرویس‌های CA برای تولید گواهی‌های MSP و TLS است. این پروژه از ابزارهای Caliper و Tape برای آزمایش عملکرد و استقرار 70 چین‌کد در 14 کانال استفاده می‌کند. تنظیمات برای کاهش فضای ذخیره‌سازی کانتینرها بهینه شده‌اند.
 
 ## ساختار پروژه
 
@@ -20,19 +20,21 @@
   - `peerOrganizations/`: MSP و TLS برای Org1 تا Org10.
   - `ordererOrganizations/`: MSP و TLS برای Orderer.
 - **`production/`**:
-  - داده‌های پایدار برای Orderer و Peerها.
+  - داده‌های پایدار برای Orderer و Peerها (فشرده‌شده).
+- **`config/`**:
+  - فایل‌های تنظیمات Peer (`core-org1.yaml` تا `core-org10.yaml`).
 
 ### فایل‌های تنظیمات
 - **`crypto-config.yaml`**: تعریف ساختار سازمانی برای تولید گواهی‌ها با `cryptogen` (10 سازمان، 1 Orderer).
 - **`configtx.yaml`**: پروفایل‌های کانال، سیاست‌ها (ANY Admins، ANY Readers، ANY Writers)، و تنظیمات اجماع `etcdraft`.
-- **`docker-compose.yaml`**: تعریف سرویس‌های Docker برای Orderer، Peerها، و CAها.
-- **`core-org1.yaml` تا `core-org10.yaml`**: تنظیمات Peerها (لاگ، چین‌کد، لجر).
+- **`docker-compose.yaml`**: تعریف سرویس‌های Docker برای Orderer، Peerها، و CAها (21 کانتینر بهینه‌شده).
+- **`core-org1.yaml` تا `core-org10.yaml`**: تنظیمات Peerها (لاگ، چین‌کد، لجر فشرده).
 - **`setup_network.sh`**: اسکریپت برای تولید آرتیفکت‌ها، راه‌اندازی شبکه، و استقرار چین‌کدها.
 - **`generateCoreYamls.sh`**: تولید فایل‌های `core-org*.yaml` برای تنظیمات Peerها.
 - **`generateConnectionProfiles.sh`**: تولید پروفایل‌های اتصال برای Caliper.
 - **`generateChaincodes.sh`**: تولید دایرکتوری‌های چین‌کد.
 - **`generateWorkloadFiles.sh`**: تولید فایل‌های بار کاری Caliper.
-- **`generateTapeConfigs.sh`**: تولید فایل‌های تنظیمات Tape.
+- **`generateTapeConfigs.sh`**: تولید 980 فایل تنظیمات Tape (بهینه‌شده).
 - **`create_zip.sh`**: بسته‌بندی پروژه به فایل زیپ.
 
 ## پیش‌نیازها
@@ -43,7 +45,7 @@
 - **Go**: نسخه 1.18 یا بالاتر (برای چین‌کدها)
 - **Node.js**: نسخه 16 یا بالاتر (برای Caliper)
 - **Tape**: ابزار تست عملکرد Hyperledger
-- **سیستم**: حداقل 8GB RAM آزاد، 4 CPU، و 20GB فضای دیسک
+- **سیستم**: حداقل 8GB RAM آزاد، 4 CPU، و 10GB فضای دیسک
 
 دستورات نصب (برای Ubuntu/Debian):
 ```bash
@@ -83,10 +85,29 @@ npm install -g @hyperledger/tape
 
 2. **ایجاد دایرکتوری‌های مورد نیاز**:
    ```bash
-   mkdir -p channel-artifacts production chaincode caliper tape workload
+   mkdir -p channel-artifacts production chaincode caliper tape workload config
    ```
 
-3. **تأیید پیش‌نیازها**:
+3. **پاک‌سازی محیط و کش Docker**:
+   ```bash
+   docker-compose -f docker-compose.yaml down
+   docker rm -f $(docker ps -a -q)
+   docker network rm 6g-fabric-network_fabric
+   docker image prune -f
+   docker volume prune -f
+   rm -rf channel-artifacts crypto-config production tape
+   mkdir -p channel-artifacts production chaincode caliper tape workload config
+   ```
+
+4. **بررسی فضای دیسک**:
+   ```bash
+   df -h
+   free -m
+   nproc
+   ```
+   اطمینان حاصل کنید که حداقل 10GB فضای دیسک و 8GB RAM آزاد دارید.
+
+5. **تأیید پیش‌نیازها**:
    ```bash
    docker version
    docker-compose version
@@ -98,16 +119,7 @@ npm install -g @hyperledger/tape
    tape --version
    ```
 
-4. **پاک‌سازی محیط (در صورت نیاز)**:
-   ```bash
-   docker-compose -f docker-compose.yaml down
-   docker rm -f $(docker ps -a -q)
-   docker network rm 6g-fabric-network_fabric
-   rm -rf channel-artifacts crypto-config production
-   mkdir -p channel-artifacts production chaincode caliper tape workload
-   ```
-
-5. **تولید مواد رمزنگاری**:
+6. **تولید مواد رمزنگاری**:
    ```bash
    cryptogen generate --config=./crypto-config.yaml 2> cryptogen.log
    cat cryptogen.log
@@ -117,7 +129,18 @@ npm install -g @hyperledger/tape
    cat crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/config.yaml
    ```
 
-6. **تولید فایل‌های تنظیمات**:
+7. **فشرده‌سازی دایرکتوری crypto-config**:
+   ```bash
+   find crypto-config -type f -name "*.pem" -exec gzip {} \;
+   find crypto-config -type f -name "*.crt" -exec gzip {} \;
+   ```
+
+8. **باز کردن فایل‌های فشرده قبل از اجرای شبکه**:
+   ```bash
+   find crypto-config -type f -name "*.gz" -exec gunzip {} \;
+   ```
+
+9. **تولید فایل‌های تنظیمات**:
    ```bash
    chmod +x generateCoreYamls.sh generateConnectionProfiles.sh generateChaincodes.sh generateWorkloadFiles.sh generateTapeConfigs.sh
    dos2unix *.sh
@@ -128,36 +151,36 @@ npm install -g @hyperledger/tape
    ./generateTapeConfigs.sh
    ```
 
-7. **اجرای اسکریپت راه‌اندازی**:
-   ```bash
-   chmod +x setup_network.sh
-   dos2unix setup_network.sh
-   ./setup_network.sh
-   ```
+10. **اجرای اسکریپت راه‌اندازی**:
+    ```bash
+    chmod +x setup_network.sh
+    dos2unix setup_network.sh
+    ./setup_network.sh
+    ```
 
-8. **بررسی وضعیت شبکه**:
-   ```bash
-   docker ps -a
-   cat container_status.log
-   cat orderer.log
-   cat peer0.org1.log
-   cat ca.org1.log
-   cat ca.orderer.log
-   ```
+11. **بررسی وضعیت شبکه**:
+    ```bash
+    docker ps -a
+    cat container_status.log
+    cat orderer.log
+    cat peer0.org1.log
+    cat ca.org1.log
+    cat ca.orderer.log
+    ```
 
-9. **اجرای بنچمارک Caliper**:
-   ```bash
-   npx caliper launch manager --caliper-workspace ./caliper \
-       --caliper-benchconfig ./caliper/benchmarkConfig.yaml \
-       --caliper-networkconfig ./caliper/networkConfig.yaml
-   ```
+12. **اجرای بنچمارک Caliper**:
+    ```bash
+    npx caliper launch manager --caliper-workspace ./caliper \
+        --caliper-benchconfig ./caliper/benchmarkConfig.yaml \
+        --caliper-networkconfig ./caliper/networkConfig.yaml
+    ```
 
-10. **اجرای تست Tape**:
+13. **اجرای تست Tape**:
     ```bash
     tape -c ./tape/tape-ResourceAllocate-generalchannelapp.yaml
     ```
 
-11. **بسته‌بندی پروژه**:
+14. **بسته‌بندی پروژه**:
     ```bash
     chmod +x create_zip.sh
     dos2unix create_zip.sh
@@ -175,18 +198,83 @@ npm install -g @hyperledger/tape
 - `org1channelapp` تا `org10channelapp`
 
 ### چین‌کدها
-شبکه شامل 70 چین‌کد است، از جمله:
+شبکه شامل 70 چین‌کد است:
 - `ResourceAllocate`
 - `BandwidthShare`
 - `DynamicRouting`
+- `LoadBalance`
+- `LatencyOptimize`
+- `EnergyOptimize`
+- `NetworkOptimize`
+- `SpectrumManage`
+- `ResourceScale`
+- `ResourcePrioritize`
+- `UserAuth`
+- `DeviceAuth`
 - `AccessControl`
-- ... (لیست کامل در `setup_network.sh`)
+- `TokenAuth`
+- `RoleBasedAuth`
+- `IdentityVerify`
+- `SessionAuth`
+- `MultiFactorAuth`
+- `AuthPolicy`
+- `AuthAudit`
+- `NetworkMonitor`
+- `PerformanceMonitor`
+- `TrafficMonitor`
+- `ResourceMonitor`
+- `HealthMonitor`
+- `AlertMonitor`
+- `LogMonitor`
+- `EventMonitor`
+- `MetricsCollector`
+- `StatusMonitor`
+- `Encryption`
+- `IntrusionDetect`
+- `FirewallRules`
+- `SecureChannel`
+- `ThreatMonitor`
+- `AccessLog`
+- `SecurityPolicy`
+- `VulnerabilityScan`
+- `DataIntegrity`
+- `SecureBackup`
+- `TransactionAudit`
+- `ComplianceAudit`
+- `AccessAudit`
+- `EventAudit`
+- `PolicyAudit`
+- `DataAudit`
+- `UserAudit`
+- `SystemAudit`
+- `PerformanceAudit`
+- `SecurityAudit`
+- `ConfigManage`
+- `PolicyManage`
+- `ResourceManage`
+- `NetworkManage`
+- `DeviceManage`
+- `UserManage`
+- `ServiceManage`
+- `EventManage`
+- `AlertManage`
+- `LogManage`
+- `DataAnalytics`
+- `FaultDetect`
+- `AnomalyDetect`
+- `PredictiveMaintenance`
+- `PerformanceAnalytics`
+- `TrafficAnalytics`
+- `SecurityAnalytics`
+- `ResourceAnalytics`
+- `EventAnalytics`
+- `LogAnalytics`
 
 هر چین‌کد در تمام کانال‌ها نصب و نمونه‌سازی می‌شود.
 
 ## عیب‌یابی
 
-اگر با خطاهایی مانند "container is not running" مواجه شدید:
+اگر با خطاهایی مانند "container is not running" یا "no space left on device" مواجه شدید:
 1. **بررسی وضعیت کانتینرها**:
    ```bash
    docker ps -a
@@ -212,7 +300,11 @@ npm install -g @hyperledger/tape
    nproc
    docker stats
    ```
-   اگر منابع محدود است، تعداد سازمان‌ها را در `crypto-config.yaml` و `docker-compose.yaml` کاهش دهید (مثلاً به 5 سازمان).
+   اگر فضای دیسک محدود است، تصاویر و حجم‌های بلااستفاده را پاک کنید:
+   ```bash
+   docker image prune -f
+   docker volume prune -f
+   ```
 
 4. **بررسی گواهی‌ها**:
    ```bash
@@ -222,16 +314,21 @@ npm install -g @hyperledger/tape
    cat crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/config.yaml
    ```
 
-5. **راه‌اندازی دستی کانتینرها**:
+5. **باز کردن فایل‌های فشرده**:
    ```bash
-   docker-compose -f docker-compose.yaml up -d ca.orderer.example.com ca.org1.example.com
+   find crypto-config -type f -name "*.gz" -exec gunzip {} \;
+   ```
+
+6. **راه‌اندازی دستی کانتینرها**:
+   ```bash
+   docker-compose -f docker-compose.yaml up -d ca.orderer.example.com ca.org1.example.com ca.org2.example.com ca.org3.example.com ca.org4.example.com ca.org5.example.com ca.org6.example.com ca.org7.example.com ca.org8.example.com ca.org9.example.com ca.org10.example.com
    sleep 60
-   docker-compose -f docker-compose.yaml up -d orderer.example.com peer0.org1.example.com
+   docker-compose -f docker-compose.yaml up -d orderer.example.com peer0.org1.example.com peer0.org2.example.com peer0.org3.example.com peer0.org4.example.com peer0.org5.example.com peer0.org6.example.com peer0.org7.example.com peer0.org8.example.com peer0.org9.example.com peer0.org10.example.com
    sleep 60
    docker ps -a
    ```
 
-6. **تست دستی ایجاد کانال**:
+7. **تست دستی ایجاد کانال**:
    ```bash
    docker exec -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org1.example.com/msp" \
                -e "CORE_PEER_LOCALMSPID=Org1MSP" \
@@ -245,7 +342,6 @@ npm install -g @hyperledger/tape
    ```
 
 ## لاگ‌های مهم
-
 - `container_status.log`: وضعیت کانتینرها
 - `orderer.log`: لاگ‌های Orderer
 - `peer0.org1.log`: لاگ‌های Peer سازمان 1
@@ -260,10 +356,10 @@ npm install -g @hyperledger/tape
 - `ca_orderer_dir.log`: محتوای دایرکتوری CA Orderer
 
 ## یادداشت‌ها
-
 - **نسخه‌ها**: از Hyperledger Fabric 2.4.9، Fabric CA 1.5.7، Caliper 0.5.0، و Tape استفاده کنید.
-- **منابع**: شبکه با 21 کانتینر (10 CA، 10 Peer، 1 Orderer) منابع قابل‌توجهی مصرف می‌کند. در صورت کمبود منابع، تعداد سازمان‌ها را کاهش دهید.
-- **زمان**: این فایل در تاریخ 2025-06-28 18:17 CEST به‌روزرسانی شده است.
-- **خطاها**: اگر با خطای "container is not running" مواجه شدید، لاگ‌های کانتینرها (`ca.orderer.log`, `ca.org1.log`, `orderer.log`, `peer0.org1.log`) را بررسی کنید و منابع سیستم را کنترل کنید.
+- **منابع**: شبکه با 21 کانتینر بهینه‌سازی شده و حداقل 8GB RAM و 10GB فضای دیسک طراحی شده است.
+- **فشرده‌سازی**: فایل‌های `.pem` و `.crt` در `crypto-config/` فشرده شده‌اند (با `gzip`). قبل از اجرای `setup_network.sh`، آن‌ها را با `gunzip` باز کنید.
+- **زمان**: این فایل در تاریخ 2025-06-29 06:45 CEST به‌روزرسانی شده است.
+- **خطاها**: اگر با خطای "no space left on device" مواجه شدید، فضای دیسک را بررسی و کش Docker را پاک کنید.
 
 برای گزارش مشکلات یا سؤالات، لاگ‌های بالا را بررسی و با تیم توسعه به اشتراک بگذارید.
