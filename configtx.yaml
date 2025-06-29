@@ -1,3 +1,5 @@
+```yaml
+---
 Organizations:
   - &OrdererOrg
     Name: OrdererOrg
@@ -13,6 +15,7 @@ Organizations:
       Admins:
         Type: Signature
         Rule: "OR('OrdererMSP.admin')"
+
   - &Org1
     Name: Org1MSP
     ID: Org1MSP
@@ -30,6 +33,10 @@ Organizations:
       Endorsement:
         Type: Signature
         Rule: "OR('Org1MSP.peer')"
+    AnchorPeers:
+      - Host: peer0.org1.example.com
+        Port: 7051
+
   - &Org2
     Name: Org2MSP
     ID: Org2MSP
@@ -47,6 +54,10 @@ Organizations:
       Endorsement:
         Type: Signature
         Rule: "OR('Org2MSP.peer')"
+    AnchorPeers:
+      - Host: peer0.org2.example.com
+        Port: 8051
+
   - &Org3
     Name: Org3MSP
     ID: Org3MSP
@@ -64,6 +75,10 @@ Organizations:
       Endorsement:
         Type: Signature
         Rule: "OR('Org3MSP.peer')"
+    AnchorPeers:
+      - Host: peer0.org3.example.com
+        Port: 9051
+
   - &Org4
     Name: Org4MSP
     ID: Org4MSP
@@ -81,6 +96,10 @@ Organizations:
       Endorsement:
         Type: Signature
         Rule: "OR('Org4MSP.peer')"
+    AnchorPeers:
+      - Host: peer0.org4.example.com
+        Port: 10051
+
   - &Org5
     Name: Org5MSP
     ID: Org5MSP
@@ -98,6 +117,10 @@ Organizations:
       Endorsement:
         Type: Signature
         Rule: "OR('Org5MSP.peer')"
+    AnchorPeers:
+      - Host: peer0.org5.example.com
+        Port: 11051
+
   - &Org6
     Name: Org6MSP
     ID: Org6MSP
@@ -115,6 +138,10 @@ Organizations:
       Endorsement:
         Type: Signature
         Rule: "OR('Org6MSP.peer')"
+    AnchorPeers:
+      - Host: peer0.org6.example.com
+        Port: 12051
+
   - &Org7
     Name: Org7MSP
     ID: Org7MSP
@@ -132,6 +159,10 @@ Organizations:
       Endorsement:
         Type: Signature
         Rule: "OR('Org7MSP.peer')"
+    AnchorPeers:
+      - Host: peer0.org7.example.com
+        Port: 13051
+
   - &Org8
     Name: Org8MSP
     ID: Org8MSP
@@ -149,6 +180,10 @@ Organizations:
       Endorsement:
         Type: Signature
         Rule: "OR('Org8MSP.peer')"
+    AnchorPeers:
+      - Host: peer0.org8.example.com
+        Port: 14051
+
   - &Org9
     Name: Org9MSP
     ID: Org9MSP
@@ -166,6 +201,10 @@ Organizations:
       Endorsement:
         Type: Signature
         Rule: "OR('Org9MSP.peer')"
+    AnchorPeers:
+      - Host: peer0.org9.example.com
+        Port: 15051
+
   - &Org10
     Name: Org10MSP
     ID: Org10MSP
@@ -183,6 +222,9 @@ Organizations:
       Endorsement:
         Type: Signature
         Rule: "OR('Org10MSP.peer')"
+    AnchorPeers:
+      - Host: peer0.org10.example.com
+        Port: 16051
 
 Capabilities:
   Channel: &ChannelCapabilities
@@ -194,6 +236,16 @@ Capabilities:
 
 Application: &ApplicationDefaults
   Organizations:
+    - *Org1
+    - *Org2
+    - *Org3
+    - *Org4
+    - *Org5
+    - *Org6
+    - *Org7
+    - *Org8
+    - *Org9
+    - *Org10
   Policies:
     Readers:
       Type: ImplicitMeta
@@ -210,6 +262,8 @@ Application: &ApplicationDefaults
     Endorsement:
       Type: ImplicitMeta
       Rule: "MAJORITY Endorsement"
+  Capabilities:
+    <<: *ApplicationCapabilities
 
 Orderer: &OrdererDefaults
   OrdererType: etcdraft
@@ -227,6 +281,7 @@ Orderer: &OrdererDefaults
     AbsoluteMaxBytes: 99 MB
     PreferredMaxBytes: 512 KB
   Organizations:
+    - *OrdererOrg
   Policies:
     Readers:
       Type: ImplicitMeta
@@ -240,6 +295,8 @@ Orderer: &OrdererDefaults
     BlockValidation:
       Type: ImplicitMeta
       Rule: "ANY Writers"
+  Capabilities:
+    <<: *OrdererCapabilities
 
 Channel: &ChannelDefaults
   Policies:
@@ -252,6 +309,8 @@ Channel: &ChannelDefaults
     Admins:
       Type: ImplicitMeta
       Rule: "ANY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
 
 Profiles:
   OrdererGenesis:
@@ -356,16 +415,6 @@ Profiles:
         - *Org1
       Capabilities:
         <<: *ApplicationCapabilities
-      Policies:
-        Readers:
-          Type: ImplicitMeta
-          Rule: "ANY Readers"
-        Writers:
-          Type: ImplicitMeta
-          Rule: "ANY Writers"
-        Admins:
-          Type: ImplicitMeta
-          Rule: "ANY Admins"
   Org2ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
@@ -376,16 +425,6 @@ Profiles:
         - *Org2
       Capabilities:
         <<: *ApplicationCapabilities
-      Policies:
-        Readers:
-          Type: ImplicitMeta
-          Rule: "ANY Readers"
-        Writers:
-          Type: ImplicitMeta
-          Rule: "ANY Writers"
-        Admins:
-          Type: ImplicitMeta
-          Rule: "ANY Admins"
   Org3ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
@@ -396,16 +435,6 @@ Profiles:
         - *Org3
       Capabilities:
         <<: *ApplicationCapabilities
-      Policies:
-        Readers:
-          Type: ImplicitMeta
-          Rule: "ANY Readers"
-        Writers:
-          Type: ImplicitMeta
-          Rule: "ANY Writers"
-        Admins:
-          Type: ImplicitMeta
-          Rule: "ANY Admins"
   Org4ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
@@ -416,16 +445,6 @@ Profiles:
         - *Org4
       Capabilities:
         <<: *ApplicationCapabilities
-      Policies:
-        Readers:
-          Type: ImplicitMeta
-          Rule: "ANY Readers"
-        Writers:
-          Type: ImplicitMeta
-          Rule: "ANY Writers"
-        Admins:
-          Type: ImplicitMeta
-          Rule: "ANY Admins"
   Org5ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
@@ -436,16 +455,6 @@ Profiles:
         - *Org5
       Capabilities:
         <<: *ApplicationCapabilities
-      Policies:
-        Readers:
-          Type: ImplicitMeta
-          Rule: "ANY Readers"
-        Writers:
-          Type: ImplicitMeta
-          Rule: "ANY Writers"
-        Admins:
-          Type: ImplicitMeta
-          Rule: "ANY Admins"
   Org6ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
@@ -456,16 +465,6 @@ Profiles:
         - *Org6
       Capabilities:
         <<: *ApplicationCapabilities
-      Policies:
-        Readers:
-          Type: ImplicitMeta
-          Rule: "ANY Readers"
-        Writers:
-          Type: ImplicitMeta
-          Rule: "ANY Writers"
-        Admins:
-          Type: ImplicitMeta
-          Rule: "ANY Admins"
   Org7ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
@@ -476,16 +475,6 @@ Profiles:
         - *Org7
       Capabilities:
         <<: *ApplicationCapabilities
-      Policies:
-        Readers:
-          Type: ImplicitMeta
-          Rule: "ANY Readers"
-        Writers:
-          Type: ImplicitMeta
-          Rule: "ANY Writers"
-        Admins:
-          Type: ImplicitMeta
-          Rule: "ANY Admins"
   Org8ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
@@ -496,16 +485,6 @@ Profiles:
         - *Org8
       Capabilities:
         <<: *ApplicationCapabilities
-      Policies:
-        Readers:
-          Type: ImplicitMeta
-          Rule: "ANY Readers"
-        Writers:
-          Type: ImplicitMeta
-          Rule: "ANY Writers"
-        Admins:
-          Type: ImplicitMeta
-          Rule: "ANY Admins"
   Org9ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
@@ -516,16 +495,6 @@ Profiles:
         - *Org9
       Capabilities:
         <<: *ApplicationCapabilities
-      Policies:
-        Readers:
-          Type: ImplicitMeta
-          Rule: "ANY Readers"
-        Writers:
-          Type: ImplicitMeta
-          Rule: "ANY Writers"
-        Admins:
-          Type: ImplicitMeta
-          Rule: "ANY Admins"
   Org10ChannelApp:
     Consortium: SampleConsortium
     <<: *ChannelDefaults
@@ -536,13 +505,4 @@ Profiles:
         - *Org10
       Capabilities:
         <<: *ApplicationCapabilities
-      Policies:
-        Readers:
-          Type: ImplicitMeta
-          Rule: "ANY Readers"
-        Writers:
-          Type: ImplicitMeta
-          Rule: "ANY Writers"
-        Admins:
-          Type: ImplicitMeta
-          Rule: "ANY Admins"
+```
