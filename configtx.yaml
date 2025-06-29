@@ -1,5 +1,3 @@
-```yaml
----
 Organizations:
   - &OrdererOrg
     Name: OrdererOrg
@@ -505,4 +503,3 @@ Profiles:
         - *Org10
       Capabilities:
         <<: *ApplicationCapabilities
-```
