@@ -81,6 +81,10 @@ sudo apt-get install -y yamllint
 # بررسی دسترسی به Docker Hub
 ping -4 registry-1.docker.io
 curl -I https://registry.hub.docker.com
+
+# بررسی اتصال عمومی
+ping -4 8.8.8.8
+ping -4 google.com
 ```
 
 ## راه‌اندازی شبکه
@@ -315,8 +319,34 @@ curl -I https://registry.hub.docker.com
      make docker
      docker tag hyperledger/fabric-ca:latest hyperledger/fabric-ca:1.5.7
      ```
+   - استفاده از mirror رجیستری (در صورت مشکلات اتصال):
+     ```bash
+     nano /etc/docker/daemon.json
+     ```
+     محتوای فایل:
+     ```json
+     {
+       "registry-mirrors": ["https://mirror.gcr.io", "https://docker.mirrors.ustc.edu.cn"]
+     }
+     ```
+     سپس:
+     ```bash
+     sudo systemctl restart docker
+     docker pull hyperledger/fabric-ca:1.5.7
+     ```
 
-2. **بررسی خطای Could not find profile**:
+2. **بررسی تنظیمات پروکسی**:
+   اگر از پروکسی استفاده می‌کنید، اطمینان حاصل کنید که `~/.docker/config.json` شامل آدرس و پورت پروکسی واقعی است:
+   ```bash
+   cat ~/.docker/config.json
+   ```
+   اگر پروکسی لازم نیست، فایل را حذف کنید:
+   ```bash
+   rm ~/.docker/config.json
+   sudo systemctl restart docker
+   ```
+
+3. **بررسی خطای Could not find profile**:
    اگر خطای `Could not find profile: Generalchannelapp` رخ داد، اطمینان حاصل کنید که نام پروفایل‌ها در `configtx.yaml` با نام‌های استفاده‌شده در `setup_network.sh` (مانند `Generalchannelapp`, `Iotchannelapp`) هماهنگ هستند:
    ```bash
    export FABRIC_CFG_PATH=$PWD
@@ -324,7 +354,7 @@ curl -I https://registry.hub.docker.com
    cat configtxgen_channel.log
    ```
 
-3. **بررسی خطای Missing channelID**:
+4. **بررسی خطای Missing channelID**:
    برای تولید بلاک جنسیس، از `-channelID system-channel` استفاده کنید:
    ```bash
    export FABRIC_CFG_PATH=$PWD
@@ -332,7 +362,7 @@ curl -I https://registry.hub.docker.com
    cat configtxgen_genesis.log
    ```
 
-4. **بررسی خطای ایجاد کانال**:
+5. **بررسی خطای ایجاد کانال**:
    اگر خطای `Error creating channel generalchannelapp` رخ داد، لاگ را بررسی کنید:
    ```bash
    cat channel_create_generalchannelapp.log
@@ -342,13 +372,13 @@ curl -I https://registry.hub.docker.com
    ls -l channel-artifacts/generalchannelapp.tx
    ```
 
-5. **بررسی وضعیت کانتینرها**:
+6. **بررسی وضعیت کانتینرها**:
    ```bash
    docker ps -a
    cat container_status.log
    ```
 
-6. **بررسی لاگ‌های کانتینرها**:
+7. **بررسی لاگ‌های کانتینرها**:
    ```bash
    docker logs ca.orderer.example.com
    docker logs ca.org1.example.com
@@ -360,7 +390,7 @@ curl -I https://registry.hub.docker.com
    cat ca.orderer.log
    ```
 
-7. **بررسی منابع سیستم**:
+8. **بررسی منابع سیستم**:
    ```bash
    df -h
    free -m
@@ -373,7 +403,7 @@ curl -I https://registry.hub.docker.com
    docker volume prune -f
    ```
 
-8. **بررسی گواهی‌ها**:
+9. **بررسی گواهی‌ها**:
    ```bash
    ls -l crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
    ls -l crypto-config/peerOrganizations/org1.example.com/msp
@@ -381,13 +411,13 @@ curl -I https://registry.hub.docker.com
    cat crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/config.yaml
    ```
 
-9. **باز کردن فایل‌های فشرده**:
-   اگر فایل‌های `crypto-config/` فشرده هستند، آن‌ها را باز کنید:
-   ```bash
-   find crypto-config -type f -name "*.gz" -exec gunzip {} \;
-   ```
+10. **باز کردن فایل‌های فشرده**:
+    اگر فایل‌های `crypto-config/` فشرده هستند، آن‌ها را باز کنید:
+    ```bash
+    find crypto-config -type f -name "*.gz" -exec gunzip {} \;
+    ```
 
-10. **راه‌اندازی دستی کانتینرها**:
+11. **راه‌اندازی دستی کانتینرها**:
     ```bash
     docker-compose -f docker-compose.yaml up -d ca.orderer.example.com ca.org1.example.com ca.org2.example.com ca.org3.example.com ca.org4.example.com ca.org5.example.com ca.org6.example.com ca.org7.example.com ca.org8.example.com ca.org9.example.com ca.org10.example.com
     sleep 60
@@ -396,7 +426,7 @@ curl -I https://registry.hub.docker.com
     docker ps -a
     ```
 
-11. **تست دستی ایجاد کانال**:
+12. **تست دستی ایجاد کانال**:
     ```bash
     docker exec -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@org1.example.com/msp" \
                 -e "CORE_PEER_LOCALMSPID=Org1MSP" \
@@ -409,7 +439,7 @@ curl -I https://registry.hub.docker.com
                 --cafile /etc/hyperledger/fabric/tls/ca.crt
     ```
 
-12. **بررسی سینتکس فایل‌های YAML**:
+13. **بررسی سینتکس فایل‌های YAML**:
     ```bash
     yamllint configtx.yaml
     yamllint crypto-config.yaml
@@ -438,9 +468,10 @@ curl -I https://registry.hub.docker.com
 - **فشرده‌سازی**: فایل‌های `.pem` و `.crt` در `crypto-config/` فشرده شده‌اند (با `gzip`). قبل از اجرای `setup_network.sh`، آن‌ها را با `gunzip` باز کنید.
 - **بلاک جنسیس**: برای تولید بلاک جنسیس، از `-channelID system-channel` در دستور `configtxgen` استفاده کنید.
 - **پروفایل‌های کانال**: نام پروفایل‌ها در `configtx.yaml` باید با نام‌های استفاده‌شده در `setup_network.sh` (مانند `Generalchannelapp`, `Iotchannelapp`) هماهنگ باشند.
-- **تصاویر Docker**: از تگ‌های معتبر مانند `hyperledger/fabric-ca:1.5.7` یا `hyperledger/fabric-ca:1.5.6` استفاده کنید. در صورت عدم دسترسی به Docker Hub، تصویر را از سورس بسازید.
-- **شبکه**: اطمینان حاصل کنید که سرور به Docker Hub دسترسی دارد یا از تصاویر محلی استفاده کنید.
-- **زمان**: این فایل در تاریخ 2025-06-29 14:00 CEST به‌روزرسانی شده است.
+- **تصاویر Docker**: از تگ‌های معتبر مانند `hyperledger/fabric-ca:1.5.7` یا `hyperledger/fabric-ca:1.5.6` استفاده کنید. در صورت عدم دسترسی به Docker Hub، از mirror رجیستری یا ساخت تصویر محلی استفاده کنید.
+- **پروکسی**: اگر پروکسی لازم نیست، فایل `~/.docker/config.json` را حذف کنید. اگر لازم است، اطمینان حاصل کنید که آدرس و پورت پروکسی واقعی تنظیم شده‌اند.
+- **اتصال به Docker Hub**: اگر `ping -4 registry-1.docker.io` packet loss نشان داد، از mirror رجیستری استفاده کنید یا با مدیر شبکه برای بررسی فیلترهای شبکه تماس بگیرید.
+- **زمان**: این فایل در تاریخ 2025-06-29 16:41 CEST به‌روزرسانی شده است.
 - **خطاها**: اگر با خطای "manifest unknown"، "no space left on device"، یا "Could not find profile" مواجه شدید، لاگ‌های مربوطه را بررسی کنید و دستورات عیب‌یابی بالا را اجرا کنید.
 
 برای گزارش مشکلات یا سؤالات، لاگ‌های بالا را بررسی و با تیم توسعه به اشتراک بگذارید.
